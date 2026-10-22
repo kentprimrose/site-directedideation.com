@@ -1,12 +1,10 @@
-## Setup
+## Local setup
+
+Install Node.js, then run:
 
 ```bash
-uv sync --all-groups --locked
-source .venv/bin/activate
+npm install
+npm run dev
 ```
 
-If you use direnv:
-
-```bash
-direnv allow
-```
+The local server serves `public/` and reloads the browser when files change. For hosting, upload the contents of `public/` to the NameHero domain's document root (typically `public_html` for the primary domain).
