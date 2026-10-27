@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "directed-ideation": {
+      "url": "http://127.0.0.1:8001/mcp",
+      "description": "Local directed-ideation MCP server",
+      "exposure": "direct"
+    }
+  }
+}
