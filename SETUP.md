@@ -3,11 +3,11 @@
 Install Node.js, then run:
 
 ```bash
-npm install
-npm run dev
+npm --prefix site install
+npm --prefix site run dev
 ```
 
-The local server serves `public/` and reloads the browser when files change. For hosting, upload the contents of `public/` to the NameHero domain's document root (typically `public_html` for the primary domain).
+The local server serves `site/public/` and reloads the browser when files change. For hosting, upload the contents of `site/public/` to the NameHero domain's document root (typically `public_html` for the primary domain).
 
 
 ## Setup

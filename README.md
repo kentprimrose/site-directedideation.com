@@ -1,6 +1,6 @@
 # site-directedideation.com
 
-A static, single-page field guide to directed ideation. The deployable site is in `public/` and consists of plain HTML and CSS; it has no framework or backend runtime.
+A static, single-page field guide to directed ideation. The deployable site is in `site/public/` and consists of plain HTML and CSS; it has no framework or backend runtime.
 
 ## Local development
 
@@ -28,7 +28,7 @@ Pi is configured to connect to the MCP endpoint through `.pi/mcp.json`. Trust th
 
 ## Deploy to NameHero
 
-Upload the **contents** of `public/` to the document root for the domain in NameHero cPanel. For the primary domain this is usually `public_html`; addon domains and subdomains use their configured document root. Ensure `index.html` is directly in that directory, with the `site/` asset directory alongside it. No build, Node installation, or server-side application is required on the hosting account.
+Upload the **contents** of `site/public/` to the document root for the domain in NameHero cPanel. For the primary domain this is usually `public_html`; addon domains and subdomains use their configured document root. The document root should contain `index.html` and a `site/` subdirectory with the stylesheet. No build, Node installation, or server-side application is required on the hosting account.
 
 
 ## Requirements
