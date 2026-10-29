@@ -2,9 +2,12 @@
 
 ## Current checkpoint
 
-The approved tool-based local complete-method prototype is implemented in the
-working tree on `main`, based on `ff0012f` (the entry-path decision). No
-implementation commit or push has been made. Recheck status before resuming.
+The approved tool-based local complete-method prototype and dev-server lifecycle
+commands were committed on `main` in `c7457d2`, following the entry-path decision
+in `ff0012f`. The directed-ideation skill was added in `5045f11`. At this
+checkpoint, `main` is three commits ahead of `origin/main`; changes to the skill's
+MCP-unavailability guidance and this handoff are uncommitted. Recheck status
+and the commit history before resuming.
 
 Read `PLAN.md` for the product contract and `docs/CAPABILITY_PROBE.md` for the
 surface, protocol evidence, client checks, and security limits.
@@ -42,8 +45,9 @@ See the probe document for models, call arguments, and reproduction guidance.
 
 ## Verification and review
 
-Final verification: **52 passing tests**, Ruff lint/format, ty, active LSP
-checks for source/tests, and `git diff --check` all passed. One pre-existing
+Prototype verification before the lifecycle work: **52 passing tests**, Ruff
+lint/format, ty, active LSP checks for source/tests, and `git diff --check` all
+passed. The later full suite has 80 tests (see below). One pre-existing
 `beartype`/`key_value` protocol-checking deprecation warning remains under
 Python 3.15.
 
@@ -89,11 +93,24 @@ have real-process rollback tests.
 Independent closure review confirmed the lifecycle blockers resolved with no
 remaining blockers; its isolated dev test run passed all 28 tests.
 
+At this checkpoint, the full suite was rerun: **80 passed**, with the same
+warning. Ruff lint/format, ty, and `git diff --check` also passed. The historical
+client conversations and independent reviews were not rerun in this check.
 
-## Next action after final verification
 
-Review/commit the prototype if accepted. Continue phase 1 with less-directed,
-varied-challenge and limited-capability validation before fixing the permanent
-surface or moving to the secure hosted slice. Detailed technique guidance,
-agent-initiated discovery, account/team service features, and hosted pilot
-readiness are not implemented by this local prototype.
+## Next actions
+
+1. Review the existing local commits and uncommitted skill and handoff changes;
+   commit the changes and push only if approved.
+2. Continue phase 1 with less-directed, varied-challenge and limited-capability
+   validation before fixing the permanent surface or moving to the secure hosted
+   slice. Document tool arguments, confirmation gates, and usefulness without
+   sending session context to the service.
+3. Reconcile the skill's supplementary-guidance instruction with `PLAN.md`:
+   the skill allows retrieval when useful, while the plan restricts it to user
+   requests for help the agent cannot adequately provide or explicit requests
+   to fetch guidance.
+
+Detailed technique guidance, agent-initiated discovery, account/team service
+features, and hosted pilot readiness are not implemented by this local
+prototype.

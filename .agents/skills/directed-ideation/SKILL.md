@@ -11,4 +11,8 @@ description: Conduct a guided directed-ideation session using the local MCP meth
 
 Keep the user's topic, answers, goals, ideas, and other session context in the conversation; never send them as MCP tool arguments. Do not execute proposed actions on the user's behalf as part of the ideation process.
 
-If the MCP tool is unavailable or fails, explain that the method could not be retrieved rather than claiming to conduct the MCP-backed process. Ask the user to start the project's local services, trust the project in Pi, and run `/reload` or restart Pi; then retry when the tool is available.
+If the MCP tool is unavailable or fails, explain that the method could not be retrieved rather than claiming to conduct the MCP-backed process. Diagnose using available Pi MCP status, connection errors, and project-trust information; report only what the evidence establishes:
+
+- If project trust prevented the project MCP configuration from loading, explain that the project is not trusted for this session. Ask the user to trust it in Pi, then run `/reload` or restart Pi and retry.
+- If the MCP server or service is unavailable, report that separately and include any useful error details. Do not ask the user to start the local service.
+- If the cause is unclear, say so rather than guessing. A saved trust decision alone does not prove the current session's effective trust, since overrides or extensions can change it.
