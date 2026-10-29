@@ -224,3 +224,6 @@ __marimo__/
 
 # Node.js
 node_modules/
+
+# Local dev-server runtime (logs, state, lock)
+.dev/

@@ -1,77 +1,99 @@
 # Session handoff
 
-## Resume here
+## Current checkpoint
 
-The user resolved the explicit-invocation decision: **prioritize standard
-Pi/Codex support and approve a tool-based entry path**. `PLAN.md` records this
-approval. The earlier instruction to wait for that decision is superseded.
+The approved tool-based local complete-method prototype is implemented in the
+working tree on `main`, based on `ff0012f` (the entry-path decision). No
+implementation commit or push has been made. Recheck status before resuming.
 
-Next action: implement the local complete-method prototype using one read-only,
-no-argument MCP tool as the canonical entry point. It retrieves reusable method
-instructions, not a server-side session. Keep supplementary tools separate and
-all ideation context client-side.
+Read `PLAN.md` for the product contract and `docs/CAPABILITY_PROBE.md` for the
+surface, protocol evidence, client checks, and security limits.
 
-1. Check the current branch, working tree, and recent commits.
-2. Read `PLAN.md` for agreed product decisions and
-   `docs/CAPABILITY_PROBE.md` for historical probe evidence and security limits.
-3. Replace the probe-only prompt entry path with the complete-method tool;
-   do not retain a duplicate prompt entry path. Choose and test a clear tool
-   name and strict empty argument schema.
-4. Implement the complete three-stage guidance and small supplementary menus
-   described in the plan, using the field-guide site as the method source.
-   Preserve context synthesis, user confirmations, interview pacing, and the
-   supplementary-retrieval policy. Detailed technique retrieval remains ToDo.
-5. Extend protocol and negative-input tests, including no rejected-value echo
-   or service logging. Run the existing quality checks.
-6. Validate interactive discovery, method retrieval/application, supplementary
-   retrieval, and stage filtering in both Pi and Codex. Record limitations
-   honestly; API-only tests are not evidence of interactive model use.
+## Implemented surface
 
-## Approved decision and evidence boundary
+- `get_directed_ideation_method`: read-only, no-argument complete-method tool.
+  Covers all three stages, existing-context synthesis, one-question pacing,
+  opportunity/goal confirmation, distinct ideas, first action/evidence, and no
+  autonomous execution.
+- `get_interview_guidance`, `get_diagnostic_checks`, and
+  `get_alternative_techniques`: separate compact supplementary menus with an
+  optional bounded `stage` selector. No detail-retrieval operation exists.
+- Removed the old `method_probe` prompt and scaffold tools. No duplicate prompt
+  entry path is exposed. Native MCP prompt support is no longer required.
+- Protocol tests exercise discovery, method content, stage filtering, rejected
+  inputs, and absence of rejected sentinel values from errors/service logs over
+  in-memory and loopback HTTP transports.
 
-The canonical entry point is now an MCP tool, not an MCP prompt. Native prompt
-support and custom client-side integration are not prerequisites. Gemini remains
-an optional third smoke test, not a replacement for either required client.
+## Client validation completed
 
-`docs/CAPABILITY_PROBE.md` describes the earlier prompt-based probe. Its warning
-against an unapproved tool fallback and its unresolved "Next decision" section
-are historical and superseded by this explicit approval. Its recorded test
-results remain evidence only for the existing probe; the new entry tool and
-complete method have not yet been implemented or validated.
+Real model-driven conversations passed in **Pi 1.4.0** (RPC) and **Codex 0.165.0**
+(CLI exec/resume), using the same fictional volunteer-handoff challenge.
+Each client completed six conversational turns: method retrieval, context /
+opportunity / goal confirmations, seven distinct actionable approaches, and
+explicitly requested supplementary retrieval with omitted and selected stages.
+All four MCP calls per client succeeded and used only `{}` or allowed stage
+selectors. No example context was transmitted in tool arguments.
 
-## Completed checkpoint
+These are conversation-level checks, not a human-operated terminal UI test.
+The scripted user turns reinforced constraints and confirmations; varied,
+less-directed challenges and limited-capability coverage remain follow-up work.
+Pi used direct tool exposure. Deferred/codemode exposure and Gemini are untested.
+See the probe document for models, call arguments, and reproduction guidance.
 
-**`fdab1ad` on `main`**, pushed to `origin`: local MCP capability probe, tests,
-client-compatibility evidence, and preceding planning-interview updates.
-**`bf86001`** added the original handoff. At this decision checkpoint, `main`
-was clean and reported no divergence from `origin/main` before documentation
-edits. Recheck on resume; the decision documentation has not been committed.
+## Verification and review
 
-- Probe surface: `method_probe` prompt, `interview_guidance` tool with optional
-  stage filter, and retained `hello_world` scaffold tool. This is not the
-  complete method or tool library.
-- Prior fresh independent review found no blocking defects. Small annotation-
-  coverage and integration-marker findings were addressed.
-- Prior result: **22 tests passed**; Ruff lint/format, ty, active LSP diagnostics,
-  and `git diff --check` passed. Tests were not rerun for this decision-only
-  update. One dependency deprecation warning remains under Python 3.15
-  (`beartype`/`key_value` protocol checking).
-- Server-side prompt and tool behavior passed in-memory and loopback HTTP
-  protocol tests. Pi discovered both tools; Codex discovered and called
-  supplementary guidance without a model turn. Neither client's interactive
-  complete-method flow has been demonstrated.
+Final verification: **52 passing tests**, Ruff lint/format, ty, active LSP
+checks for source/tests, and `git diff --check` all passed. One pre-existing
+`beartype`/`key_value` protocol-checking deprecation warning remains under
+Python 3.15.
+
+Independent review identified one substantive issue: the complete method needed
+the supplementary-retrieval policy in its own returned text. That was fixed and
+pinned by protocol assertions. Negative tests now cover invalid stages and extra
+context fields for every supplementary tool on both transports. The reviewer
+approved the closure check with no new blockers. Both client conversations were
+rerun successfully against the final code after this fix.
 
 ## Guardrails and operational notes
 
-- Preserve the agreed context boundary: all ideation context stays with the
-  calling agent; MCP requests use no arguments for the method and bounded,
-  context-free selectors for supplementary guidance.
-- Keep the unauthenticated prototype loopback-only. Production ingress,
-  metadata, payload limits, telemetry, authentication, and rate limits remain
-  separate work; see the probe document's security limits.
-- Prior client checks used temporary isolated settings and no model calls.
-  Normal Codex configuration had an unrelated invalid MCP transport entry;
-  it was left unchanged. No persistent client settings were changed.
-- An existing dev server on port 8001 was left running and may still contain
-  the old scaffold. Inspect processes before testing. Automated HTTP tests
-  use an OS-assigned loopback port.
+- All ideation context stays client-side. MCP accepts no challenge, answers,
+  goals, ideas, history, or ideation-session IDs. Tools return reusable guidance;
+  they do not start or store sessions.
+- The unauthenticated prototype stays loopback-only. Production ingress/body
+  limits, metadata, telemetry, authentication, and rate limits remain separate
+  work; the current tests are not evidence of hosted security readiness.
+- Client validation used temporary isolated settings and real model requests.
+  Persistent Pi/Codex configuration was not changed, and temporary credential
+  copies were removed. The unrelated invalid normal Codex MCP entry was not
+  touched.
+- Existing dev services on ports 8000/8001 were left untouched. The separate
+  loopback validation server was stopped after final checks. Automated HTTP
+  tests manage their own ports.
+
+## Development-server lifecycle command
+
+`pyproject.toml` now registers both `dev` and `servers` entrypoints. Use
+`uv run dev start|restart|stop` for tracked background services, or plain
+`uv run dev` for foreground operation. Runtime state and per-service logs are
+under ignored `.dev/`. Untracked listeners are never killed automatically;
+older pre-lifecycle services must be stopped manually before the first start.
+See `README.md` for usage and safety behaviour.
+
+The parent verified real API/MCP/npm start, duplicate-start refusal, restart,
+stop, and repeated stop with temporary state and ephemeral ports, leaving normal
+services untouched. Latest full suite: **80 tests passed**; Ruff lint/format,
+ty, active LSP checks for dev source/tests, and `git diff --check` passed.
+The parent also reproduced and fixed Ctrl-C during startup leaving live,
+untracked children; interruption and post-readiness state-write failures now
+have real-process rollback tests.
+Independent closure review confirmed the lifecycle blockers resolved with no
+remaining blockers; its isolated dev test run passed all 28 tests.
+
+
+## Next action after final verification
+
+Review/commit the prototype if accepted. Continue phase 1 with less-directed,
+varied-challenge and limited-capability validation before fixing the permanent
+surface or moving to the secure hosted slice. Detailed technique guidance,
+agent-initiated discovery, account/team service features, and hosted pilot
+readiness are not implemented by this local prototype.

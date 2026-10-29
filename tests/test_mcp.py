@@ -1,4 +1,4 @@
-"""Protocol-level tests for the local MCP capability probe."""
+"""Protocol-level tests for the local directed-ideation MCP prototype."""
 
 from __future__ import annotations
 
@@ -20,6 +20,36 @@ from site_directedideation_com.mcp import INTERVIEW_STAGES, mcp
 
 Transport = Literal["memory", "http"]
 pytestmark = pytest.mark.mcp
+
+_SUPPLEMENTARY_TOOLS = [
+    "get_interview_guidance",
+    "get_diagnostic_checks",
+    "get_alternative_techniques",
+]
+
+_INVALID_STAGE_ARGUMENTS = [
+    {"stage": "SENTINEL_PROBE"},
+    {"stage": ["SENTINEL_PROBE"]},
+    {"stage": {"x": "SENTINEL_PROBE"}},
+    {"stage": 42},
+]
+
+_EXTRA_CONTEXT_ARGUMENTS = [
+    {"context": "SENTINEL_PROBE"},
+]
+
+_REJECTED_INPUT_CASES = [
+    ("tool", "get_directed_ideation_method", {"extra": "SENTINEL_PROBE"}),
+    *[
+        ("tool", tool, args)
+        for tool in _SUPPLEMENTARY_TOOLS
+        for args in _INVALID_STAGE_ARGUMENTS + _EXTRA_CONTEXT_ARGUMENTS
+    ],
+    ("tool", "SENTINEL_PROBE", {}),
+    ("prompt", "method_probe", {}),
+    ("prompt", "method_probe", {"extra": "SENTINEL_PROBE"}),
+    ("prompt", "SENTINEL_PROBE", {}),
+]
 
 
 @asynccontextmanager
@@ -79,39 +109,111 @@ def text(result) -> str:
 @pytest.mark.parametrize(
     "transport", ["memory", pytest.param("http", marks=pytest.mark.integration)]
 )
-def test_probe_discovery_and_successful_calls(transport: Transport) -> None:
-    """Both transports expose the prompt, read-only tools, and optional filter."""
+def test_discovery_and_annotations(transport: Transport) -> None:
+    """Both transports expose only the canonical tools and expected annotations."""
 
     async def check(client: Client) -> None:
         tools = (await client.list_tools()).tools
-        assert {tool.name for tool in tools} == {"hello_world", "interview_guidance"}
-        tool = next(tool for tool in tools if tool.name == "interview_guidance")
-        for discovered_tool in tools:
-            assert discovered_tool.annotations is not None
-            assert discovered_tool.annotations.read_only_hint is True
-            assert discovered_tool.annotations.destructive_hint is False
-            assert discovered_tool.annotations.idempotent_hint is True
-            assert discovered_tool.annotations.open_world_hint is False
-        assert tool.input_schema.get("additionalProperties") is False
-        assert "stage" not in tool.input_schema.get("required", [])
-        assert "stage" in tool.input_schema["properties"]
+        assert {tool.name for tool in tools} == {
+            "get_directed_ideation_method",
+            "get_interview_guidance",
+            "get_diagnostic_checks",
+            "get_alternative_techniques",
+        }
+        for tool in tools:
+            assert tool.annotations is not None
+            assert tool.annotations.read_only_hint is True
+            assert tool.annotations.destructive_hint is False
+            assert tool.annotations.idempotent_hint is True
+            assert tool.annotations.open_world_hint is False
 
+        method_tool = next(
+            tool for tool in tools if tool.name == "get_directed_ideation_method"
+        )
+        assert method_tool.input_schema.get("additionalProperties") is False
+        assert not method_tool.input_schema.get("properties")
+        assert not method_tool.input_schema.get("required")
+
+        for name in {
+            "get_interview_guidance",
+            "get_diagnostic_checks",
+            "get_alternative_techniques",
+        }:
+            tool = next(t for t in tools if t.name == name)
+            assert tool.input_schema.get("additionalProperties") is False
+            assert "stage" in tool.input_schema["properties"]
+            assert "stage" not in tool.input_schema.get("required", [])
+            stage_schema = tool.input_schema["properties"]["stage"]
+            assert any(
+                sub.get("enum") == list(INTERVIEW_STAGES)
+                for sub in stage_schema.get("anyOf", [])
+            )
         prompts = (await client.list_prompts()).prompts
-        prompt = next(prompt for prompt in prompts if prompt.name == "method_probe")
-        assert not prompt.arguments
-        result = await client.get_prompt("method_probe")
-        assert len(result.messages) == 1
-        content = result.messages[0].content
-        assert isinstance(content, TextContent)
-        assert "Ask the user exactly this question" in content.text
-        assert "What would you like to explore? [method-probe]" in content.text
+        assert prompts == []
 
-        assert text(await client.call_tool("hello_world", {})) == "Hello, world!"
+    run_check(transport, check)
+
+
+@pytest.mark.parametrize(
+    "transport", ["memory", pytest.param("http", marks=pytest.mark.integration)]
+)
+def test_complete_method(transport: Transport) -> None:
+    """The canonical tool returns the full three-stage method guidance."""
+
+    async def check(client: Client) -> None:
+        result = text(await client.call_tool("get_directed_ideation_method", {}))
+        assert "# Directed Ideation — complete method" in result
+        assert "Stage 1: Identify opportunities" in result
+        assert "Stage 2: Select goals" in result
+        assert "Stage 3: Ideate with purpose" in result
+        assert "confirm context" in result.lower()
+        assert "one question at a time" in result.lower()
+        assert "confirm it" in result.lower()
+        assert "confirm or revise it" in result.lower()
+        assert "First action" in result
+        assert "Observable evidence" in result
+        assert "Do not execute actions" in result
+        assert "Do not send this record to the MCP service" in result
+        assert "Optional supplementary guidance" in result
+        assert "Use the complete method and your own capabilities first" in result
+        assert "user explicitly requests" in result.lower()
+        assert "explicitly instructs" in result.lower()
+        assert "a routine step" in result.lower()
+        assert "not fetch it merely because you think" in result.lower()
+        assert "get_interview_guidance" in result
+        assert "get_diagnostic_checks" in result
+        assert "get_alternative_techniques" in result
+        assert "context-free" in result
+        assert "no session content" in result.lower()
+        assert "does not track or store session state" in result.lower()
+        assert "not advertised" in result.lower()
+        assert "callable operation" in result.lower()
+
+    run_check(transport, check)
+
+
+@pytest.mark.parametrize(
+    "transport", ["memory", pytest.param("http", marks=pytest.mark.integration)]
+)
+@pytest.mark.parametrize(
+    "tool_name",
+    [
+        "get_interview_guidance",
+        "get_diagnostic_checks",
+        "get_alternative_techniques",
+    ],
+)
+def test_supplementary_menus(transport: Transport, tool_name: str) -> None:
+    """Each supplementary tool returns compact menus with optional stage filter."""
+
+    async def check(client: Client) -> None:
         for arguments in ({}, {"stage": None}):
-            menu = text(await client.call_tool("interview_guidance", arguments))
+            menu = text(await client.call_tool(tool_name, arguments))
             assert all(stage in menu for stage in INTERVIEW_STAGES)
+            assert "not yet implemented" in menu.lower()
+            assert "not advertised" in menu.lower()
         for stage in INTERVIEW_STAGES:
-            menu = text(await client.call_tool("interview_guidance", {"stage": stage}))
+            menu = text(await client.call_tool(tool_name, {"stage": stage}))
             assert stage in menu
             assert all(
                 other not in menu for other in INTERVIEW_STAGES if other != stage
@@ -125,17 +227,7 @@ def test_probe_discovery_and_successful_calls(transport: Transport) -> None:
 )
 @pytest.mark.parametrize(
     ("operation", "name", "arguments"),
-    [
-        ("tool", "interview_guidance", {"stage": "SENTINEL_PROBE"}),
-        ("tool", "interview_guidance", {"SENTINEL_PROBE": "SENTINEL_PROBE"}),
-        ("tool", "interview_guidance", {"stage": ["SENTINEL_PROBE"]}),
-        ("tool", "interview_guidance", {"stage": {"x": "SENTINEL_PROBE"}}),
-        ("tool", "interview_guidance", {"stage": 42}),
-        ("tool", "hello_world", {"extra": "SENTINEL_PROBE"}),
-        ("tool", "SENTINEL_PROBE", {}),
-        ("prompt", "method_probe", {"extra": "SENTINEL_PROBE"}),
-        ("prompt", "SENTINEL_PROBE", {}),
-    ],
+    _REJECTED_INPUT_CASES,
 )
 def test_rejected_inputs_do_not_echo_over_protocol(
     transport: Transport,
@@ -156,11 +248,9 @@ def test_rejected_inputs_do_not_echo_over_protocol(
                 await client.get_prompt(name, arguments)
         assert error.value.code == -32602
         assert "SENTINEL_PROBE" not in str(error.value)
-        assert "Invalid probe parameters" in str(error.value)
+        assert "Invalid parameters" in str(error.value)
 
     run_check(transport, check)
-    # The caller controls client-side logs; the HTTP client logs its own outgoing
-    # messages at DEBUG. Inspect service-side logs without hiding server DEBUG.
     service_logs = "\n".join(
         record.getMessage()
         for record in caplog.records

@@ -12,6 +12,7 @@ dependencies = [
 
 [project.scripts]
 dev = "site_directedideation_com.dev:main"
+servers = "site_directedideation_com.dev:main"
 
 [dependency-groups]
 dev = [
