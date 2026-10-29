@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from threading import Lock
 from typing import Literal
 
 from fastmcp import FastMCP
@@ -221,6 +222,19 @@ _SUPPLEMENTARY_TOOLS = {
     "get_alternative_techniques",
 }
 
+# Process-local totals only; no per-call records or cross-dimension breakdowns.
+_counter_lock = Lock()
+_tool_counts = dict.fromkeys(
+    (*sorted(_SUPPLEMENTARY_TOOLS), "get_directed_ideation_method"), 0
+)
+_stage_counts = dict.fromkeys((*INTERVIEW_STAGES, "unfiltered"), 0)
+
+
+def aggregate_counts() -> dict[str, dict[str, int]]:
+    """Return a detached snapshot for local in-process inspection, not an MCP tool."""
+    with _counter_lock:
+        return {"tools": _tool_counts.copy(), "stage_filters": _stage_counts.copy()}
+
 
 def _format_menu(
     title: str,
@@ -260,7 +274,13 @@ class _InputBoundary(Middleware):
             valid = False
         if not valid:
             raise MCPError(code=-32602, message="Invalid parameters")
-        return await call_next(context)
+        result = await call_next(context)
+        if not result.is_error:
+            with _counter_lock:
+                _tool_counts[message.name] += 1
+                if message.name in _SUPPLEMENTARY_TOOLS:
+                    _stage_counts[arguments.get("stage") or "unfiltered"] += 1
+        return result
 
     async def on_get_prompt(self, context: MiddlewareContext, call_next):
         # No prompts are exposed; reject every prompt request.

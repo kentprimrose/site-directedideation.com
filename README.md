@@ -84,6 +84,25 @@ supplementary tools accept only an optional stage filter. See
 `docs/CAPABILITY_PROBE.md` for the full surface, test results, and successful
 Pi/Codex conversational validation, including its limitations.
 
+#### Local aggregate telemetry
+
+The prototype counts successful guidance tool calls by fixed tool name, and
+successful supplementary calls by fixed stage filter (or `unfiltered` for
+omitted/null). These are separate totals, not tool-by-stage records. Rejected
+calls and tool errors do not count. It records no request bodies, free text,
+identifiers, account associations, timestamps, connections, or call sequences.
+These totals are usage counts, not session or user counts; a stage filter is
+not evidence of progress. Low counts can still reveal usage to someone with
+access, and repeated snapshots can reveal changes over time.
+
+Counters exist only in each server process's memory, start at zero, and are
+lost/reset on process restart; they are not persisted or exported. There is no
+MCP or HTTP reporting endpoint: code running in the same process can inspect a
+copy via `aggregate_counts()` in `site_directedideation_com.mcp` (or an operator
+can inspect process memory). There is no cross-worker aggregation, historical
+reporting, or access control beyond local process access. This is a local-only
+prototype, not a hosted telemetry or production privacy/security design.
+
 ## Deploy to NameHero
 
 Upload the **contents** of `site/public/` to the document root for the domain in NameHero cPanel. For the primary domain this is usually `public_html`; addon domains and subdomains use their configured document root. The document root should contain `index.html` and a `site/` subdirectory with the stylesheet. No build, Node installation, or server-side application is required on the hosting account.

@@ -7,7 +7,8 @@ import logging
 import socket
 from collections.abc import AsyncGenerator, Awaitable, Callable
 from contextlib import asynccontextmanager
-from typing import Literal
+from types import SimpleNamespace
+from typing import Any, Literal, cast
 
 import pytest
 import uvicorn
@@ -16,7 +17,12 @@ from mcp.client.streamable_http import streamable_http_client
 from mcp.shared.exceptions import MCPError
 from mcp.types import TextContent
 
-from site_directedideation_com.mcp import INTERVIEW_STAGES, mcp
+from site_directedideation_com.mcp import (
+    INTERVIEW_STAGES,
+    _InputBoundary,
+    aggregate_counts,
+    mcp,
+)
 
 Transport = Literal["memory", "http"]
 pytestmark = pytest.mark.mcp
@@ -104,6 +110,78 @@ def text(result) -> str:
     assert len(result.content) == 1
     assert isinstance(result.content[0], TextContent)
     return result.content[0].text
+
+
+def test_tool_failures_do_not_increment_counts() -> None:
+    """Both exceptions and explicit error results are excluded."""
+    before = aggregate_counts()
+    context = cast(
+        Any,
+        SimpleNamespace(
+            message=SimpleNamespace(name="get_interview_guidance", arguments={})
+        ),
+    )
+
+    async def error_result(_context):
+        return SimpleNamespace(is_error=True)
+
+    async def exception(_context):
+        raise RuntimeError("failure")
+
+    async def check() -> None:
+        boundary = _InputBoundary()
+        await boundary.on_call_tool(context, error_result)
+        with pytest.raises(RuntimeError):
+            await boundary.on_call_tool(context, exception)
+
+    asyncio.run(check())
+    assert aggregate_counts() == before
+
+
+@pytest.mark.parametrize(
+    "transport", ["memory", pytest.param("http", marks=pytest.mark.integration)]
+)
+def test_aggregate_counts_are_bounded_and_exclude_rejections(
+    transport: Transport,
+) -> None:
+    """Only bounded successful calls affect the independent aggregate totals."""
+    before = aggregate_counts()
+
+    async def check(client: Client) -> None:
+        text(await client.call_tool("get_directed_ideation_method", {}))
+        text(await client.call_tool("get_interview_guidance", {}))
+        text(await client.call_tool("get_interview_guidance", {"stage": None}))
+        text(
+            await client.call_tool(
+                "get_diagnostic_checks", {"stage": INTERVIEW_STAGES[0]}
+            )
+        )
+        for operation, name, arguments in _REJECTED_INPUT_CASES:
+            with pytest.raises(MCPError):
+                if operation == "tool":
+                    await client.call_tool(name, arguments)
+                else:
+                    await client.get_prompt(name, cast(Any, arguments))
+
+    run_check(transport, check)
+    after = aggregate_counts()
+    assert {k: after["tools"][k] - v for k, v in before["tools"].items()} == {
+        "get_directed_ideation_method": 1,
+        "get_interview_guidance": 2,
+        "get_diagnostic_checks": 1,
+        "get_alternative_techniques": 0,
+    }
+    assert {
+        k: after["stage_filters"][k] - v for k, v in before["stage_filters"].items()
+    } == {
+        INTERVIEW_STAGES[0]: 1,
+        INTERVIEW_STAGES[1]: 0,
+        INTERVIEW_STAGES[2]: 0,
+        "unfiltered": 2,
+    }
+    assert "SENTINEL_PROBE" not in repr(after)
+    after["tools"].clear()
+    assert aggregate_counts()["tools"]
 
 
 @pytest.mark.parametrize(
