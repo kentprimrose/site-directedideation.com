@@ -253,11 +253,11 @@ def test_complete_method(transport: Transport) -> None:
         assert "Do not execute actions" in result
         assert "Do not send this record to the MCP service" in result
         assert "Optional supplementary guidance" in result
-        assert "Use the complete method and your own capabilities first" in result
-        assert "user explicitly requests" in result.lower()
-        assert "explicitly instructs" in result.lower()
-        assert "a routine step" in result.lower()
-        assert "not fetch it merely because you think" in result.lower()
+        assert "when you judge it useful or needed" in result.lower()
+        assert "user requests it" in result.lower()
+        assert "on your own initiative" in result.lower()
+        assert "an explicit user request\nis not required" in result.lower()
+        assert "only retrieve" not in result.lower()
         assert "get_interview_guidance" in result
         assert "get_diagnostic_checks" in result
         assert "get_alternative_techniques" in result

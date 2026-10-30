@@ -88,11 +88,9 @@ Goal: generate multiple actionable ideas, each tied to the confirmed goal.
 
 ## Optional supplementary guidance
 
-Use the complete method and your own capabilities first. Only retrieve
-supplementary guidance when the user explicitly requests additional help that
-you cannot adequately provide, or when the user explicitly instructs you to
-fetch more guidance. Do not make supplementary retrieval a routine step, and do
-not fetch it merely because you think more guidance might be useful.
+Retrieve supplementary guidance when you judge it useful or needed, or when the
+user requests it. You may do so on your own initiative; an explicit user request
+is not required.
 
 When supplementary guidance is appropriate, call one of these read-only tools
 with no session content:

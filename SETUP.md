@@ -51,12 +51,19 @@ password, for example in a private Python session:
 
 ```python
 import hashlib, secrets
-user = input('User ID: ')
+
+user = input("User ID: ")
 from getpass import getpass
-password = getpass('Password: ')
+
+password = getpass("Password: ")
 salt = secrets.token_bytes(16)
-print('METRICS_ADMIN_USER_SHA256=' + hashlib.sha256(user.encode()).hexdigest())
-print('METRICS_ADMIN_PASSWORD_SCRYPT=' + salt.hex() + ':' + hashlib.scrypt(password.encode(), salt=salt, n=16384, r=8, p=1, dklen=32).hex())
+print("METRICS_ADMIN_USER_SHA256=" + hashlib.sha256(user.encode()).hexdigest())
+print(
+    "METRICS_ADMIN_PASSWORD_SCRYPT="
+    + salt.hex()
+    + ":"
+    + hashlib.scrypt(password.encode(), salt=salt, n=16384, r=8, p=1, dklen=32).hex()
+)
 ```
 
 Store hashes securely in the service environment, not in source control. Basic
