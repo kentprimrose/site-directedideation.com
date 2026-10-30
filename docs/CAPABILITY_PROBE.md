@@ -158,6 +158,155 @@ not a general guarantee of model adherence. The user turns explicitly reinforced
 context boundaries and confirmation gates; unprompted adherence, varied challenges,
 limited-capability coverage, and usefulness evaluation remain follow-up work.
 
+### Less-directed follow-up (2026-10-29; partial, mixed result)
+
+Two fictional challenges were run against a freshly started, unauthenticated
+loopback-only server, in empty temporary working directories and client homes.
+No method instructions or confirmation-gate instructions were pasted into the
+conversations. Both clients used the same versions and models as above. These
+model requests were sent to the configured model provider; “client-side” here
+means **not sent to this MCP service**, not offline or private from the model
+provider. Credentials were copied to temporary homes and removed with them; the
+existing port-8001 server, client configuration, and staged skill were untouched.
+
+- **Pi, seed library:** The initial request was “Please help me with directed
+  ideation. Our fictional neighborhood seed library struggles to get borrowed
+  seeds returned; it has only volunteers and no budget.” The only observed MCP
+  call was `get_directed_ideation_method({})`, which succeeded. Pi asked to
+  confirm the context, then asked about forgetting versus the hidden return box.
+  In a first four-turn attempt, two ambiguous “Yes”/“go ahead” replies did not
+  identify which opportunity the user wanted; Pi repeated the choice and then
+  chose the return box itself and asked for an example. It did not reach a goal.
+- **Pi follow-up, same challenge:** A separate run used the same first two turns,
+  then selected the return-box issue, supplied an example, and gave short
+  affirmations. Pi proposed an opportunity and asked for confirmation; it later
+  proposed a no-budget goal and asked for confirmation. It ultimately offered
+  six directions and two proposed tests, with a first action and observation for
+  those two tests, but not for each of the six directions. The ideas were
+  plausibly relevant to volunteer and budget constraints, though the signs and
+  arrows overlap. No action was executed. **This is not a clean gate pass:** a
+  harness buffering/timeout fault disrupted turn synchronization, and a generic
+  affirmation intended for the goal arrived before the goal was proposed; the
+  later “Please go ahead” was treated as assent. The requested supplementary
+  turn did not run. Do not use this attempt to infer strict goal confirmation or
+  precise latency.
+- **Codex, museum:** The first user turn was “Please use directed ideation to
+  help our fictional small museum reduce long waits for wheelchair users at its
+  crowded entrance, without buying equipment.” It immediately proposed a target,
+  six ideas and a pilot without a context, opportunity, or goal confirmation.
+  After the user clarified that deliveries shared the accessible entrance and
+  only one attendant was available, it revised the ideas and dropped an
+  impractical extra-staff suggestion. It proposed delivery scheduling, visitor
+  priority and wait/interruption observations; feasibility and accessibility
+  require real stakeholder assessment. Across four turns there were **no MCP
+  tool-call events**. Thus the method was not demonstrated, the confirmation
+  gates failed for this less-directed request, and no argument privacy claim can
+  be inferred from absence of calls. The setup does not prove whether the tool
+  was discoverable but ignored, or unavailable to this model turn. A planned
+  follow-up explicitly asking for MCP retrieval never started because the Pi
+  harness failed.
+
+**Reproduction:** Use the loopback server command above on an unused port and
+create isolated client homes. Put only `{"mcpServers":{"directed_ideation":
+{"url":"http://127.0.0.1:PORT/mcp","exposure":"direct"}}}` in Pi's
+`mcp.json` and `[mcp_servers.directed_ideation]` plus
+`url = "http://127.0.0.1:PORT/mcp"` in Codex's `config.toml`. Securely copy
+only the necessary existing auth files into the temporary homes and remove the
+homes after the run. Set `PI_CODING_AGENT_DIR` and `CODEX_HOME` accordingly.
+Run Pi RPC with `--no-session --no-extensions -e builtin:mcp --no-skills
+--no-prompt-templates --no-context-files --tools 'mcp__directed_ideation__*'
+--model openai/gpt-6.1-terra --thinking low`. Send JSON `prompt` commands and
+wait for `agent_settled` before the next turn. For Codex run `codex exec --json
+--skip-git-repo-check --sandbox read-only -m gpt-6.1-sol -c
+'model_reasoning_effort="low"'` in the empty directory, then use `codex exec
+resume THREAD_ID --json --skip-git-repo-check -m gpt-6.1-sol -c
+'model_reasoning_effort="low"'` for later turns. Supply the fictional initial
+requests above; follow up naturally, confirming or revising what the agent
+actually asks rather than supplying gate instructions. Inspect JSON tool events,
+arguments, outcomes and each confirmation before advancing. A harness must drain
+stdout continuously: the prior select/readline implementation is a plausible
+cause of its false timeouts and subsequent broken pipe (see the follow-up below).
+The server was stopped and temporary homes removed; no unrelated process was stopped.
+
+The first Pi conversation used four model turns; the interrupted follow-up
+produced seven assistant turns. Pi's reported estimated model cost was about
+$0.038 and $0.041 respectively (provider-reported estimates, not invoices).
+Codex reported per-turn input/output tokens of 18,404/441, 37,275/741,
+62,241/877, and 87,356/1,087, including cached input; no monetary cost was
+reported. No reliable latency or full pilot usefulness score is claimed. These
+are small, unpaired synthetic examples, not the approximately 20 varied
+challenges and repeated paired runs in the plan.
+
+**Limited-capability partial evidence:** `uv run pytest tests/test_mcp.py -q`
+passed 53 tests on 2026-10-29. Its real MCP Python client extracts and asserts
+single `TextContent` results for the method and menus, including over loopback
+HTTP. This exercises a text-only consumption path but is **not** an independent
+limited-capability interactive model client, nor does it show a model can use
+text without structured content. That coverage and both clients' less-directed
+complete flows and supplementary retrieval remain open before fixing the surface.
+
+
+### Continued validation (2026-10-29)
+
+A fresh loopback server on 127.0.0.1:18973, isolated temporary homes and empty
+working directory were used with the same client versions and models. Model
+requests went to the provider. The server and temporary credential copies were
+removed afterward; port 8001, persistent settings, and the staged skill were
+not changed. These are small synthetic checks, not a usefulness evaluation.
+
+**Synchronization diagnosis and replacement.** A controlled local pipe test
+wrote two lines together. After one text `readline`, `select` reported no
+readable bytes while the second line was immediately available in Python's
+buffer. This reproduces the proposed failure mechanism, but does not prove the
+exact historical timeout cause because the old event stream was not retained.
+`docs/pi_rpc_probe.py` continuously drains Pi stdout in a reader thread into a
+queue, uses an absolute monotonic 120-second deadline per turn (overridable with
+`PROBE_TIMEOUT`), waits for `agent_settled`, and terminates/kills the child on
+failure. Seven turns settled in each of two new Pi runs with a 90-second bound.
+The harness takes a JSON array of prompts on stdin and emits JSON events that
+include prompts and responses; protect or delete those logs. Run it only with an
+isolated `PI_CODING_AGENT_DIR`. Predetermined prompts are not adaptive and can
+themselves misalign with what the model asks, as the first run demonstrated.
+
+**Pi:** Both runs retrieved `get_directed_ideation_method({})` and confirmed
+context. In the first, Pi proposed and got confirmation of the opportunity.
+The next scripted reply affirmed a goal before one had been proposed, in response
+to a question about box location; Pi then produced seven ideas without asking
+for goal confirmation. It later acknowledged the goal had not been explicitly
+confirmed. This is a synchronized run but **not a clean goal-gate pass**, and
+the premature reply limits interpretation. An explicit supplementary request
+produced successful `get_interview_guidance({})`, `get_diagnostic_checks`
+with `{"stage":"select-goals"}`, and `get_alternative_techniques` with
+`{"stage":"ideate-with-purpose"}`; Pi summarized the menus and said detailed
+guidance is unavailable. A second run supplied an actual example, confirmed the
+opportunity, and provided resource constraints; by turn seven Pi had proposed a
+goal and asked for confirmation. It did not reach ideas because the fixed
+replies did not answer its questions about beneficiaries and evidence. No action
+was executed. A complete adaptive less-directed Pi flow remains open.
+
+**Codex:** In a new museum conversation the first turn again produced seven ideas
+and a pilot, without MCP calls or confirmation gates. On the next turn the user
+provided the delivery/single-attendant constraint and explicitly requested the
+configured MCP method. Codex successfully called
+`get_directed_ideation_method({})` and asked to confirm context; it then asked
+about the incident. Thus the tool was available in the *same thread* on the
+next turn; this supports an ignored-or-not-selected interpretation for the
+first turn but does not establish precisely what the model was shown at that
+turn. A later explicit request successfully retrieved all three supplementary
+menus with the same empty and bounded stage arguments listed above, and Codex
+summarized them. The resumed method flow was not continued through confirmed
+goal and ideas. In both clients all observed MCP arguments in these runs were
+empty or the listed stage filters; no challenge or session context was sent in
+them. This is example-specific, not a general privacy guarantee.
+
+**Text fallback:** A separate minimal Python MCP SDK consumer on loopback called
+all four tools, checked the single text content item and relevant markers, and
+did not read structured content. It passed after correcting two harness API
+mistakes (the transport yields two streams, and the error attribute is
+`is_error`). The server still returned structured content; this demonstrates
+that a consumer can ignore it, not that an independent limited-capability
+interactive model can use a text-only server. That model-client exercise and
+adaptive full flows remain gaps.
 ### Reproduce the conversational check
 
 Start a fresh loopback server with the command above. In a temporary directory,

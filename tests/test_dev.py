@@ -633,3 +633,60 @@ class TestStopResistance:
             assert _port_is_occupied("127.0.0.1", port) is False
         finally:
             _state_path(state_dir).unlink(missing_ok=True)
+
+
+def test_admin_service_configuration(monkeypatch: pytest.MonkeyPatch) -> None:
+    """All lifecycle modes share the loopback-only dashboard definition."""
+    from site_directedideation_com import dev
+
+    monkeypatch.setattr(dev.shutil, "which", lambda name: f"/bin/{name}")
+    services = dev._services()
+    name, command, cwd, port = next(s for s in services if s[0] == "Admin")
+    assert (name, cwd, port) == ("Admin", PROJECT_ROOT, 8002)
+    assert command == [
+        sys.executable,
+        "-m",
+        "uvicorn",
+        "site_directedideation_com.admin:app",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8002",
+    ]
+
+
+def test_admin_managed_lifecycle_and_conflict(
+    tmp_path: Path, state_dir: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Dashboard readiness, state, logs, restart and stop use the lifecycle."""
+    monkeypatch.setenv("METRICS_ENV", "development")
+    monkeypatch.setenv("METRICS_DB", str(tmp_path / "metrics.sqlite"))
+    port = _find_free_port()
+    service = (
+        "Admin",
+        [
+            sys.executable,
+            "-m",
+            "uvicorn",
+            "site_directedideation_com.admin:app",
+            "--host",
+            "127.0.0.1",
+            "--port",
+            str(port),
+        ],
+        PROJECT_ROOT,
+        port,
+    )
+    assert _start_command([service], state_dir) == 0
+    try:
+        state = _read_state(state_dir)
+        assert state is not None and state.services[0].name == "Admin"
+        assert state.services[0].port == port
+        assert (state_dir / "logs" / "admin.log").exists()
+        with pytest.raises(RuntimeError, match="Admin is occupied"):
+            _start_services([service], tmp_path / "other-state")
+        assert _restart_command([service], state_dir) == 0
+        assert _port_is_occupied("127.0.0.1", port)
+    finally:
+        assert _stop_command(state_dir) == 0
+    assert not _port_is_occupied("127.0.0.1", port)

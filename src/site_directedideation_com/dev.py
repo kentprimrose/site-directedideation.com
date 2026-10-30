@@ -28,6 +28,7 @@ STATE_DIR = PROJECT_ROOT / ".dev"
 # are never killed automatically.
 _API_PORT = 8000
 _MCP_PORT = 8001
+_ADMIN_PORT = 8002
 _STATIC_PORT = 3000
 
 # Seconds to wait for all services to bind their ports before treating the
@@ -145,6 +146,21 @@ def _services() -> list[tuple[str, list[str], Path, int]]:
             ],
             PROJECT_ROOT,
             _MCP_PORT,
+        ),
+        (
+            "Admin",
+            [
+                sys.executable,
+                "-m",
+                "uvicorn",
+                "site_directedideation_com.admin:app",
+                "--host",
+                "127.0.0.1",
+                "--port",
+                str(_ADMIN_PORT),
+            ],
+            PROJECT_ROOT,
+            _ADMIN_PORT,
         ),
         (
             "Static site",
@@ -658,6 +674,7 @@ def _start_command(
         print(f"Logs: {state_dir / 'logs'}")
         print("API: http://127.0.0.1:8000/")
         print("MCP: http://127.0.0.1:8001/mcp")
+        print("Admin: http://127.0.0.1:8002/")
         print("Site: http://127.0.0.1:3000/")
         print("Run 'uv run dev stop' to shut them down.")
         return 0
@@ -690,6 +707,7 @@ def _restart_command(
         print(f"Logs: {state_dir / 'logs'}")
         print("API: http://127.0.0.1:8000/")
         print("MCP: http://127.0.0.1:8001/mcp")
+        print("Admin: http://127.0.0.1:8002/")
         print("Site: http://127.0.0.1:3000/")
         print("Run 'uv run dev stop' to shut them down.")
         return 0
@@ -734,6 +752,7 @@ def _foreground(services: list[tuple[str, list[str], Path, int]]) -> int:
 
         print("API: http://127.0.0.1:8000/", flush=True)
         print("MCP: http://127.0.0.1:8001/mcp", flush=True)
+        print("Admin: http://127.0.0.1:8002/", flush=True)
         print("Site: http://127.0.0.1:3000/", flush=True)
         print("Press Ctrl-C to stop all services.", flush=True)
 

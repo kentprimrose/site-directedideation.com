@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
-from threading import Lock
+from contextlib import asynccontextmanager
 from typing import Literal
 
 from fastmcp import FastMCP
 from fastmcp.server.middleware import Middleware, MiddlewareContext
 from mcp.shared.exceptions import MCPError
+
+from site_directedideation_com.metrics import connect, increment, snapshot
 
 Stage = Literal["identify-opportunities", "select-goals", "ideate-with-purpose"]
 INTERVIEW_STAGES: tuple[Stage, ...] = (
@@ -23,7 +25,28 @@ READ_ONLY = {
     "openWorldHint": False,
 }
 
-mcp = FastMCP("site-directedideation.com", mask_error_details=True)
+
+@asynccontextmanager
+async def _lifespan(server):
+    """Fail startup if aggregate metrics cannot be configured and written."""
+    try:
+        connection = connect()
+        try:
+            connection.execute("BEGIN IMMEDIATE")
+            connection.execute(
+                "INSERT INTO counters VALUES (?, ?, 0) "
+                "ON CONFLICT(dimension, name) DO UPDATE SET count = count",
+                ("tools", "get_directed_ideation_method"),
+            )
+            connection.rollback()
+        finally:
+            connection.close()
+    except Exception as exc:
+        raise RuntimeError(f"MCP metrics startup validation failed: {exc}") from exc
+    yield
+
+
+mcp = FastMCP("site-directedideation.com", mask_error_details=True, lifespan=_lifespan)
 
 
 _COMPLETE_METHOD = """\
@@ -222,18 +245,10 @@ _SUPPLEMENTARY_TOOLS = {
     "get_alternative_techniques",
 }
 
-# Process-local totals only; no per-call records or cross-dimension breakdowns.
-_counter_lock = Lock()
-_tool_counts = dict.fromkeys(
-    (*sorted(_SUPPLEMENTARY_TOOLS), "get_directed_ideation_method"), 0
-)
-_stage_counts = dict.fromkeys((*INTERVIEW_STAGES, "unfiltered"), 0)
-
 
 def aggregate_counts() -> dict[str, dict[str, int]]:
-    """Return a detached snapshot for local in-process inspection, not an MCP tool."""
-    with _counter_lock:
-        return {"tools": _tool_counts.copy(), "stage_filters": _stage_counts.copy()}
+    """Return a detached snapshot of persistent aggregate totals."""
+    return snapshot()
 
 
 def _format_menu(
@@ -276,10 +291,12 @@ class _InputBoundary(Middleware):
             raise MCPError(code=-32602, message="Invalid parameters")
         result = await call_next(context)
         if not result.is_error:
-            with _counter_lock:
-                _tool_counts[message.name] += 1
-                if message.name in _SUPPLEMENTARY_TOOLS:
-                    _stage_counts[arguments.get("stage") or "unfiltered"] += 1
+            stage = (
+                (arguments.get("stage") or "unfiltered")
+                if message.name in _SUPPLEMENTARY_TOOLS
+                else None
+            )
+            increment(message.name, stage)
         return result
 
     async def on_get_prompt(self, context: MiddlewareContext, call_next):

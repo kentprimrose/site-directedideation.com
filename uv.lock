@@ -1400,6 +1400,7 @@ source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
     { name = "fastmcp" },
+    { name = "python-dotenv" },
     { name = "uvicorn" },
 ]
 
@@ -1419,6 +1420,7 @@ dev = [
 requires-dist = [
     { name = "fastapi" },
     { name = "fastmcp" },
+    { name = "python-dotenv" },
     { name = "uvicorn" },
 ]
 

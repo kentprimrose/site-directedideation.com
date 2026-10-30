@@ -12,7 +12,16 @@ Install the static-site development dependency once:
 npm --prefix site install
 ```
 
-Start all three local services from the repository root:
+Configure metrics before starting MCP; tool calls require explicit `METRICS_ENV`
+and `METRICS_DB` settings and a writable database directory. From the repository
+root, create the local defaults once (do not overwrite an existing `.env`):
+
+```bash
+cp .env.example .env
+mkdir -p .dev
+```
+
+Start all four local services from the repository root:
 
 ```bash
 uv run dev
@@ -22,9 +31,10 @@ The command starts:
 
 - FastAPI at <http://127.0.0.1:8000>
 - FastMCP over Streamable HTTP at <http://127.0.0.1:8001/mcp>
+- The read-only admin dashboard at <http://127.0.0.1:8002/>
 - The static site at <http://127.0.0.1:3000>
 
-Press Ctrl-C to stop all three. Foreground mode also catches `SIGTERM`, so no
+Press Ctrl-C to stop all four. Foreground mode also catches `SIGTERM`, so no
 orphan process groups are left behind when the command is terminated by a
 supervisor or shell.
 
@@ -50,10 +60,10 @@ State, logs, and the runtime lock live under `.dev/` (ignored by git):
 
 - `.dev/dev-server-state.json` – PIDs, process groups, ports, and recorded command
   signatures for the current run.
-- `.dev/logs/` – one log file per service.
+- `.dev/logs/` – one log file per service, including `admin.log`.
 - `.dev/dev-server.lock` – prevents concurrent `start`/`restart`/`stop` calls.
 
-`start` pre-flights all dev ports (8000, 8001, 3000) before launching anything. If a
+`start` pre-flights all dev ports (8000, 8001, 8002, 3000) before launching anything. If a
 port is occupied, it aborts and prints the offending port. It does **not** kill
 untracked or orphan processes automatically; investigate with
 `lsof -i :<port>` and stop them manually before trying again.
@@ -95,13 +105,11 @@ These totals are usage counts, not session or user counts; a stage filter is
 not evidence of progress. Low counts can still reveal usage to someone with
 access, and repeated snapshots can reveal changes over time.
 
-Counters exist only in each server process's memory, start at zero, and are
-lost/reset on process restart; they are not persisted or exported. There is no
-MCP or HTTP reporting endpoint: code running in the same process can inspect a
-copy via `aggregate_counts()` in `site_directedideation_com.mcp` (or an operator
-can inspect process memory). There is no cross-worker aggregation, historical
-reporting, or access control beyond local process access. This is a local-only
-prototype, not a hosted telemetry or production privacy/security design.
+Counters are persisted as independent bounded totals in SQLite, shared between
+workers and process restarts. The separate read-only admin dashboard displays
+them; see [SETUP.md](SETUP.md#mcp-aggregate-metrics-and-admin) for explicit
+environment configuration, authentication and important security limitations.
+The MCP server remains a local-only prototype, not a public production service.
 
 ## Deploy to NameHero
 
