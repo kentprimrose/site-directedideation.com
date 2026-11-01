@@ -8,7 +8,9 @@ from typing import Literal
 from fastmcp import FastMCP
 from fastmcp.server.middleware import Middleware, MiddlewareContext
 from mcp.shared.exceptions import MCPError
+from starlette.middleware import Middleware as ASGIMiddleware
 
+from site_directedideation_com.mcp.http_boundary import RequestBodyLimit
 from site_directedideation_com.metrics import connect, increment, snapshot
 
 Stage = Literal["identify-opportunities", "select-goals", "ideate-with-purpose"]
@@ -46,7 +48,19 @@ async def _lifespan(server):
     yield
 
 
-mcp = FastMCP("site-directedideation.com", mask_error_details=True, lifespan=_lifespan)
+class _BoundedHTTPFastMCP(FastMCP):
+    def http_app(self, path=None, middleware=None, *args, **kwargs):
+        return super().http_app(
+            path,
+            [ASGIMiddleware(RequestBodyLimit), *(middleware or [])],
+            *args,
+            **kwargs,
+        )
+
+
+mcp = _BoundedHTTPFastMCP(
+    "site-directedideation.com", mask_error_details=True, lifespan=_lifespan
+)
 
 
 _COMPLETE_METHOD = """\

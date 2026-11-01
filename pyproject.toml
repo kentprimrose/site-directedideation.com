@@ -3,11 +3,14 @@ name = "site-directedideation.com"
 version = "0.1.0"
 description = "site-directedideation.com"
 readme = "README.md"
-requires-python = ">=3.15.0"
+requires-python = ">=3.11"
 dependencies = [
+    "argon2-cffi>=23,<26",
     "fastapi",
     "fastmcp",
+    "pymysql>=1.1,<2",
     "python-dotenv",
+    "sqlalchemy>=2,<3",
     "uvicorn",
 ]
 
@@ -43,7 +46,7 @@ markers = [
 ]
 
 [tool.ruff]
-target-version = "py315"
+target-version = "py311"
 line-length = 88
 
 [tool.ruff.lint]

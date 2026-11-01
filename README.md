@@ -4,7 +4,7 @@ A static, single-page field guide to directed ideation. The deployable site is i
 
 ## Local development
 
-Requirements: Node.js, npm, and [uv](https://docs.astral.sh/uv/).
+Requirements: Node.js, npm, and [uv](https://docs.astral.sh/uv/). The Python services support Python 3.11 and newer; `.python-version` selects 3.11.18 for local development.
 
 Install the static-site development dependency once:
 

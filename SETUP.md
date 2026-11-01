@@ -23,6 +23,24 @@ If you use direnv:
 direnv allow
 ```
 
+## MCP HTTP request boundary
+
+The local MCP HTTP app limits each request body to 65,536 bytes, including
+streamed/chunked bodies and requests without `Content-Length`. It checks a
+single valid decimal `Content-Length` early, then counts actual received bytes
+before passing the complete body to the MCP transport. Oversized bodies receive
+HTTP 413; malformed or duplicate length headers receive HTTP 400. These boundary
+responses are fixed text and do not include or log the body. Requests at or below
+the limit still go through normal MCP validation. The limit applies to both
+streamable HTTP and legacy SSE HTTP endpoints, not in-memory or stdio transport.
+
+This is not authentication, rate limiting, a connection or read timeout, or a
+limit on concurrent requests, headers, server/proxy buffering, or logging by
+other components. A slow sender can hold a connection; each concurrent request
+can consume up to the limit plus server buffers. HTTP framing is handled by the
+ASGI server. Keep the MCP service local and do not send sensitive session
+context; this pilot measure does not make it production-ready.
+
 ## MCP aggregate metrics and admin
 
 Copy `.env.example` to `.env`, create `.dev` (`mkdir -p .dev`), and restart

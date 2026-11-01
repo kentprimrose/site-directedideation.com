@@ -65,7 +65,7 @@ def _process_alive(pid: int) -> bool:
     """Return whether ``pid`` is still alive."""
     try:
         os.kill(pid, 0)
-    except ProcessLookupError, PermissionError, OSError:
+    except (ProcessLookupError, PermissionError, OSError):
         return False
     return True
 

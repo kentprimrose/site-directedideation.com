@@ -255,7 +255,7 @@ def _read_state(state_dir: Path) -> ServerState | None:
         return None
     try:
         return _state_from_dict(json.loads(path.read_text(encoding="utf-8")))
-    except OSError, json.JSONDecodeError, KeyError, ValueError:
+    except (OSError, json.JSONDecodeError, KeyError, ValueError):
         return None
 
 
@@ -289,7 +289,7 @@ def _get_cmdline(pid: int) -> list[str] | None:
             raw = proc_path.read_bytes()
             parts = raw.decode("utf-8", errors="replace").split("\x00")
             return [part for part in parts if part]
-    except OSError, PermissionError:
+    except (OSError, PermissionError):
         pass
 
     try:
@@ -302,7 +302,7 @@ def _get_cmdline(pid: int) -> list[str] | None:
         )
         if result.returncode == 0:
             return result.stdout.strip().split()
-    except OSError, subprocess.TimeoutExpired:
+    except (OSError, subprocess.TimeoutExpired):
         pass
     return None
 
@@ -419,11 +419,11 @@ def _wait_for_group_exit(service: ServiceState, deadline: float) -> tuple[bool, 
                 reaped, _ = os.waitpid(service.pid, os.WNOHANG)
                 if reaped == service.pid:
                     leader_reaped = True
-            except ChildProcessError, OSError:
+            except (ChildProcessError, OSError):
                 leader_reaped = True
         try:
             os.killpg(service.pgid, 0)
-        except ProcessLookupError, PermissionError, OSError:
+        except (ProcessLookupError, PermissionError, OSError):
             return True, leader_reaped
         time.sleep(0.05)
     return False, leader_reaped
