@@ -147,3 +147,29 @@ Install exactly the dependencies recorded in `uv.lock`:
 ```bash
 uv sync --all-groups --frozen
 ```
+
+## Private MCP deployment foundation
+
+See [deploy/README.md](deploy/README.md) for the private-only Compose deployment,
+CI prerequisites, rollback, metrics backup, and local Podman/Docker checks. This
+is unauthenticated and must not be exposed publicly or used for pilot access.
+
+## Local MCP with Podman
+
+Install Podman (and initialize its default machine on macOS/Windows), then run:
+
+```bash
+./scripts/mcp-podman.sh start
+./scripts/mcp-podman.sh stop
+```
+
+Start brings up the default Podman machine if the engine is unavailable, builds
+from the current working tree using the build cache, and starts only this local
+MCP at `http://127.0.0.1:8001/mcp`. Re-running start rebuilds and replaces its
+own container. Stop leaves the machine and other services running. Metrics
+persist across restarts in the `directedideation-local-mcp-metrics` Podman volume;
+neither command deletes it. If port 8001 is occupied, start fails without
+stopping the other service; free the port and retry. An unrelated container
+with the script's reserved name is never modified. These commands use the
+currently configured Podman connection; they do not change it. The endpoint is
+unauthenticated and intended only for local use.

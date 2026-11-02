@@ -1,0 +1,31 @@
+services:
+  mcp:
+    image: ${MCP_IMAGE:?Set MCP_IMAGE to a locally loaded release image}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s = socket.create_connection(('127.0.0.1', 8001), timeout=2); s.close()"]
+      interval: 5s
+      timeout: 3s
+      retries: 6
+      start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "127.0.0.1:8001:8001"
+    environment:
+      METRICS_ENV: production
+      METRICS_DB: /metrics/metrics.sqlite3
+    volumes:
+      - metrics:/metrics
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
+volumes:
+  metrics:
