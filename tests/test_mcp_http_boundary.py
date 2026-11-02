@@ -86,8 +86,10 @@ def test_disconnect_does_not_dispatch(caplog):
     assert not sent and not received
 
 
-def test_http_app_rejects_oversized_and_malformed_json(caplog):
+def test_http_app_rejects_oversized_and_malformed_json(caplog, monkeypatch, tmp_path):
     """Exercise the configured app with oversized and invalid JSON."""
+    monkeypatch.setenv("METRICS_ENV", "development")
+    monkeypatch.setenv("METRICS_DB", str(tmp_path / "metrics.sqlite3"))
     from site_directedideation_com.mcp import mcp
 
     async def check():
