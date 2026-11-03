@@ -39,6 +39,7 @@ packages = ["src/site_directedideation_com"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]
 addopts = "-ra"
 markers = [
     "mcp: MCP capability probe tests",

@@ -1,0 +1,10 @@
+# EXAMPLE ONLY: do not include or load without completing the activation gate.
+# Merge as a separate site into the existing Caddy configuration; do not replace it.
+mcp-staging.directedideation.com {
+    # Caddy automatic HTTPS requires DNS and port 80/443 access; see README.
+    # No access log directive. Do not enable global HTTP access logging for this site.
+    request_body {
+        max_size 64KB
+    }
+    reverse_proxy 127.0.0.1:8765
+}
