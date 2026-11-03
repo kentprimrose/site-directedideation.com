@@ -45,3 +45,10 @@ actual WorkOS staging tenant. Verify real claims, resource audience, user ID
 mapping, token refresh, metadata, JWKS failure/rotation, client interoperability,
 network controls and logging before any exposure. This is not a production
 security review or a complete deployment plan.
+
+The backend independently caps each `/mcp` request body at 64 KiB, including
+streamed bodies, before dispatch. Invalid or inconsistent Content-Length is
+rejected. This is a per-request bound, not a concurrency or read-time bound:
+many simultaneous or slow clients can still exhaust connection or aggregate
+memory capacity. Keep the backend private behind the configured proxy and apply
+connection, concurrency and timeout limits at the deployment boundary.

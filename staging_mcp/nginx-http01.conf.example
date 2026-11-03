@@ -1,0 +1,21 @@
+# EXAMPLE ONLY: include in http context only after separate ACME route approval.
+# Do not install the TLS example until issuance has succeeded.
+server {
+    listen 80;
+    server_name mcp-staging.directedideation.com;
+    access_log off;
+
+    # Do not accept a missing, unknown, or conflicting Host, even if this
+    # server is selected as the listener's implicit default.
+    if ($http_host !~* ^mcp-staging\.directedideation\.com(?::80)?$) {
+        return 444;
+    }
+
+    location ^~ /.well-known/acme-challenge/ {
+        root /var/lib/di-staging-acme;
+        try_files $uri =404;
+    }
+    location / {
+        return 404;
+    }
+}

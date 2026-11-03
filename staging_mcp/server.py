@@ -5,6 +5,7 @@ import math
 import os
 import re
 import time
+from typing import TypeGuard
 
 from fastmcp import FastMCP
 from fastmcp.server.auth import JWTVerifier, RemoteAuthProvider
@@ -13,6 +14,74 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 BASE = "https://mcp-staging.directedideation.com"
 RESOURCE = BASE + "/mcp"
+MAX_MCP_BODY_BYTES = 64 * 1024
+
+
+class MCPBodyLimitMiddleware:
+    """Buffer only bounded MCP bodies before allowing the application to run."""
+
+    def __init__(self, app):
+        """Wrap the MCP application."""
+        self.app = app
+
+    async def __call__(self, scope, receive, send):  # noqa: C901
+        """Validate and buffer a complete bounded request before dispatch."""
+        path = scope.get("path", "")
+        if scope["type"] != "http" or not (path == "/mcp" or path.startswith("/mcp/")):
+            await self.app(scope, receive, send)
+            return
+
+        lengths = [
+            value
+            for name, value in scope.get("headers", [])
+            if name.lower() == b"content-length"
+        ]
+        if len(lengths) > 1 or (lengths and not re.fullmatch(rb"[0-9]+", lengths[0])):
+            await self._reject(send, 400)
+            return
+        # Avoid converting an arbitrarily long integer supplied by a client.
+        length = None
+        if lengths:
+            digits = lengths[0].lstrip(b"0") or b"0"
+            if len(digits) > len(str(MAX_MCP_BODY_BYTES)):
+                await self._reject(send, 413)
+                return
+            length = int(digits)
+            if length > MAX_MCP_BODY_BYTES:
+                await self._reject(send, 413)
+                return
+
+        body = bytearray()
+        while True:
+            message = await receive()
+            if message["type"] != "http.request":
+                # A disconnected client cannot provide a complete body.
+                return
+            chunk = message.get("body", b"")
+            if len(chunk) > MAX_MCP_BODY_BYTES - len(body):
+                await self._reject(send, 413)
+                return
+            body.extend(chunk)
+            if not message.get("more_body", False):
+                break
+        if length is not None and length != len(body):
+            await self._reject(send, 400)
+            return
+
+        async def replay():
+            nonlocal body
+            if body is not None:
+                data = bytes(body)
+                body = None
+                return {"type": "http.request", "body": data, "more_body": False}
+            return await receive()
+
+        await self.app(scope, replay, send)
+
+    @staticmethod
+    async def _reject(send, status):
+        await send({"type": "http.response.start", "status": status, "headers": []})
+        await send({"type": "http.response.body", "body": b""})
 
 
 class StagingVerifier(JWTVerifier):
@@ -36,29 +105,35 @@ class StagingVerifier(JWTVerifier):
         """Deny missing expiry, non-exact audience or unapproved subjects."""
         if len(token) > 16384:
             return None
-        result = await super().verify_token(token)
+        try:
+            result = await super().verify_token(token)
+        except OverflowError:
+            # The upstream verifier converts exp to int before our checks.
+            return None
         if result is None:
             return None
         claims = result.claims
         exp = claims.get("exp")
         nbf = claims.get("nbf")
         sub = claims.get("sub")
+
+        def finite_number(value: object) -> TypeGuard[int | float]:
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                return False
+            try:
+                return math.isfinite(value)
+            except OverflowError:
+                return False
+
         if (
-            isinstance(exp, bool)
-            or not isinstance(exp, (int, float))
-            or not math.isfinite(exp)
+            not finite_number(exp)
             or exp <= time.time()
             or claims.get("aud") != RESOURCE
             or not isinstance(sub, str)
             or sub not in self.subjects
         ):
             return None
-        if "nbf" in claims and (
-            isinstance(nbf, bool)
-            or not isinstance(nbf, (int, float))
-            or not math.isfinite(nbf)
-            or nbf > time.time()
-        ):
+        if "nbf" in claims and (not finite_number(nbf) or nbf > time.time()):
             return None
         return result
 
@@ -93,6 +168,7 @@ def create_app():
         return "pong"
 
     app = mcp.http_app(path="/mcp", stateless_http=True)
+    app.add_middleware(MCPBodyLimitMiddleware)
     app.add_middleware(
         TrustedHostMiddleware, allowed_hosts=["mcp-staging.directedideation.com"]
     )

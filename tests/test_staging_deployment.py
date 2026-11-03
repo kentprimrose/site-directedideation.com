@@ -20,13 +20,65 @@ def test_staging_compose_is_loopback_only_and_has_no_mounts():
 
 def test_proxy_example_only_targets_staging():
     """The example must never direct requests to the private MCP."""
-    config = (STAGING / "Caddyfile.example").read_text()
-    assert "mcp-staging.directedideation.com {" in config
-    assert "reverse_proxy 127.0.0.1:8765" in config
+    config = (STAGING / "nginx.conf.example").read_text()
+    assert "server_name mcp-staging.directedideation.com;" in config
+    assert "proxy_pass http://127.0.0.1:8765;" in config
     assert "8001" not in config
-    assert "max_size 64KB" in config
-    assert "log {" not in config
+    assert "client_max_body_size 64k;" in config
+    assert "limit_req_zone $binary_remote_addr" in config
+    assert "limit_conn_zone $binary_remote_addr" in config
+    assert "limit_req zone=staging_mcp_req burst=5 nodelay;" in config
+    assert "limit_conn staging_mcp_conn 4;" in config
+    assert "proxy_set_header X-Forwarded-For $remote_addr;" in config
+    assert 'proxy_set_header Forwarded "";' in config
+    assert "access_log off;" in config
+    assert "ssl_certificate_key /etc/letsencrypt/" in config
+    assert "proxy_read_timeout 300s;" in config
+    assert "listen 443 ssl;" in config
+    assert "listen [::]" not in config
+    assert "ssl_protocols TLSv1.2 TLSv1.3;" in config
+    assert "server_tokens off;" in config
+    assert "limit_req_log_level warn;" in config
+    assert "limit_conn_log_level warn;" in config
+    assert "proxy_set_header Authorization $http_authorization;" in config
 
+
+def test_proxy_activation_and_certificate_bootstrap_are_gated():
+    """Require activation, listener review, and safe certificate bootstrap gates."""
+    deployment = " ".join((STAGING / "DEPLOYMENT.md").read_text().split())
+    assert "currently BLOCKED" in deployment
+    assert "certonly" in deployment and "--webroot" in deployment
+    assert "Do not use `certbot --nginx`" in deployment
+    assert "does not override inherited real-IP settings" in deployment
+    assert "full IPv6 address keys allow /64 address rotation" in deployment
+    assert "no `Retry-After`" in deployment
+    assert "implicit defaults" in deployment
+    assert "no SNI, an unknown SNI" in deployment
+    assert "staging SNI with an unexpected Host" in deployment
+    assert "ssl_reject_handshake on;" in deployment
+    assert "not included in the example" in deployment
+
+
+
+def test_http01_example_is_isolated_and_fail_closed():
+    config = (STAGING / "nginx-http01.conf.example").read_text()
+    assert "listen 80;" in config
+    assert "server_name mcp-staging.directedideation.com;" in config
+    assert 'if ($http_host !~* ^mcp-staging\\.directedideation\\.com(?::80)?$)' in config
+    assert "location ^~ /.well-known/acme-challenge/" in config
+    assert "root /var/lib/di-staging-acme;" in config
+    assert "try_files $uri =404;" in config
+    assert "return 444;" in config and "return 404;" in config
+    assert "proxy_pass" not in config and "default_server" not in config
+    assert "ssl_certificate" not in config
+
+
+def test_http01_bootstrap_and_renewal_are_separately_gated():
+    deployment = " ".join((STAGING / "DEPLOYMENT.md").read_text().split())
+    for required in ("public ACME-only HTTP route", "no AAAA record", "implicit defaults",
+                     "certbot certonly --webroot", "nginx -t && systemctl reload nginx",
+                     "--dry-run --run-deploy-hooks", "does not approve public MCP access"):
+        assert required in deployment
 
 def test_build_context_excludes_environment_files():
     """Only the explicitly allowed server and Dockerfile enter the context."""
