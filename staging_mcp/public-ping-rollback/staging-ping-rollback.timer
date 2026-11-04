@@ -1,0 +1,11 @@
+[Unit]
+Description=Repeatedly enforce staging ping expiry
+
+[Timer]
+OnBootSec=10s
+OnUnitActiveSec=15s
+AccuracySec=1s
+Unit=staging-ping-rollback.service
+
+[Install]
+WantedBy=timers.target

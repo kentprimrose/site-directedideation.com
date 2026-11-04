@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /usr/local/libexec/di-shared-test rollback

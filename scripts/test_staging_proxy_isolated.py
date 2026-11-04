@@ -103,7 +103,9 @@ check('valid signed token through proxy', 200, '127.0.0.6', bearer=token)
 body = check('authenticated ping', 200, '127.0.0.7', bearer=token, payload=call)
 assert 'pong' in body, body
 statuses = [request('127.0.0.8')[0] for _ in range(12)]
-assert 429 in statuses and 401 in statuses, statuses
+assert statuses == [401] * 12, statuses
+statuses += [request('127.0.0.8')[0] for _ in range(35)]
+assert 429 in statuses, statuses
 print('rate limit burst:', statuses, flush=True)
 """
 
@@ -160,8 +162,9 @@ def main():
             (path / "bootstrap.py").write_text(SERVER)
             (path / "client.py").write_text(CLIENT)
             example = (ROOT / "staging_mcp/nginx.conf.example").read_text()
-            assert example.count("listen 443 ssl;") == 1
-            example = example.replace("listen 443 ssl;", "listen 8443 ssl;")
+            assert example.count("listen 0.0.0.0:443 ssl;") == 1
+            example = example.replace("listen 0.0.0.0:443 ssl;", "listen 0.0.0.0:8443 ssl;")
+            assert example.count("listen 0.0.0.0:8443 ssl;") == 1
             example = example.replace(
                 "/etc/letsencrypt/live/mcp-staging.directedideation.com/fullchain.pem",
                 "/test/tls.crt",
@@ -172,7 +175,7 @@ def main():
             )
             # Same optional default as DEPLOYMENT.md, adapted to the isolated port.
             default = """server {
-    listen 8443 ssl default_server;
+    listen 0.0.0.0:8443 ssl default_server;
     ssl_reject_handshake on;
     return 444;
 }

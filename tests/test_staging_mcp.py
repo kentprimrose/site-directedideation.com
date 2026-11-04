@@ -1,6 +1,9 @@
 """Offline staging resource-server boundary tests."""
 
+import json
 import time
+from collections.abc import Callable
+from typing import cast
 
 import jwt
 import pytest
@@ -8,6 +11,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 from starlette.testclient import TestClient
 
+from site_directedideation_com.mcp import Stage
 from staging_mcp.server import RESOURCE, StagingVerifier, create_app
 
 ISSUER = "https://auth.example.com"
@@ -78,6 +82,7 @@ def test_http_auth_each_request(monkeypatch, caplog):
         assert request(claims, other).status_code == 401
         for bad in (
             {"iss": "https://wrong.example"},
+            {"iss": ISSUER + "/"},
             {"aud": "client_id"},
             {"aud": [RESOURCE]},
             {"exp": 1},
@@ -133,6 +138,20 @@ def test_http_auth_each_request(monkeypatch, caplog):
             ).status_code
             == 401
         )
+
+
+@pytest.mark.parametrize("issuer", [ISSUER, "https://tenant.auth.example.org"])
+def test_protected_resource_metadata_preserves_issuer(monkeypatch, issuer):
+    """Advertise the exact configured issuer at the real HTTP endpoint."""
+    monkeypatch.setenv("WORKOS_STAGING_ISSUER", issuer)
+    monkeypatch.setenv("WORKOS_STAGING_ALLOWED_SUBJECTS", "user_ABC")
+    with TestClient(create_app()) as client:
+        response = client.get(
+            "/.well-known/oauth-protected-resource/mcp", headers=HEADERS
+        )
+    assert response.status_code == 200
+    assert response.json()["authorization_servers"] == [issuer]
+    assert response.json()["resource"] == RESOURCE
 
 
 def test_configuration_fails_closed(monkeypatch):
@@ -252,3 +271,143 @@ def test_body_limit_installed_on_app(monkeypatch):
             ).status_code
             == 200
         )
+
+
+def test_authenticated_canonical_tools_and_input_boundary(monkeypatch):
+    """Expose canonical results and reject invalid input without echoing it."""
+    from site_directedideation_com.mcp import (
+        get_alternative_techniques,
+        get_diagnostic_checks,
+        get_directed_ideation_method,
+        get_interview_guidance,
+    )
+
+    monkeypatch.setenv("WORKOS_STAGING_ISSUER", ISSUER)
+    monkeypatch.setenv("WORKOS_STAGING_ALLOWED_SUBJECTS", "user_ABC")
+    key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    public = key.public_key().public_bytes(
+        Encoding.PEM, PublicFormat.SubjectPublicKeyInfo
+    )
+
+    async def get_key(self, token):
+        return public
+
+    monkeypatch.setattr(StagingVerifier, "_get_verification_key", get_key)
+    token = jwt.encode(
+        {
+            "iss": ISSUER,
+            "aud": RESOURCE,
+            "exp": int(time.time()) + 300,
+            "sub": "user_ABC",
+        },
+        key,
+        algorithm="RS256",
+    )
+    headers = {**HEADERS, "authorization": "Bearer " + token}
+    tools = (
+        get_directed_ideation_method,
+        get_interview_guidance,
+        get_diagnostic_checks,
+        get_alternative_techniques,
+    )
+    with TestClient(create_app()) as client:
+
+        def rpc(method, params, auth=headers):
+            return client.post(
+                "/mcp",
+                headers=auth,
+                json={"jsonrpc": "2.0", "id": 1, "method": method, "params": params},
+            )
+
+        listing = json.loads(rpc("tools/list", {}).text.split("data: ", 1)[1])[
+            "result"
+        ]["tools"]
+        assert {t["name"] for t in listing} == {"ping", *(t.__name__ for t in tools)}
+        supported_stages: tuple[Stage | None, ...] = (
+            None,
+            "identify-opportunities",
+            "select-goals",
+            "ideate-with-purpose",
+        )
+        for tool in tools:
+            stages = (None,) if tool is tools[0] else supported_stages
+            for stage in stages:
+                args = {} if stage is None else {"stage": stage}
+                response = rpc("tools/call", {"name": tool.__name__, "arguments": args})
+                expected = (
+                    tool()
+                    if stage is None
+                    else cast(Callable[[Stage], str], tool)(stage)
+                )
+                assert (
+                    json.loads(response.text.split("data: ", 1)[1])["result"][
+                        "content"
+                    ][0]["text"]
+                    == expected
+                )
+            for args in ({"extra": "SENTINEL_PRIVATE"}, {"stage": "SENTINEL_PRIVATE"}):
+                response = rpc("tools/call", {"name": tool.__name__, "arguments": args})
+                assert "SENTINEL_PRIVATE" not in response.text
+                assert "Invalid parameters" in response.text
+            assert (
+                rpc(
+                    "tools/call", {"name": tool.__name__, "arguments": {}}, HEADERS
+                ).status_code
+                == 401
+            )
+
+
+def test_pilot_hostname_switch_pins_host_audience_and_metadata(monkeypatch):
+    """Switching host must not accept the old audience or old Host header."""
+    monkeypatch.setenv("WORKOS_STAGING_ISSUER", ISSUER)
+    monkeypatch.setenv("WORKOS_STAGING_ALLOWED_SUBJECTS", "user_ABC")
+    monkeypatch.setenv("STAGING_MCP_HOST", "mcp.directedideation.com")
+    key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    public = key.public_key().public_bytes(
+        Encoding.PEM, PublicFormat.SubjectPublicKeyInfo
+    )
+
+    async def get_key(self, token):
+        return public
+
+    monkeypatch.setattr(StagingVerifier, "_get_verification_key", get_key)
+    claims = {
+        "iss": ISSUER,
+        "aud": "https://mcp.directedideation.com/mcp",
+        "exp": int(time.time()) + 300,
+        "sub": "user_ABC",
+    }
+    headers = {**HEADERS, "host": "mcp.directedideation.com"}
+    with TestClient(create_app()) as client:
+
+        def request(payload):
+            token = jwt.encode(payload, key, algorithm="RS256")
+            return client.post(
+                "/mcp",
+                headers={**headers, "authorization": "Bearer " + token},
+                json=INIT,
+            )
+
+        assert request(claims).status_code == 200
+        assert request({**claims, "aud": RESOURCE}).status_code == 401
+        assert client.post("/mcp", headers=HEADERS, json=INIT).status_code == 400
+        metadata = client.get(
+            "/.well-known/oauth-protected-resource/mcp", headers=headers
+        )
+        assert metadata.status_code == 200
+        assert metadata.json()["resource"] == claims["aud"]
+
+
+def test_pilot_hostname_rejects_unapproved_values(monkeypatch):
+    """Only explicitly approved exact hostnames may be configured."""
+    monkeypatch.setenv("WORKOS_STAGING_ISSUER", ISSUER)
+    monkeypatch.setenv("WORKOS_STAGING_ALLOWED_SUBJECTS", "user_ABC")
+    for host in (
+        "",
+        "evil.example",
+        "mcp.directedideation.com:443",
+        "MCP.directedideation.com",
+    ):
+        monkeypatch.setenv("STAGING_MCP_HOST", host)
+        with pytest.raises(ValueError, match="STAGING_MCP_HOST"):
+            create_app()

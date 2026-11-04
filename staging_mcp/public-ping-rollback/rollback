@@ -1,0 +1,34 @@
+#!/bin/sh
+# Dedicated nginx instance only. All paths and commands are intentionally fixed.
+set -u
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+export PATH
+state=/var/lib/staging-ping-rollback
+authorized=/etc/nginx-staging-ping/conf.d/public-ping.conf
+service=nginx-staging-ping.service
+mkdir -p "$state" || exit 1
+exec 9>"$state/lock" || exit 1
+flock -x 9 || exit 1
+now=$(date +%s) || exit 1
+deadline=$(cat "$state/deadline" 2>/dev/null) || deadline=
+case "$deadline" in ''|*[!0-9]*) expired=1 ;; *)
+    # Reject absurd values as well as missing/corrupt deadlines.
+    if [ "${#deadline}" -gt 10 ] || [ "$deadline" -le "$now" ] || [ "$deadline" -gt $((now + 1800)) ]; then expired=1; else expired=0; fi ;;
+esac
+[ "$expired" -eq 1 ] || exit 0
+if ! rm -f -- "$authorized"; then
+    flock -u 9 || :
+    [ "${1:-check}" = guard ] || systemctl stop "$service" || :
+    exit 1
+fi
+# No worker is running at ExecStartPre. Do not recursively manage the unit.
+[ "${1:-check}" = guard ] && exit 0
+# Release before systemctl to avoid deadlock with a concurrent boot guard.
+flock -u 9 || exit 1
+# Reload to retire workers using the old configuration. Failure is contained to
+# the dedicated instance; never stop/reload the host's unrelated nginx service.
+if nginx -t -c /etc/nginx-staging-ping/nginx.conf && systemctl reload "$service"; then
+    exit 0
+fi
+systemctl stop "$service" || :
+exit 1

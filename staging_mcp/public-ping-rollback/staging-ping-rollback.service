@@ -1,0 +1,7 @@
+[Unit]
+Description=Expire one-time staging ping public configuration
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/local/sbin/staging-ping-rollback check

@@ -1,13 +1,14 @@
 services:
   staging-mcp:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: .build-context
+      dockerfile: staging_mcp/Dockerfile
     image: directed-ideation-staging-mcp:local
     restart: unless-stopped
     ports:
       - "127.0.0.1:8765:8765"
     environment:
+      STAGING_MCP_HOST: ${STAGING_MCP_HOST:-mcp-staging.directedideation.com}
       WORKOS_STAGING_ISSUER: ${WORKOS_STAGING_ISSUER:?Set the staging issuer}
       WORKOS_STAGING_ALLOWED_SUBJECTS: ${WORKOS_STAGING_ALLOWED_SUBJECTS:?Set exact staging subject IDs}
     read_only: true

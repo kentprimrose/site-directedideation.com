@@ -1,0 +1,160 @@
+#!/usr/bin/python3
+"""One-time shared nginx test. Install and invoke only as documented."""
+import fcntl
+import hashlib
+import os
+import stat
+import subprocess
+import sys
+import time
+
+CONF = '/etc/nginx/conf.d'
+STATE = '/var/lib/di-shared-test'
+SOURCE = '/home/kent/di-staging-prep.DN3Sxw2R/di-staging-public-test.conf'
+DIGEST = '7f840890562b29787b516fde9c5bf151b34db7d28ece50e8bcd08b9ebb3ac530'
+# Rollback accepts the previously reviewed 10r/m configuration during migration.
+OLD_DIGEST = '814b89c83fcc507d773cb73fee5f77a1a727d45da48b03927cf5959f4d32d3f4'
+PUBLIC = 'di-staging-public-test.conf'
+LOOP = 'di-staging-loopback-check.conf'
+ROLLBACK = '/usr/local/sbin/di-shared-test-rollback'
+UNIT = 'di-shared-test-rollback-once'
+WINDOW = 1500
+COMMAND_TIMEOUT = 20
+
+
+def trusted_dir(path):
+    path = os.path.abspath(path)
+    while True:
+        s = os.lstat(path)
+        if not stat.S_ISDIR(s.st_mode) or s.st_uid != 0 or s.st_mode & 0o022:
+            raise RuntimeError('untrusted directory: ' + path)
+        if path == '/':
+            break
+        path = os.path.dirname(path)
+
+
+def read_regular(path, root_owned=False):
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    try:
+        s = os.fstat(fd)
+        if not stat.S_ISREG(s.st_mode) or (root_owned and (s.st_uid != 0 or s.st_mode & 0o022)):
+            raise RuntimeError('unsafe file: ' + path)
+        with os.fdopen(fd, 'rb', closefd=False) as f:
+            return f.read(1024 * 1024 + 1)
+    finally:
+        os.close(fd)
+
+
+def command(args, timeout=COMMAND_TIMEOUT):
+    subprocess.run(args, check=True, timeout=timeout, stdin=subprocess.DEVNULL)
+
+
+def lock():
+    trusted_dir(CONF)
+    trusted_dir(os.path.dirname(STATE))
+    try:
+        os.mkdir(STATE, 0o700)
+    except FileExistsError:
+        pass
+    trusted_dir(STATE)
+    fd = os.open(os.path.join(STATE, 'lock'), os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+    s = os.fstat(fd)
+    if not stat.S_ISREG(s.st_mode) or s.st_uid != 0 or s.st_mode & 0o077:
+        raise RuntimeError('unsafe lock')
+    fcntl.flock(fd, fcntl.LOCK_EX)
+    return fd
+
+
+def reload_nginx(deadline=None):
+    def remaining():
+        if deadline is None:
+            return COMMAND_TIMEOUT
+        left = deadline - time.monotonic()
+        if left <= 0:
+            raise RuntimeError('timer deadline elapsed')
+        return min(COMMAND_TIMEOUT, left)
+    command(['/usr/sbin/nginx', '-t'], remaining())
+    command(['/usr/bin/systemctl', 'reload', 'nginx.service'], remaining())
+    if deadline is not None and time.monotonic() >= deadline:
+        raise RuntimeError('timer deadline elapsed during reload')
+
+
+def rollback():
+    public = os.path.join(CONF, PUBLIC)
+    loop = os.path.join(CONF, LOOP)
+    backup = loop + '.disabled'
+    # Refuse to destroy an unexpected file, even when recovering from failure.
+    if os.path.lexists(public):
+        if hashlib.sha256(read_regular(public, True)).hexdigest() not in (DIGEST, OLD_DIGEST):
+            raise RuntimeError('unexpected public configuration; manual intervention required')
+        os.unlink(public)
+    if os.path.lexists(backup):
+        read_regular(backup, True)
+        if os.path.lexists(loop):
+            raise RuntimeError('loopback destination occupied; manual intervention required')
+        os.rename(backup, loop)
+    reload_nginx()
+
+
+def activate():
+    public = os.path.join(CONF, PUBLIC)
+    loop = os.path.join(CONF, LOOP)
+    backup = loop + '.disabled'
+    marker = os.path.join(STATE, 'used')
+    if any(os.path.lexists(p) for p in (public, public + '.disabled', backup, marker)):
+        raise RuntimeError('existing test, backup, or one-time marker')
+    read_regular(loop, True)
+    data = read_regular(SOURCE)
+    if hashlib.sha256(data).hexdigest() != DIGEST:
+        raise RuntimeError('source SHA-256 mismatch')
+    # Validate the installed rollback and its parents before committing any state.
+    trusted_dir(os.path.dirname(ROLLBACK))
+    read_regular(ROLLBACK, True)
+    trusted_dir('/usr/local/libexec')
+    read_regular('/usr/local/libexec/di-shared-test', True)
+    fd = os.open(marker, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+    os.close(fd)
+    staged = False
+    temp = os.path.join(CONF, '.di-staging-public-test.tmp')
+    try:
+        fd = os.open(temp, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o644)
+        try:
+            with os.fdopen(fd, 'wb') as f:
+                f.write(data)
+            os.rename(loop, backup)
+            staged = True
+            os.link(temp, public, follow_symlinks=False)
+        finally:
+            os.unlink(temp)
+        # Start the conservative deadline before asking systemd to schedule it.
+        deadline = time.monotonic() + WINDOW
+        command(['/usr/bin/systemd-run', '--unit=' + UNIT, '--on-active=25m',
+                 '--timer-property=AccuracySec=1s', ROLLBACK])
+        reload_nginx(deadline)
+    except BaseException:
+        if staged:
+            try:
+                rollback()
+            except Exception as error:
+                print('ROLLBACK FAILED: ' + str(error), file=sys.stderr)
+        raise
+
+
+def main():
+    if os.geteuid() != 0:
+        raise RuntimeError('must run as root')
+    if len(sys.argv) != 2 or sys.argv[1] not in ('activate', 'rollback'):
+        raise RuntimeError('expected activate or rollback')
+    fd = lock()
+    try:
+        (activate if sys.argv[1] == 'activate' else rollback)()
+    finally:
+        os.close(fd)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except Exception as exc:
+        print('di-shared-test: ' + str(exc), file=sys.stderr)
+        sys.exit(1)
