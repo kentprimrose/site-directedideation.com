@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Disposable, labelled Podman rehearsal of guard a5c72bb; not a production test.
+"""Disposable, labelled Podman rehearsal of the checked-in guard; not a production test.
 
 Requires the running rootful podman-machine-default, docker-compose v2+, and an
 already-local docker.io/library/python:3.11-slim. No ports or volumes published.
@@ -17,7 +17,6 @@ import tempfile
 from pathlib import Path
 from typing import Any, cast
 
-REV = "a5c72bb6d09865f1e1ec6a4524f6f2cae09a9894"
 ROOT = Path(__file__).resolve().parents[1]
 BASE = "docker.io/library/python:3.11-slim"
 
@@ -29,8 +28,20 @@ def call(*args, **kwargs):
     ).stdout.strip()
 
 
+def load_guard(project):
+    """Load the checked-in guard with an isolated Compose project name."""
+    path = ROOT / "staging_mcp" / "staging-upgrade" / "upgrade.py"
+    spec = importlib.util.spec_from_file_location("rehearsal_guard", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("Cannot load checked-in guard")
+    guard = cast(Any, importlib.util.module_from_spec(spec))
+    spec.loader.exec_module(guard)
+    guard.PROJECT = project
+    return guard
+
+
 def main():  # noqa: C901
-    """Exercise the pinned guard on isolated labelled Podman resources."""
+    """Exercise the checked-in guard on isolated labelled Podman resources."""
     podman = shutil.which("podman")
     compose = shutil.which("docker-compose")
     if not podman or not compose:
@@ -56,22 +67,10 @@ def main():  # noqa: C901
     tag = "localhost/" + token + ":active"
     backup = "localhost/" + token + ":backup"
     candidate_tag = "localhost/" + token + ":candidate"
-    # Substitute only the hard-coded project name; all other guard code comes
-    # from the pinned commit. The adapter below translates Docker to Podman.
-    source = call(
-        "git", "-C", str(ROOT), "show", REV + ":staging_mcp/staging-upgrade/upgrade.py"
-    )
-    source = source.replace("'di-staging'", repr(project))
     try:
         with tempfile.TemporaryDirectory(prefix=token) as td:
             root = Path(td)
-            module = root / "guard.py"
-            module.write_text(source)
-            spec = importlib.util.spec_from_file_location("rehearsal_guard", module)
-            if spec is None or spec.loader is None:
-                raise RuntimeError("Cannot load pinned guard")
-            u = cast(Any, importlib.util.module_from_spec(spec))
-            spec.loader.exec_module(u)
+            u = load_guard(project)
             u.TAG, u.BACKUP, u.CONTAINER = tag, backup, project + "-staging-mcp-1"
             u.OLD, u.NEW, u.STATE = (
                 root / "old" / "compose.yaml",
@@ -176,6 +175,7 @@ networks:
                     if args[0] == "inspect":
                         data = json.loads(out)
                         for c in data:
+                            c["Name"] = "/" + c["Name"].lstrip("/")
                             c["Image"] = "sha256:" + c["Image"].removeprefix("sha256:")
                         out = json.dumps(data)
                     return out

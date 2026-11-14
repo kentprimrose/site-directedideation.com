@@ -104,13 +104,14 @@ settings require independent inspection. Recovery files are checked as mode 0600
 in a mode 0700 root-owned state directory; trusted ancestors need not be 0700.
 `scripts/rehearse_guard_podman.py` passed switch, recovery, drift and injected
 failure checks against guard commit `a5c72bb6d09865f1e1ec6a4524f6f2cae09a9894`.
-It loads that Git object, not the current checkout; that object must be locally
-available. The harness substitutes synthetic Compose inputs and a Podman adapter,
-bypasses root-path trust and the CLI, and injects exceptions rather than process
+The harness now loads the checked-in guard directly, with a synthetic project
+name, Compose inputs and a Podman adapter; no historical Git object is required.
+It bypasses root-path trust and the CLI, and injects exceptions rather than process
 kills. It does not establish real image identity, actual nginx closure, OAuth,
 lock races, filesystem crash durability or Docker/Compose equivalence.
 The guard now refuses unexpected, duplicated or renamed Compose project
 containers and rechecks the inventory before recreation; those checks are not
 atomic against other Docker users. The current CLI switch remains disabled
-pending a credible pre-switch reproducibility proof. The pinned-commit rehearsal
-predates the new container-inventory checks. No live action was performed.
+pending a credible pre-switch reproducibility proof. The historical pinned-commit
+rehearsal predates the new container-inventory checks. A subsequent disposable rehearsal of the checked-in guard exercises those
+checks as well. No live action was performed.
