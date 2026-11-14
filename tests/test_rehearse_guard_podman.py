@@ -64,4 +64,9 @@ def test_load_guard_uses_checkout_without_git(monkeypatch, tmp_path):
 
 def test_production_default_project_unchanged():
     """Loading an isolated module does not change the checked-in default."""
-    assert rehearsal.load_guard("di-staging").PROJECT == "di-staging"
+    path = rehearsal.ROOT / "staging_mcp" / "staging-upgrade" / "upgrade.py"
+    spec = importlib.util.spec_from_file_location("production_guard", path)
+    assert spec and spec.loader
+    guard = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(guard)
+    assert guard.PROJECT == "di-staging"
