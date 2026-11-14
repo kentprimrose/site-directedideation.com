@@ -10,43 +10,16 @@ customer-facing use. Use a limited, explicitly approved subject allowlist and do
 not put sensitive material into the pilot. Authentication limitations and remaining
 risks still apply. Read README.md for the authentication limitations.
 
-## Planned pilot hostname migration (not yet performed)
+## Approved trusted-user pilot migration (not yet performed)
 
-The intended new address is `https://mcp.directedideation.com/mcp`, still the
-**limited staging pilot**, using the same WorkOS staging issuer and exact subject
-allowlist; this is not a production launch. Existing examples, commands, reviewed
-proxy configurations and rollback artifacts below refer to the current
-`mcp-staging.directedideation.com` deployment unless explicitly stated otherwise.
-Do not silently replace them or their recorded digests. No DNS, host, certificate,
-WorkOS, or client changes are made by this repository change.
+G1 and G2 are approved: the intended address is `https://mcp.directedideation.com/mcp`, using **WorkOS production**, a new production issuer, and an explicit allowlist of production user IDs for approximately 2–5 personally approved trusted users. This non-sensitive pilot accepts the risk of deferring legal and independent security reviews, privacy/subprocessor disclosures, US eligibility controls, and broad client validation; these are not waived and must be completed before commercial release or access outside the trusted set. General availability remains blocked. The existing WorkOS staging environment is retained for rollback, not reused as the new issuer.
 
-Before an explicitly approved cutover, inventory the live deployment and DNS,
-TLS, proxy configuration, image/configuration and exact rollback dependencies;
-securely preserve and independently verify the existing rollback artifacts and
-hashes. Review a separate new-host nginx configuration and certificate issuance/
-renewal plan, including HTTP-01 routing, IPv4/IPv6, TLS, private backend, logging,
-rate and connection limits. Do not reuse a staging-host certificate path or assume
-these examples are already suitable. Rehearse on an isolated setup, check the
-new name is available, decide the outage/TTL window, and obtain authorization
-for DNS, host and WorkOS changes. Keep general production blocked.
+The approved process is to inventory the live state read-only, preserve and verify rollback artifacts, prepare and rehearse closure and full restoration, then pre-provision, cut over and verify as described in `docs/PROD_DEPLOY_PLAN.md`. Process approval is not authorization to execute individual live changes; obtain a separate go-ahead for each. Existing examples, commands, proxy configurations and rollback artifacts below describe the current staging deployment unless explicitly stated otherwise. Do not silently replace their recorded digests.
 
-At the approved window, register the exact new resource indicator
-`https://mcp.directedideation.com/mcp` in the **staging** WorkOS environment,
-confirm issuer, subject allowlist and token semantics remain unchanged, and plan
-client reauthorization: old resource tokens have the wrong `aud` and are rejected.
-Update clients to discover/use the new resource and obtain new tokens (including
-refresh/reconsent as necessary); do not copy bearer tokens into logs or commands.
-Deploy the reviewed image and proxy with `STAGING_MCP_HOST=mcp.directedideation.com`
-in the staging Compose environment, provision and verify the matching certificate,
-then apply the approved DNS routing. Backend Host validation, protected-resource
-metadata, healthcheck and exact single-string audience change together; neither
-hostname nor audience is accepted simultaneously. Coordinate this with proxy/DNS
-and client changes to avoid an accidental service interruption. Setting the
-variable alone does not configure the proxy or WorkOS.
-
+For cutover, register the new resource in WorkOS production, collect the exact production identities through a supported controlled flow, deploy the reviewed backend with the new host, production issuer and production allowlist together, and coordinate proxy, DNS, TLS and client changes. Users must change the URL and reauthorize; old resource tokens fail audience validation. Host and audience are not accepted simultaneously. Do not put tokens in logs or command arguments.
 Verify externally and on the private boundary: DNS A/AAAA and certificate identity,
 no direct backend exposure, host rejection, healthy container, protected-resource
-metadata and exact staging issuer/resource, unauthenticated 401, rejection of
+metadata and exact production issuer/resource, unauthenticated 401, rejection of
 old-audience/wrong-issuer/non-allowlisted tokens, and successful authorized pilot
 client discovery, reauthorization, `ping` and guidance calls. Check logging,
 rate limits, refresh and expiry behavior without exposing credentials. Stop and
