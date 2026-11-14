@@ -20,6 +20,7 @@ STATE = Path("/var/lib/di-staging-upgrade")
 LOCK = Path("/run/lock/di-staging-allowlist.lock")
 OLD_HASH = "18e3d4bf8a8d5fdbf365fb069c0eae14903a11292197812ae28e44506eff3c45"
 NEW_HASH = "8530bd8b4071cfba9943d66105a776da613193cb8fbe10f317c200ab82cae5ff"
+PROJECT = "di-staging"
 TAG = "directed-ideation-staging-mcp:local"
 BACKUP = "directed-ideation-staging-mcp:upgrade-preserved"
 CONTAINER = "di-staging-staging-mcp-1"
@@ -186,7 +187,7 @@ def container():
                 fail("Invalid container labels.")
             if (
                 c["Name"].lstrip("/") == CONTAINER
-                or labels.get("com.docker.compose.project") == "di-staging"
+                or labels.get("com.docker.compose.project") == PROJECT
             ):
                 relevant.append(c)
         except (ValueError, KeyError, TypeError):
@@ -232,7 +233,7 @@ def compose(path, env, *args):
     return run(
         "compose",
         "--project-name",
-        "di-staging",
+        PROJECT,
         "--project-directory",
         str(path.parent),
         "-f",
@@ -265,7 +266,7 @@ def verify(c, image_id, path, env, expected_hash, old):
         fail("Container image or running state mismatch.")
     labels = c["Config"]["Labels"]
     for key, val in {
-        "project": "di-staging",
+        "project": PROJECT,
         "service": "staging-mcp",
         "project.config_files": str(path),
         "project.working_dir": str(path.parent),
