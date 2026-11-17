@@ -47,6 +47,10 @@ jobs:
           mkdir -p ~/.ssh
           printf '%s\n' "$KEY" > ~/.ssh/deploy_key
           printf '%s\n' "$HOST_KEYS" > ~/.ssh/known_hosts
+      - name: Refuse stale main revision
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 scripts/check_main_tip.py
       - name: Transfer and deploy
         timeout-minutes: 15
         env:

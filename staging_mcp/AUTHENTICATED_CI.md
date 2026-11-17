@@ -56,3 +56,12 @@ and recreate only `di-staging`. Verify health, unauthorized rejection, and an
 authorized client. The rollback tag is a single slot, not history; repeated deploys
 replace it. Preserve additional immutable image IDs separately before operations.
 Never run manual recovery concurrently with CI or allowlist changes.
+
+The workflow checks the current GitHub main tip after approval and image build,
+just before transfer; stale runs and API failures do not deploy. This is a
+point-in-time check, not an atomic transaction with a push to main. A push or
+host-lock delay after the check can still make a deployment stale; coordinate
+long-running host operations and verify the deployed revision after the queue
+clears. The receiver checks the pinned Compose inputs under the shared lock
+immediately before deployment and again before any rollback; if they change,
+rollback is refused and an operator must recover safely.

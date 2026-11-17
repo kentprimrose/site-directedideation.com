@@ -34,10 +34,8 @@ def run(*args, env=None, stdin=None):
     ).stdout
 
 
-def main(sha):  # noqa: C901
-    """Validate the live service and deploy or restore its image."""
-    if os.geteuid() != 0 or not re.fullmatch(r"[0-9a-f]{40}", sha):
-        raise ValueError("Invalid caller or revision")
+def validate_compose():
+    """Check trusted Compose inputs while holding the shared lock."""
     for path in ("/etc", "/etc/di-staging", COMPOSE):
         s = os.lstat(path)
         if stat.S_ISLNK(s.st_mode) or s.st_uid != 0 or s.st_mode & 0o022:
@@ -47,8 +45,15 @@ def main(sha):  # noqa: C901
         or hashlib.sha256(open(COMPOSE, "rb").read()).hexdigest() != COMPOSE_SHA
     ):
         raise ValueError("Unexpected compose configuration")
+
+
+def main(sha):  # noqa: C901
+    """Validate the live service and deploy or restore its image."""
+    if os.geteuid() != 0 or not re.fullmatch(r"[0-9a-f]{40}", sha):
+        raise ValueError("Invalid caller or revision")
     with open("/run/lock/di-staging-allowlist.lock", "a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
+        validate_compose()
         c = json.loads(run("inspect", CONTAINER))[0]
         labels = c["Config"]["Labels"]
         if (
@@ -111,10 +116,12 @@ def main(sha):  # noqa: C901
             "staging-mcp",
         )
         try:
+            validate_compose()
             run(*command, env=env)
         except Exception:
             run("tag", old, TAG)
             try:
+                validate_compose()
                 run(*command, env=env)
             except Exception:
                 print(

@@ -123,3 +123,9 @@ Stop only the local project with `podman compose -p di-local -f compose.yaml
 down` (set `MCP_IMAGE` as above); do not use `-v` if preserving metrics.
 Podman Compose provider behavior and rootless networking differ from Docker;
 test Docker on the droplet and do not infer external isolation from local tests.
+
+The workflow checks the current GitHub main tip after approval and image build,
+just before transfer; stale runs and API failures do not deploy. This is a
+point-in-time check: a later push or a wait for the host lock can still make an
+in-flight deployment stale. Coordinate long-running host operations and verify
+the deployed revision after the queue clears.

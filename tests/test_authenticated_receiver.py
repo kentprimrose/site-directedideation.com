@@ -16,7 +16,9 @@ receiver = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(receiver)
 
 
-@pytest.mark.parametrize("fail_deploy", [False, True])
+@pytest.mark.parametrize(
+    "fail_deploy", [False, True, "change_on_lock", "change_on_failure"]
+)
 def test_deploy_and_rollback(monkeypatch, tmp_path, fail_deploy):
     """Recreate only the target and restore on deployment failure."""
     compose = tmp_path / "compose.yaml"
@@ -39,7 +41,12 @@ def test_deploy_and_rollback(monkeypatch, tmp_path, fail_deploy):
         ),
     )
     monkeypatch.setattr(receiver.os.path, "lexists", lambda p: False)
-    monkeypatch.setattr(receiver.fcntl, "flock", lambda *a: None)
+
+    def lock(*args):
+        if fail_deploy == "change_on_lock":
+            compose.write_text("unreviewed")
+
+    monkeypatch.setattr(receiver.fcntl, "flock", lock)
     monkeypatch.setattr(receiver.sys, "stdin", SimpleNamespace(buffer=io.BytesIO()))
     original_open = open
     monkeypatch.setattr(
@@ -79,17 +86,25 @@ def test_deploy_and_rollback(monkeypatch, tmp_path, fail_deploy):
             and fail_deploy
             and sum(c[0][0] == "compose" for c in calls) == 1
         ):
+            if fail_deploy == "change_on_failure":
+                compose.write_text("unreviewed")
             raise RuntimeError("failure")
         return b""
 
     monkeypatch.setattr(receiver, "run", run)
+    if fail_deploy == "change_on_lock":
+        with pytest.raises(ValueError):
+            receiver.main("a" * 40)
+        assert not calls
+        return
     if fail_deploy:
         with pytest.raises(RuntimeError):
             receiver.main("a" * 40)
         assert (("tag", old, receiver.TAG), {}) in calls
     else:
         receiver.main("a" * 40)
-    assert sum(c[0][0] == "compose" for c in calls) == (2 if fail_deploy else 1)
+    expected = 1 if fail_deploy in (False, "change_on_failure") else 2
+    assert sum(c[0][0] == "compose" for c in calls) == expected
     assert all(
         c[1]["env"]["WORKOS_STAGING_ALLOWED_SUBJECTS"] == "user_ABC"
         for c in calls
