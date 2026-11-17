@@ -7,6 +7,7 @@ import logging
 import socket
 from collections.abc import AsyncGenerator, Awaitable, Callable
 from contextlib import asynccontextmanager
+from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, Literal, cast
 
@@ -248,6 +249,18 @@ def test_complete_method(transport: Transport) -> None:
         assert "one question at a time" in result.lower()
         assert "confirm it" in result.lower()
         assert "confirm or revise it" in result.lower()
+        for phrase in (
+            "direction is a compass, not a track",
+            "observation and reframing",
+            "deciding and sharpening",
+            "diverge, converge and learn",
+            "do not invent evidence",
+            "do not advance",
+            "do not claim an action",
+            "ideas considered",
+            "learning, revisions",
+        ):
+            assert phrase in result.lower()
         assert "First action" in result
         assert "Observable evidence" in result
         assert "Do not execute actions" in result
@@ -290,8 +303,16 @@ def test_supplementary_menus(transport: Transport, tool_name: str) -> None:
             assert all(stage in menu for stage in INTERVIEW_STAGES)
             assert "not yet implemented" in menu.lower()
             assert "not advertised" in menu.lower()
+        unfiltered = text(await client.call_tool(tool_name, {}))
         for stage in INTERVIEW_STAGES:
             menu = text(await client.call_tool(tool_name, {"stage": stage}))
+            title, sections = unfiltered.split("\n\n", 1)
+            expected = next(
+                part
+                for part in sections.split("\n\n")
+                if part.startswith(f"## {stage}\n")
+            )
+            assert menu == f"{title}\n\n{expected}"
             assert stage in menu
             assert all(
                 other not in menu for other in INTERVIEW_STAGES if other != stage
@@ -337,3 +358,24 @@ def test_rejected_inputs_do_not_echo_over_protocol(
     assert "SENTINEL_PROBE" not in service_logs
     captured = capsys.readouterr()
     assert "SENTINEL_PROBE" not in captured.out + captured.err
+
+
+def test_documented_tool_responses_match_implementation() -> None:
+    """The checked-in reference captures the actual unfiltered responses."""
+    from site_directedideation_com.mcp import (
+        get_alternative_techniques,
+        get_diagnostic_checks,
+        get_directed_ideation_method,
+        get_interview_guidance,
+    )
+
+    reference = (
+        Path(__file__).resolve().parents[1] / "docs/MCP_TOOL_RESPONSES.md"
+    ).read_text()
+    for tool in (
+        get_directed_ideation_method,
+        get_interview_guidance,
+        get_diagnostic_checks,
+        get_alternative_techniques,
+    ):
+        assert f"## `{tool.__name__}`\n\n```text\n{tool().rstrip()}\n```" in reference

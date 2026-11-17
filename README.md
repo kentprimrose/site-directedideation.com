@@ -89,7 +89,11 @@ services.
 The local MCP server exposes one canonical explicit-invocation tool,
 `get_directed_ideation_method`, plus three supplementary read-only tools:
 `get_interview_guidance`, `get_diagnostic_checks`, and `get_alternative_techniques`.
-All context stays client-side; the tools accept no session content and the
+The method uses three revisable loops: observe and reframe opportunities, decide
+and sharpen goals, then diverge, converge and learn from ideas. The chosen goal
+is a compass rather than a fixed track; the user can revisit earlier framing as
+evidence emerges. See [MCP tool responses](docs/MCP_TOOL_RESPONSES.md) for the
+complete guidance. All context stays client-side; the tools accept no session content and the
 supplementary tools accept only an optional stage filter. See
 `docs/CAPABILITY_PROBE.md` for the full surface, test results, and successful
 Pi/Codex conversational validation, including its limitations.
