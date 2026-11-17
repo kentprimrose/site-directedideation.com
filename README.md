@@ -198,3 +198,6 @@ ports rather than stopping other processes. State and append-only logs live in
 only signals a process whose recorded identity can be verified; if verification
 fails, it retains the state for investigation. An alternate port also requires
 updating the MCP client endpoint.
+
+Authenticated production CI setup and recovery are described in
+[staging_mcp/AUTHENTICATED_CI.md](staging_mcp/AUTHENTICATED_CI.md).

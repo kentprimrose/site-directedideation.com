@@ -1,0 +1,62 @@
+name: Authenticated production deployment
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: authenticated-production-deployment
+  cancel-in-progress: false
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.11'
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
+      - run: uv sync --all-groups --frozen
+      - run: uv run --frozen pytest
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: authenticated-production
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Build isolated authenticated image
+        run: |
+          python3 scripts/prepare_staging_build_context.py
+          docker build \
+            -f staging_mcp/.build-context/staging_mcp/Dockerfile \
+            -t "directed-ideation-authenticated:${GITHUB_SHA}" \
+            staging_mcp/.build-context
+      - name: Configure SSH
+        env:
+          KEY: ${{ secrets.AUTH_DEPLOY_SSH_PRIVATE_KEY }}
+          HOST_KEYS: ${{ secrets.AUTH_DEPLOY_SSH_KNOWN_HOSTS }}
+        run: |
+          set -eu
+          umask 077
+          mkdir -p ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/deploy_key
+          printf '%s\n' "$HOST_KEYS" > ~/.ssh/known_hosts
+      - name: Transfer and deploy
+        timeout-minutes: 15
+        env:
+          HOST: ${{ secrets.AUTH_DEPLOY_HOST }}
+          USER: ${{ secrets.AUTH_DEPLOY_USER }}
+        run: |
+          set -euo pipefail
+          docker save "directed-ideation-authenticated:${GITHUB_SHA}" | \
+            ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes \
+              -o StrictHostKeyChecking=yes -o BatchMode=yes \
+              -o ConnectTimeout=15 -o ServerAliveInterval=15 \
+              -o ServerAliveCountMax=4 "$USER@$HOST" \
+              sudo -n /usr/local/sbin/di-auth-receive "$GITHUB_SHA"

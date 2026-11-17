@@ -21,6 +21,7 @@ from site_directedideation_com.mcp import (
     get_diagnostic_checks,
     get_directed_ideation_method,
     get_interview_guidance,
+    get_lateral_thinking_guidance,
 )
 
 BASE = "https://mcp-staging.directedideation.com"
@@ -102,7 +103,11 @@ class ToolInputBoundary(Middleware):
         """Validate the allowed arguments before SDK validation can echo values."""
         message = context.message
         arguments = message.arguments or {}
-        if message.name in {"ping", "get_directed_ideation_method"}:
+        if message.name in {
+            "ping",
+            "get_directed_ideation_method",
+            "get_lateral_thinking_guidance",
+        }:
             valid = not arguments
         elif message.name in {
             "get_interview_guidance",
@@ -212,6 +217,7 @@ def create_app():
     for tool in (
         get_directed_ideation_method,
         get_interview_guidance,
+        get_lateral_thinking_guidance,
         get_diagnostic_checks,
         get_alternative_techniques,
     ):
@@ -224,7 +230,5 @@ def create_app():
 
     app = mcp.http_app(path="/mcp", stateless_http=True)
     app.add_middleware(MCPBodyLimitMiddleware)
-    app.add_middleware(
-        TrustedHostMiddleware, allowed_hosts=[host]
-    )
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=[host])
     return app
