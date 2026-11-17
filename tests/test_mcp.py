@@ -20,6 +20,7 @@ from mcp.types import TextContent
 
 from site_directedideation_com.mcp import (
     INTERVIEW_STAGES,
+    Stage,
     _InputBoundary,
     aggregate_counts,
     mcp,
@@ -131,9 +132,9 @@ def test_tool_failures_do_not_increment_counts() -> None:
 
     async def check() -> None:
         boundary = _InputBoundary()
-        await boundary.on_call_tool(context, error_result)
+        await boundary.on_call_tool(context, cast(Any, error_result))
         with pytest.raises(RuntimeError):
-            await boundary.on_call_tool(context, exception)
+            await boundary.on_call_tool(context, cast(Any, exception))
 
     asyncio.run(check())
     assert aggregate_counts() == before
@@ -319,6 +320,40 @@ def test_supplementary_menus(transport: Transport, tool_name: str) -> None:
             )
 
     run_check(transport, check)
+
+
+@pytest.mark.parametrize(
+    ("stage", "phrases"),
+    [
+        (
+            "identify-opportunities",
+            ("recent, specific", "inferring", "other need", "best fits"),
+        ),
+        (
+            "select-goals",
+            ("fixed", "assumed", "tradeoffs", "observable sign", "revisable"),
+        ),
+        (
+            "ideate-with-purpose",
+            (
+                "different mechanisms",
+                "which ideas",
+                "first small action",
+                "evidence",
+                "what happened",
+                "framing change",
+            ),
+        ),
+    ],
+)
+def test_interview_guidance_covers_iterative_substeps(
+    stage: Stage, phrases: tuple[str, ...]
+) -> None:
+    """Each filtered menu offers the stage's key iterative questions."""
+    from site_directedideation_com.mcp import get_interview_guidance
+
+    menu = get_interview_guidance(stage)
+    assert all(phrase in menu.lower() for phrase in phrases)
 
 
 @pytest.mark.parametrize(

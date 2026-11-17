@@ -192,24 +192,27 @@ Do not send this record to the MCP service.
 
 _INTERVIEW_GUIDANCE: dict[Stage, list[str]] = {
     "identify-opportunities": [
-        "Concrete incident: ask for a recent, specific example of the friction.",
-        "Stakeholder viewpoint: ask whose experience is overlooked.",
-        "Change scan: ask what has become possible recently.",
-        "Reframe loop: ask what another observation or perspective might change.",
+        "Observation: what happened in a recent, specific example?",
+        "Assumption: what are we inferring rather than observing?",
+        "Perspective: whose experience or workaround have we missed?",
+        "Compare framings: what other need or tension could explain this?",
+        "Confirm: which framing best fits, and would you revise it?",
     ],
     "select-goals": [
-        "Value check: ask who benefits and by how much.",
-        "Evidence check: ask what has been observed and what is assumed.",
-        "Agency check: ask what the user can actually change.",
-        "Learning check: ask what small experiment would teach the most.",
-        "Sharpen: ask what success looks like and which tradeoff matters most.",
+        "Value and agency: who benefits, and what can you influence?",
+        "Constraints: which limits are fixed, and which are assumed?",
+        "Compare: which opportunity offers the most value and learning?",
+        "Tradeoffs: what would you give up by choosing this goal?",
+        "Success: what observable sign would show progress?",
+        "Confirm: is this a useful, revisable goal?",
     ],
     "ideate-with-purpose": [
-        "Reframe: ask 'How might we...?' tied to the confirmed goal.",
-        "Mechanism variety: ask for ideas that work in five different ways.",
-        "Constraint provocation: ask what could work with no new software.",
-        "Falsifiability: ask what would need to be seen to change their mind.",
-        "Learn: ask what happened and whether to revise the idea, goal, or framing.",
+        "Reframe: what 'How might we...?' follows from the confirmed goal?",
+        "Diverge: what approaches use genuinely different mechanisms?",
+        "Provoke: what could work without new software or budget?",
+        "Compare: which ideas best fit the goal, constraints, and tradeoffs?",
+        "Act: what is the first small action, and what evidence will you look for?",
+        "Learn: what happened, and should the idea, goal, or framing change?",
     ],
 }
 
@@ -325,6 +328,7 @@ class _InputBoundary(Middleware):
 
     async def on_get_prompt(self, context: MiddlewareContext, call_next):
         # No prompts are exposed; reject every prompt request.
+        del context, call_next
         raise MCPError(code=-32602, message="Invalid parameters")
 
 
