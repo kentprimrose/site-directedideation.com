@@ -2,7 +2,7 @@
 
 This document captures the text returned by the local directed-ideation MCP prototype. The implementation in `src/site_directedideation_com/mcp/__init__.py` is authoritative; update this reference when its responses change.
 
-The three supplementary tools accept an optional `stage`: `identify-opportunities`, `select-goals`, or `ideate-with-purpose`. The outputs below omit the filter (equivalent to `null`); supplying a stage returns the same menu title and only that stage’s section. No session context is sent to the tools.
+The three supplementary tools accept an optional `stage`: `identify-opportunities`, `select-goals`, or `ideate-with-purpose`. The outputs below omit the filter (equivalent to `null`); supplying a stage returns the same menu title and only that stage’s section. The stage-independent `get_lateral_thinking_guidance` accepts no arguments or stage filter. No session context is sent to the tools.
 
 ## `get_directed_ideation_method`
 
@@ -106,11 +106,15 @@ with no session content:
 - `get_alternative_techniques`: compact directed-ideation-specific and broader
   techniques.
 
-Each tool accepts only an optional, bounded, context-free `stage` filter
+These three tools accept only an optional, bounded, context-free `stage` filter
 (`identify-opportunities`, `select-goals`, or `ideate-with-purpose`). It does
 not accept the user's challenge, answers, goals, ideas, or any other session
 context, and it does not track or store session state. Apply the returned
 guidance locally.
+
+For a creative block at any stage or outside this method, call
+`get_lateral_thinking_guidance` with no arguments. It provides optional thinking
+exercises; introduce each explicitly as an exercise and let the user choose.
 
 Detailed technique guidance is not yet implemented and is not advertised as a
 callable operation.
@@ -216,4 +220,36 @@ Alternative techniques menu:
 - Broader — SCAMPER: substitute, combine, adapt, modify, put to other uses, eliminate, reverse.
 - Broader — random entry: introduce an unrelated word and force a connection.
 - Detailed technique guidance is not yet implemented and is not advertised as a callable operation.
+```
+
+## `get_lateral_thinking_guidance`
+
+```text
+# Lateral-thinking exercises
+
+Use when the user requests lateral thinking or when it may help them past a
+block, whether or not they are doing directed ideation. Apply this guidance
+locally; do not send private context to the tool. These are optional exercises,
+not instructions to act on implausible ideas.
+
+Whenever offering a prompt, explicitly introduce it as a thinking exercise,
+for example: "Let's try a thinking exercise: ..." Ask one question at a time
+and wait for the answer. The user may choose a technique, skip, stop, or return
+to their own direction; do not pressure them to participate.
+
+Choose or offer one of these original prompts:
+- Provocation: Edward de Bono used "po" to signal a provocation, a deliberately
+  unlikely starting point rather than a claim. Try: "Po: the waiting room moves
+  to the visitor. What possibility does that suggest?"
+- Reverse assumptions: "What if the opposite of an assumption were true?"
+- Random stimulus: "What connection can you make between a lighthouse and
+  this challenge?" Let the user choose another unrelated word if preferred.
+- Perspective: "How might someone with a very different role see this?"
+- Remove or exaggerate: "What changes if one familiar constraint disappears?"
+  Alternatively, exaggerate one feature and explore what that reveals.
+- Analogy: "Where else is a similar tension handled differently?"
+
+After the response, help extract a potentially useful principle from the
+exercise and ask how, if at all, it might serve the user's direction. Treat
+practicality and constraints as something to check together, not as proven.
 ```

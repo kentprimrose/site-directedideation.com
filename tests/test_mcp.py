@@ -48,6 +48,8 @@ _EXTRA_CONTEXT_ARGUMENTS = [
 
 _REJECTED_INPUT_CASES = [
     ("tool", "get_directed_ideation_method", {"extra": "SENTINEL_PROBE"}),
+    ("tool", "get_lateral_thinking_guidance", {"context": "SENTINEL_PROBE"}),
+    ("tool", "get_lateral_thinking_guidance", {"stage": "SENTINEL_PROBE"}),
     *[
         ("tool", tool, args)
         for tool in _SUPPLEMENTARY_TOOLS
@@ -151,6 +153,7 @@ def test_aggregate_counts_are_bounded_and_exclude_rejections(
 
     async def check(client: Client) -> None:
         text(await client.call_tool("get_directed_ideation_method", {}))
+        text(await client.call_tool("get_lateral_thinking_guidance", {}))
         text(await client.call_tool("get_interview_guidance", {}))
         text(await client.call_tool("get_interview_guidance", {"stage": None}))
         text(
@@ -172,6 +175,7 @@ def test_aggregate_counts_are_bounded_and_exclude_rejections(
         "get_interview_guidance": 2,
         "get_diagnostic_checks": 1,
         "get_alternative_techniques": 0,
+        "get_lateral_thinking_guidance": 1,
     }
     assert {
         k: after["stage_filters"][k] - v for k, v in before["stage_filters"].items()
@@ -199,6 +203,7 @@ def test_discovery_and_annotations(transport: Transport) -> None:
             "get_interview_guidance",
             "get_diagnostic_checks",
             "get_alternative_techniques",
+            "get_lateral_thinking_guidance",
         }
         for tool in tools:
             assert tool.annotations is not None
@@ -213,6 +218,10 @@ def test_discovery_and_annotations(transport: Transport) -> None:
         assert method_tool.input_schema.get("additionalProperties") is False
         assert not method_tool.input_schema.get("properties")
         assert not method_tool.input_schema.get("required")
+
+        lateral = next(t for t in tools if t.name == "get_lateral_thinking_guidance")
+        assert lateral.input_schema.get("additionalProperties") is False
+        assert not lateral.input_schema.get("properties")
 
         for name in {
             "get_interview_guidance",
@@ -275,6 +284,7 @@ def test_complete_method(transport: Transport) -> None:
         assert "get_interview_guidance" in result
         assert "get_diagnostic_checks" in result
         assert "get_alternative_techniques" in result
+        assert "get_lateral_thinking_guidance" in result
         assert "context-free" in result
         assert "no session content" in result.lower()
         assert "does not track or store session state" in result.lower()
@@ -402,6 +412,7 @@ def test_documented_tool_responses_match_implementation() -> None:
         get_diagnostic_checks,
         get_directed_ideation_method,
         get_interview_guidance,
+        get_lateral_thinking_guidance,
     )
 
     reference = (
@@ -412,5 +423,36 @@ def test_documented_tool_responses_match_implementation() -> None:
         get_interview_guidance,
         get_diagnostic_checks,
         get_alternative_techniques,
+        get_lateral_thinking_guidance,
     ):
         assert f"## `{tool.__name__}`\n\n```text\n{tool().rstrip()}\n```" in reference
+
+
+@pytest.mark.parametrize(
+    "transport", ["memory", pytest.param("http", marks=pytest.mark.integration)]
+)
+def test_lateral_guidance_protocol(transport: Transport) -> None:
+    """Exercise guidance is available over each protocol transport."""
+
+    async def check(client: Client) -> None:
+        result = text(
+            await client.call_tool("get_lateral_thinking_guidance", {})
+        ).lower()
+        for phrase in (
+            "thinking exercise",
+            "one question at a time",
+            "skip, stop",
+            "edward de bono",
+            "provocation",
+            "reverse assumptions",
+            "random stimulus",
+            "perspective",
+            "remove or exaggerate",
+            "analogy",
+            "useful principle",
+            "user's direction",
+            "private context",
+        ):
+            assert phrase in result
+
+    run_check(transport, check)

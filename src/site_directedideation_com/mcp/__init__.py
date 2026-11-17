@@ -163,11 +163,15 @@ with no session content:
 - `get_alternative_techniques`: compact directed-ideation-specific and broader
   techniques.
 
-Each tool accepts only an optional, bounded, context-free `stage` filter
+These three tools accept only an optional, bounded, context-free `stage` filter
 (`identify-opportunities`, `select-goals`, or `ideate-with-purpose`). It does
 not accept the user's challenge, answers, goals, ideas, or any other session
 context, and it does not track or store session state. Apply the returned
 guidance locally.
+
+For a creative block at any stage or outside this method, call
+`get_lateral_thinking_guidance` with no arguments. It provides optional thinking
+exercises; introduce each explicitly as an exercise and let the user choose.
 
 Detailed technique guidance is not yet implemented and is not advertised as a
 callable operation.
@@ -189,6 +193,37 @@ Maintain a concise, client-side record of:
 
 Do not send this record to the MCP service.
 """
+
+_LATERAL_THINKING_GUIDANCE = """\
+# Lateral-thinking exercises
+
+Use when the user requests lateral thinking or when it may help them past a
+block, whether or not they are doing directed ideation. Apply this guidance
+locally; do not send private context to the tool. These are optional exercises,
+not instructions to act on implausible ideas.
+
+Whenever offering a prompt, explicitly introduce it as a thinking exercise,
+for example: "Let's try a thinking exercise: ..." Ask one question at a time
+and wait for the answer. The user may choose a technique, skip, stop, or return
+to their own direction; do not pressure them to participate.
+
+Choose or offer one of these original prompts:
+- Provocation: Edward de Bono used "po" to signal a provocation, a deliberately
+  unlikely starting point rather than a claim. Try: "Po: the waiting room moves
+  to the visitor. What possibility does that suggest?"
+- Reverse assumptions: "What if the opposite of an assumption were true?"
+- Random stimulus: "What connection can you make between a lighthouse and
+  this challenge?" Let the user choose another unrelated word if preferred.
+- Perspective: "How might someone with a very different role see this?"
+- Remove or exaggerate: "What changes if one familiar constraint disappears?"
+  Alternatively, exaggerate one feature and explore what that reveals.
+- Analogy: "Where else is a similar tension handled differently?"
+
+After the response, help extract a potentially useful principle from the
+exercise and ask how, if at all, it might serve the user's direction. Treat
+practicality and constraints as something to check together, not as proven.
+"""
+
 
 _INTERVIEW_GUIDANCE: dict[Stage, list[str]] = {
     "identify-opportunities": [
@@ -305,7 +340,10 @@ class _InputBoundary(Middleware):
     async def on_call_tool(self, context: MiddlewareContext, call_next):
         message = context.message
         arguments = message.arguments or {}
-        if message.name == "get_directed_ideation_method":
+        if message.name in {
+            "get_directed_ideation_method",
+            "get_lateral_thinking_guidance",
+        }:
             valid = not arguments
         elif message.name in _SUPPLEMENTARY_TOOLS:
             stage = arguments.get("stage")
@@ -389,3 +427,13 @@ def get_alternative_techniques(stage: Stage | None = None) -> str:
         stage: Optional guidance filter, not a report of session progress.
     """
     return _format_menu("Alternative techniques", _ALTERNATIVE_TECHNIQUES, stage)
+
+
+@mcp.tool(annotations=READ_ONLY)
+def get_lateral_thinking_guidance() -> str:
+    """Return stage-independent lateral-thinking exercises without session context.
+
+    Use on request or when a creative block might benefit from an optional
+    thinking exercise. Apply it locally; never send private context here.
+    """
+    return _LATERAL_THINKING_GUIDANCE

@@ -11,6 +11,7 @@ TOOLS = (
     "get_interview_guidance",
     "get_diagnostic_checks",
     "get_alternative_techniques",
+    "get_lateral_thinking_guidance",
 )
 STAGES = ("identify-opportunities", "select-goals", "ideate-with-purpose", "unfiltered")
 
