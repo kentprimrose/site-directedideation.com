@@ -13,6 +13,8 @@ def test_lifecycle(
 ) -> None:
     """Start a real server, repeat operations, and read its log."""
     monkeypatch.setattr(mcp_control, "STATE_DIR", tmp_path)
+    monkeypatch.setenv("METRICS_ENV", "development")
+    monkeypatch.setenv("METRICS_DB", str(tmp_path / "metrics.sqlite3"))
     with socket.socket() as sock:
         sock.bind(("127.0.0.1", 0))
         port = sock.getsockname()[1]

@@ -13,7 +13,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-from cutover_shims import PY, write_shims
+from cutover_shims import PY, SHIMS, write_shims
 
 ROOT = Path(__file__).resolve().parents[1]
 PKG = ROOT / "staging_mcp/prod-cutover"
@@ -171,7 +171,17 @@ def box(tmp_path):
     (stage / "conf").write_bytes(b"new conf\n")
     (stage / "helper").write_bytes(new_helper_bytes)
     bin_ = tmp_path / "bin"
-    write_shims(bin_, {"nginx": NGINX, "systemctl": SYSTEMCTL})
+    # Model trusted system ancestors without weakening checks inside the sandbox.
+    # Linux pytest defaults to /tmp, which the real installer rightly rejects.
+    ancestors = {str(p) for p in tmp_path.parents}
+    stat = SHIMS["stat"].replace(
+        "st = os.lstat(path)",
+        f"st = os.lstat(path)\ntrusted_ancestors = {ancestors!r}",
+    ).replace(
+        "format(st.st_mode & 0o7777, 'o')",
+        "format(st.st_mode & (0o7755 if path in trusted_ancestors else 0o7777), 'o')",
+    )
+    write_shims(bin_, {"nginx": NGINX, "systemctl": SYSTEMCTL, "stat": stat})
     text = INSTALL.read_text()
     reps = [
         ("PATH=/usr/sbin:/usr/bin:/sbin:/bin", f"PATH={bin_}:/usr/sbin:/usr/bin:/sbin:/bin", 1),
@@ -207,6 +217,18 @@ def box(tmp_path):
 
 def unchanged(b):
     return b.conf.read_bytes() == b"old conf\n" and b.helper.read_bytes() == b"old helper\n"
+
+
+@pytest.mark.parametrize("directory", ["conf_d", "tmp"])
+def test_installer_rejects_untrusted_sandbox_directory(box, directory):
+    """The simulated trusted ancestors must not mask sandbox permissions."""
+    untrusted = getattr(box, directory)
+    untrusted.chmod(0o777)
+    result = box.run()
+    assert result.returncode != 0
+    assert f"untrusted directory: {untrusted}" in result.stderr
+    assert unchanged(box)
+
 
 
 def test_install_success_order_and_lock_held(box):
