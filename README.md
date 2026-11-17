@@ -173,3 +173,22 @@ stopping the other service; free the port and retry. An unrelated container
 with the script's reserved name is never modified. These commands use the
 currently configured Podman connection; they do not change it. The endpoint is
 unauthenticated and intended only for local use.
+
+## Local MCP only
+
+After configuring metrics as above, run just the MCP server (no Node services):
+
+```bash
+uv run mcp-local start             # localhost:8001
+uv run mcp-local start --port 8011 # optional alternative port
+uv run mcp-local log               # print the accumulated log
+uv run mcp-local stop
+```
+
+Start and stop are idempotent for the tracked server; a different requested port
+requires stopping it first. Start reports the listening URL and refuses occupied
+ports rather than stopping other processes. State and append-only logs live in
+`.dev/mcp-control/`, separate from `uv run dev` and the Podman service. Stop
+only signals a process whose recorded identity can be verified; if verification
+fails, it retains the state for investigation. An alternate port also requires
+updating the MCP client endpoint.
