@@ -370,29 +370,47 @@ class TestLifecycle:
         assert _state_path(state_dir).exists() is False
         assert _port_is_occupied("127.0.0.1", port) is False
 
-    def test_start_services_cleans_up_on_immediate_exit(
-        self, state_dir: Path, tmp_path: Path
+    @pytest.mark.parametrize("exit_during_readiness", [False, True])
+    @pytest.mark.parametrize("missing_binary", [False, True])
+    def test_start_services_cleans_up_on_child_exit(
+        self,
+        state_dir: Path,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+        exit_during_readiness: bool,
+        missing_binary: bool,
     ) -> None:
-        """A service that exits immediately is cleaned up."""
+        """Both early and readiness-time child exits fail and remove state."""
         port = _find_free_port()
-        services = [
-            ("fails", [sys.executable, "-c", "raise SystemExit(1)"], tmp_path, port)
-        ]
-        with pytest.raises(RuntimeError, match="exited immediately"):
-            _start_services(services, state_dir)
-        assert _state_path(state_dir).exists() is False
-        assert _state_path(state_dir).exists() is False
+        command = (
+            [str(tmp_path / "no_such_executable")]
+            if missing_binary
+            else [sys.executable, "-c", "raise SystemExit(1)"]
+        )
+        services = [("fails", command, tmp_path, port)]
+        original_poll = subprocess.Popen.poll
+        first_poll = True
 
-    def test_start_services_cleans_up_on_missing_binary(
-        self, state_dir: Path, tmp_path: Path
-    ) -> None:
-        """A service with a missing executable is cleaned up."""
-        port = _find_free_port()
-        missing = tmp_path / "no_such_executable"
-        services = [("missing", [str(missing)], tmp_path, port)]
-        with pytest.raises(RuntimeError, match="exited immediately"):
+        def controlled_poll(process: subprocess.Popen[bytes]) -> int | None:
+            nonlocal first_poll
+            if first_poll:
+                first_poll = False
+                if exit_during_readiness:
+                    return None
+            process.wait(timeout=5)
+            return original_poll(process)
+
+        monkeypatch.setattr(subprocess.Popen, "poll", controlled_poll)
+        expected = (
+            r"Services did not become ready: fails exited before its port "
+            r"became ready \(return code 1\)"
+            if exit_during_readiness
+            else r"fails exited immediately with code 1"
+        )
+        with pytest.raises(RuntimeError, match=expected):
             _start_services(services, state_dir)
-        assert _state_path(state_dir).exists() is False
+        assert not _state_path(state_dir).exists()
+        assert not _port_is_occupied("127.0.0.1", port)
 
     def test_start_services_cleans_up_on_state_write_failure(
         self, state_dir: Path, tmp_path: Path
