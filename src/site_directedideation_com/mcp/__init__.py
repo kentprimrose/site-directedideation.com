@@ -207,17 +207,14 @@ for example: "Let's try a thinking exercise: ..." Ask one question at a time
 and wait for the answer. The user may choose a technique, skip, stop, or return
 to their own direction; do not pressure them to participate.
 
-Choose or offer one of these original prompts:
-- Provocation: Edward de Bono used "po" to signal a provocation, a deliberately
-  unlikely starting point rather than a claim. Try: "Po: the waiting room moves
-  to the visitor. What possibility does that suggest?"
-- Reverse assumptions: "What if the opposite of an assumption were true?"
-- Random stimulus: "What connection can you make between a lighthouse and
-  this challenge?" Let the user choose another unrelated word if preferred.
-- Perspective: "How might someone with a very different role see this?"
-- Remove or exaggerate: "What changes if one familiar constraint disappears?"
-  Alternatively, exaggerate one feature and explore what that reveals.
-- Analogy: "Where else is a similar tension handled differently?"
+Choose or offer one of these original prompts: - Provocation: Edward de Bono used "po" to signal a
+provocation, a deliberately unlikely starting point rather than a claim. Try: "Po: the waiting room
+moves to the visitor. What possibility does that suggest?" - Reverse assumptions: "What if the
+opposite of an assumption were true?" - Random stimulus: "What connection can you make between a
+lighthouse and this challenge?" Let the user choose another unrelated word if preferred. -
+Perspective: "How might someone with a very different role see this?" - Remove or exaggerate: "What
+changes if one familiar constraint disappears?" Alternatively, exaggerate one feature and explore
+what that reveals. - Analogy: "Where else is a similar tension handled differently?"
 
 After the response, help extract a potentially useful principle from the
 exercise and ask how, if at all, it might serve the user's direction. Treat

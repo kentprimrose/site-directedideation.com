@@ -26,11 +26,11 @@ that cutover. No production changes were made by implementing this pipeline.
   (receiver path and 40 lowercase hex SHA) and executes it; reject everything
   else. Preserve stdin for the image. Configure sudo without a password for only
   this receiver. Test the gate and host key out of band.
-* Create the GitHub environment `authenticated-production`, add required reviewers
-  and restrict deployment branches to `main`. Add environment secrets
+* Create the GitHub environment `authenticated-production` without required
+  reviewers and restrict deployment branches to `main`. Add environment secrets
   `AUTH_DEPLOY_SSH_PRIVATE_KEY`, `AUTH_DEPLOY_SSH_KNOWN_HOSTS` (verified pinned
   host key), `AUTH_DEPLOY_HOST`, and `AUTH_DEPLOY_USER`. No WorkOS secrets or
-  tokens are copied to GitHub. Push to main runs tests then requests deployment;
+  tokens are copied to GitHub. Push to main runs tests then deploys automatically;
   manual dispatch is restricted to main. Private deployment remains independent.
 * Verify platform architecture matches the GitHub runner's linux/amd64 image;
   configure a matching runner/build platform if not. Ensure adequate disk space.
