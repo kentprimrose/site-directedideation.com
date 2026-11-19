@@ -108,3 +108,82 @@ def test_validation_and_turn_limit(tmp_path):
     assert status == "no_final"
     assert len(transcript) == 24
     assert len((tmp_path / "t.jsonl").read_text().splitlines()) == 24
+
+
+def test_review_regressions(tmp_path, monkeypatch):
+    """Exercise validation, protocol termination, and completed-only means offline."""
+    import importlib.util
+
+    import pytest
+
+    spec = importlib.util.spec_from_file_location("eval_harness_regressions", SCRIPT)
+    assert spec is not None and spec.loader is not None
+    h = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(h)
+    models = [
+        dict(id=str(i), model=str(i), command=["mock"], version_command=["mock"])
+        for i in range(3)
+    ]
+    config = tmp_path / "config.json"
+    models[1]["model"] = " 0 "
+    config.write_text(json.dumps({"models": models}))
+    with pytest.raises(ValueError, match="distinct declared"):
+        h.load_config(config)
+    scores = dict(
+        distinct_approaches=2,
+        stages_completed=None,
+        actionability=4,
+        falsifiability=3,
+        correctness=5,
+        usefulness=4,
+        justification="Good",
+    )
+    assert h.parse_scores("```json\n" + json.dumps(scores) + "\n```") == scores
+    scores["usefulness"] = True
+    with pytest.raises(ValueError):
+        h.parse_scores("```\n" + json.dumps(scores) + "\n```")
+    with pytest.raises(ValueError):
+        h.parse_scores("prefix\n```json\n{}\n```")
+
+    problem = {"id": "p", "statement": "p", "hidden_brief": "b", "known_good": "k"}
+    for i, response in enumerate(("FINAL:", "FINAL: premature\nQUESTION: Continue?")):
+        monkeypatch.setattr(
+            h, "invoke", lambda model, _prompt: response if model == "a" else "answer"
+        )
+        _, status = h.run_dialogue(
+            problem, "control", "a", "i", "", tmp_path / f"{i}.jsonl"
+        )
+        assert status == "no_final"
+    monkeypatch.setattr(
+        h, "invoke", lambda _model, _prompt: "FINAL:\nA substantive\nrecommendation"
+    )
+    _, status = h.run_dialogue(
+        problem, "control", "a", "i", "", tmp_path / "final.jsonl"
+    )
+    assert status == "final"
+
+    def dialogue(_problem, _arm, answerer, _interrogator, _method, _path):
+        return [], "final" if answerer["id"] == "0" else "no_final"
+
+    def judge(model, _prompt):
+        return json.dumps(
+            dict(
+                distinct_approaches=2,
+                stages_completed=3,
+                actionability=4,
+                falsifiability=3,
+                correctness=5,
+                usefulness=4 if model["id"] == "2" else 1,
+                justification="Good",
+            )
+        )
+
+    monkeypatch.setattr(h, "run_dialogue", dialogue)
+    monkeypatch.setattr(h, "invoke", judge)
+    h.run(models, {}, [problem], "method", tmp_path / "out")
+    report = (tmp_path / "out/report.md").read_text()
+    assert "| method | 1 | 2 | 0 | 1 |" in report
+    assert "4.00" in report
+    assert next(
+        line for line in report.splitlines() if line.startswith("| method | ")
+    ).endswith("| 4.00 |")

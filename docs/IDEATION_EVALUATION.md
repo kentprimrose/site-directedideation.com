@@ -24,7 +24,9 @@ string fields `id` (unique filename-safe alphanumerics, underscore or hyphen),
 text from the project's MCP method tool in a UTF-8 `method.md`. Only the method
 arm receives it; both arms may ask questions. The answerer has at most 12
 messages, marked `QUESTION:` or `FINAL:` at the start of a line. Missing markers
-are treated as questions; missing FINAL is reported, not fabricated.
+are treated as questions. A FINAL must be the last protocol marker and have
+substantive text after it, including on subsequent lines; otherwise it is not
+accepted as final. Missing FINAL is reported, not fabricated.
 
 Create a private config with three model entries **in Claude, Codex, Gemini
 order**, each with `id`, pinned `model`, `command`, and `version_command`.
@@ -32,6 +34,10 @@ Commands are argument arrays, receive prompt on stdin and must print only the
 assistant response on stdout. Use wrappers to adapt CLI interfaces, extract final
 text and disable tools, memory, MCP and external access as appropriate. The
 `model` field is recorded, not enforced: commands must select the pinned model.
+Declared model identities must be distinct (ignoring case and surrounding
+whitespace), but neither model family nor wrapper behavior is verified. Different
+declarations may still invoke the same underlying model; inspect wrappers and
+independently verify identity and family before interpreting role independence.
 Version commands should be local and must not invoke a model. Example entry:
 
 ```json
@@ -53,10 +59,13 @@ Omit `--pilot` to run all problems. Output must not already exist. It contains
 `versions.json`, a method snapshot, JSONL transcripts, JSON judgments,
 `summary.csv` and `report.md`. Each transcript is scored for distinct
 approaches, stages completed (0–3 or null), actionability, falsifiability,
-correctness and usefulness (1–5), plus a justification. Invalid JSON or scores
+correctness and usefulness (1–5), plus a justification. A single JSON object may be returned bare or inside one JSON code fence.
+Invalid JSON or scores
 are recorded as errors; runs continue and exit nonzero for errors or missing
-FINAL. Partial transcripts survive failures. The report includes scored
-non-final transcripts; check status before interpreting means. There is no
+FINAL. Partial transcripts survive failures. The report shows completed, non-final, error, and completed-scored counts by
+arm. Primary means include only scored completed runs; non-final judgments remain
+available in the individual artifacts and CSV. Check status and counts before
+interpreting means. There is no
 resume or retry. Store artifacts securely: transcripts, reference answers and
 method text can be sensitive. The CLI wrappers are not sandboxed.
 

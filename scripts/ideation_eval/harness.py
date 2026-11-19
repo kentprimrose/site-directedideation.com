@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any
 
 ROLES = ((0, 1, 2), (1, 2, 0), (2, 0, 1))
 ARMS = ("method", "control")
@@ -20,7 +21,7 @@ SCORES = (
     "correctness",
     "usefulness",
 )
-MARKER = re.compile(r"^(QUESTION|FINAL):\s*(.*)$", re.MULTILINE)
+MARKER = re.compile(r"^(QUESTION|FINAL):[ \t]*(.*)$", re.MULTILINE)
 
 
 def load_config(path):
@@ -30,13 +31,19 @@ def load_config(path):
     if len(models) != 3 or len({m["id"] for m in models}) != 3:
         raise ValueError("exactly three uniquely named models required")
     for m in models:
-        if not m.get("model") or any(
-            not isinstance(m.get(k), list)
-            or not m[k]
-            or not all(isinstance(x, str) and x for x in m[k])
-            for k in ("command", "version_command")
+        if (
+            not isinstance(m.get("model"), str)
+            or not m["model"].strip()
+            or any(
+                not isinstance(m.get(k), list)
+                or not m[k]
+                or not all(isinstance(x, str) and x for x in m[k])
+                for k in ("command", "version_command")
+            )
         ):
             raise ValueError("each model needs model, command and version_command")
+    if len({m["model"].strip().casefold() for m in models}) != 3:
+        raise ValueError("three distinct declared model identities required")
     return models
 
 
@@ -143,7 +150,11 @@ def judge_prompt(problem, transcript):
 
 def parse_scores(text):
     """Parse scores."""
-    scores = json.loads(text)
+    text = text.strip()
+    fence = re.fullmatch(
+        r"```(?:json)?[ \t]*\r?\n(.*?)\r?\n```", text, re.DOTALL | re.IGNORECASE
+    )
+    scores = json.loads(fence.group(1) if fence else text)
     if not isinstance(scores, dict):
         raise ValueError("judgment must be an object")
     for key in SCORES:
@@ -181,7 +192,11 @@ def run_dialogue(problem, arm, answerer, interrogator, method, transcript_path):
             add("answerer", text)
             matches = list(MARKER.finditer(text))
             marker = matches[-1] if matches else None
-            if marker and marker.group(1) == "FINAL":
+            if (
+                marker
+                and marker.group(1) == "FINAL"
+                and text[marker.start(2) :].strip()
+            ):
                 return transcript, "final"
             question = marker.group(2).strip() if marker else text
             add(
@@ -223,7 +238,7 @@ def run(models, versions, problems, method, output):
         (output / d).mkdir()
     (output / "versions.json").write_text(json.dumps(versions, indent=2) + "\n")
     (output / "method.md").write_text(method)
-    rows = []
+    rows: list[dict[str, Any]] = []
     for problem in problems:
         for number, indices in enumerate(ROLES, 1):
             answerer, interrogator, judge = (models[i] for i in indices)
@@ -249,6 +264,7 @@ def run(models, versions, problems, method, output):
                     )
                     row.update(
                         status=status,
+                        dialogue_status=status,
                         turns=sum(t["speaker"] == "answerer" for t in transcript),
                     )
                     raw = invoke(judge, judge_prompt(problem, transcript))
@@ -269,6 +285,7 @@ def run(models, versions, problems, method, output):
         "interrogator",
         "judge",
         "status",
+        "dialogue_status",
         "turns",
         *SCORES,
     ]
@@ -281,16 +298,26 @@ def run(models, versions, problems, method, output):
         "",
         f"Problems: {len(problems)}; runs: {len(rows)}",
         "",
-        "| Arm | Runs scored | " + " | ".join(SCORES) + " |",
-        "|---|---|" + "---|" * len(SCORES),
+        "| Arm | Completed | No final | Errors | Completed scored | "
+        + " | ".join(SCORES)
+        + " |",
+        "|---|---|---|---|---|" + "---|" * len(SCORES),
     ]
     for arm in ARMS:
-        scored = [r for r in rows if r["arm"] == arm and "usefulness" in r]
+        arm_rows = [r for r in rows if r["arm"] == arm]
+        completed = [r for r in arm_rows if r.get("dialogue_status") == "final"]
+        scored = [r for r in completed if "usefulness" in r]
+        no_final = sum(r.get("dialogue_status") == "no_final" for r in arm_rows)
+        errors = sum(r["status"].startswith("error:") for r in arm_rows)
         means = []
         for key in SCORES:
             vals = [r[key] for r in scored if isinstance(r[key], int)]
             means.append(f"{sum(vals) / len(vals):.2f}" if vals else "n/a")
-        lines.append(f"| {arm} | {len(scored)} | " + " | ".join(means) + " |")
+        lines.append(
+            f"| {arm} | {len(completed)} | {no_final} | {errors} | {len(scored)} | "
+            + " | ".join(means)
+            + " |"
+        )
     lines += [
         "",
         (
