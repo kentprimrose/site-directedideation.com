@@ -1,0 +1,7 @@
+{
+  "id": "p01",
+  "statement": "Describe the problem as the user would present it to the assistant.",
+  "hidden_brief": "Describe the simulated user's situation, relevant facts, constraints and preferences. Include facts the interrogator may reveal
+if asked, and how it should respond to possible stage confirmations.",
+  "known_good": "Describe the features, constraints and conclusions against which the judge should assess the recommendation."
+}

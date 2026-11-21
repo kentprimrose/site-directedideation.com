@@ -1,0 +1,33 @@
+# Herder job spec for the directed-ideation test.
+# Adjust field names to Herder's actual schema.
+
+name: directed-ideation-test
+version: 1
+schedule: manual
+
+inputs:
+  problems_dir: ./problems
+  method_file: ./method.md
+  pilot: true
+
+steps:
+  - id: preflight
+    run: python driver.py --check
+    timeout: 5m
+    on_failure: abort
+
+  - id: run
+    run: >
+      python driver.py
+      --problems {{inputs.problems_dir}}
+      --method {{inputs.method_file}}
+      {{ "--pilot" if inputs.pilot else "" }}
+    timeout: 6h
+    on_failure: abort
+
+outputs:
+  - runs/{{timestamp}}/summary.csv
+  - runs/{{timestamp}}/report.md
+  - runs/{{timestamp}}/versions.json
+  - runs/{{timestamp}}/transcripts/
+  - runs/{{timestamp}}/judgements/

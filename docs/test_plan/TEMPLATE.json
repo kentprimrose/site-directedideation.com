@@ -1,0 +1,6 @@
+{
+  "id": "p01",
+  "statement": "What the answerer sees, written as a user would describe it.",
+  "hidden_brief": "Ground truth for the interrogator only: situation, constraints, facts it may reveal when asked, and what a strong answer looks like.",
+  "known_good": "Features or conclusion the judge checks correctness against."
+}

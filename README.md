@@ -185,14 +185,15 @@ unauthenticated and intended only for local use.
 After configuring metrics as above, run just the MCP server (no Node services):
 
 ```bash
-uv run mcp-local start             # localhost:8001
-uv run mcp-local start --port 8011 # optional alternative port
-uv run mcp-local log               # print the accumulated log
-uv run mcp-local stop
+./scripts/mcp_local.sh start             # localhost:8001
+./scripts/mcp_local.sh start --port 8011 # optional alternative port
+./scripts/mcp_local.sh restart            # retain the current port
+./scripts/mcp_local.sh log                # follow the log; Ctrl-C to exit
+./scripts/mcp_local.sh stop
 ```
 
-Start and stop are idempotent for the tracked server; a different requested port
-requires stopping it first. Start reports the listening URL and refuses occupied
+Start fails if the tracked server is already running; stop and restart require it
+to be running. Restart retains the current port. Start reports the listening URL and refuses occupied
 ports rather than stopping other processes. State and append-only logs live in
 `.dev/mcp-control/`, separate from `uv run dev` and the Podman service. Stop
 only signals a process whose recorded identity can be verified; if verification
