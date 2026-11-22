@@ -31,6 +31,20 @@ def test_live_cases_load_and_have_interview_scoring_keys():
         assert tuple(keys) == expected_keys
 
 
+def test_matched_library_variants_keep_the_same_opening_and_target():
+    """Keep public inputs constant while changing the decision-relevant evidence."""
+    cases_dir = SCRIPT.parents[2] / "docs/test_plan/live_cases"
+    reminders, cancellations = [
+        json.loads((cases_dir / filename).read_text())
+        for filename in ("04-library-reminders.json", "05-library-cancellations.json")
+    ]
+    assert reminders["statement"] == cancellations["statement"]
+    assert reminders["decision_key"] != cancellations["decision_key"]
+    for case in (reminders, cancellations):
+        assert "[success] At most 12 of 48 slots unused" in case["hidden_brief"]
+        assert case["decision_key"].strip()
+
+
 def test_pilot_and_role_isolation(tmp_path):
     """Six independent judgments follow the specified rotation and protocol."""
     cli = tmp_path / "cli.py"

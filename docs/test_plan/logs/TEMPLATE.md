@@ -6,6 +6,13 @@
 - **Order, exchange budget, and coordinator:**
 - **Status:** valid pair / smoke-only / invalid / incomplete
 
+## MCP preflight
+
+- **Endpoint and config scope:** Session-local, isolated profile, or isolated home (no secrets).
+- **Enabled arm:** Config/discovery evidence or throwaway probe reference.
+- **Control arm:** Config/discovery evidence that no MCP servers are available.
+- **Isolation or auth blockers / skipped arms:**
+
 ## Trace checks
 
 | Arm | Workspace / trace reference | Tool result before first question | Exchanges | Final received? |
@@ -18,6 +25,7 @@
 ## Interview coverage
 
 For each key, record the first exchange where the relevant fact was elicited or `Not uncovered`. Note material details that stayed hidden even when the key was broadly covered.
+ For matched variants, also log the first exchange that elicited the full `decision_key` (or any partial disclosure), quote the question and reply as evidence, and note whether the final plan uses it.
 
 | Brief key | MCP | Control |
 |---|---|---|
@@ -49,7 +57,6 @@ Record scores of 0–2 with a sentence of evidence in each cell, or `Not scored`
 ## Takeaway and limitations
 
 State what differed, what this pair cannot establish, and any follow-up worth testing.
-
 
 ## Closeout
 

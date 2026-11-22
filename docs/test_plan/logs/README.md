@@ -32,3 +32,7 @@ The record is a summary and audit trail, not a transcript dump. Keep raw traces 
 The [judge evidence archive](2026-11-22-judge-evidence.json) preserves the exact scores and evidence for all nine successful judgments across the three native harnesses.
 
 **Closeout (2026-11-22 01:00 UTC):** Verified that the ten Pi-Bolt interview traces were saved and that all nine judge responses were archived. Closed completed evaluation workspaces `w6`, `w7`, `w8`, `w9`, `wA`–`wF`, `wG`, `wH`, and `wJ`. The parent workspace `w1` was left open.
+
+**Matched native rerun:** [Final results](2026-11-22-matched-native-library.md) and [protocol audit](2026-11-22-matched-native-library-audit.md). Twelve interviews and twelve judgments are archived, including the two Codex judge retries. Only one of six pairs met the interview protocol. All workspaces created for the run were closed.
+
+**Gemini Herdr authentication smoke check (2026-11-22 13:01 UTC):** Native `agy` 1.5.14 with `gemini-4-neon-medium` responded to one-line probes in both an interactive Herdr session (`wX`) and a print-mode Herdr session (`wY`) using the existing Google login. The interactive session initially displayed a local workspace-trust prompt, not a Google credential prompt; print mode recorded zero tool steps. This was an authentication and launch check, not an MCP-mode evaluation. Both completed workspaces were closed.
