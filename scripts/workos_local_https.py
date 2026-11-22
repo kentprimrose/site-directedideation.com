@@ -9,7 +9,7 @@ def main():
     print(
         "Local HTTPS WorkOS harness disabled: proxy settings cannot prevent "
         "a client from connecting to the public staging endpoint. "
-        "See scripts/WORKOS_LOCAL_HTTPS.md.",
+        "See docs/scripts/WORKOS_LOCAL_HTTPS.md.",
         file=sys.stderr,
     )
     return 1

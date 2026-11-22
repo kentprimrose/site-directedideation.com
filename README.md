@@ -113,7 +113,7 @@ access, and repeated snapshots can reveal changes over time.
 
 Counters are persisted as independent bounded totals in SQLite, shared between
 workers and process restarts. The separate read-only admin dashboard displays
-them; see [SETUP.md](SETUP.md#mcp-aggregate-metrics-and-admin) for explicit
+them; see [docs/SETUP.md](docs/SETUP.md#mcp-aggregate-metrics-and-admin) for explicit
 environment configuration, authentication and important security limitations.
 The MCP server remains a local-only prototype, not a public production service.
 
@@ -156,7 +156,7 @@ uv sync --all-groups --frozen
 
 ## Private MCP deployment foundation
 
-See [deploy/README.md](deploy/README.md) for the private-only Compose deployment,
+See [docs/deploy/README.md](docs/deploy/README.md) for the private-only Compose deployment,
 CI prerequisites, rollback, metrics backup, and local Podman/Docker checks. This
 is unauthenticated and must not be exposed publicly or used for pilot access.
 
@@ -201,4 +201,4 @@ fails, it retains the state for investigation. An alternate port also requires
 updating the MCP client endpoint.
 
 Authenticated production CI setup and recovery are described in
-[staging_mcp/AUTHENTICATED_CI.md](staging_mcp/AUTHENTICATED_CI.md).
+[docs/staging_mcp/AUTHENTICATED_CI.md](docs/staging_mcp/AUTHENTICATED_CI.md).

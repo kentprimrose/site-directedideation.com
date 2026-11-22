@@ -8,7 +8,7 @@ Facts about the target droplet, real DNS, ACME, WorkOS tokens, Docker and nginx 
 verified in this note.
 
 Scope: the single-droplet, single-node staging endpoint described in
-`staging_mcp/DEPLOYMENT.md` and `staging_mcp/Caddyfile.example` — one Caddy TLS terminator in
+`docs/staging_mcp/DEPLOYMENT.md` and `staging_mcp/Caddyfile.example` — one Caddy TLS terminator in
 front of `127.0.0.1:8765`, 2–5 allow-listed WorkOS users, no WAF, no load balancer, no CDN.
 
 ---
@@ -34,7 +34,7 @@ front of `127.0.0.1:8765`, 2–5 allow-listed WorkOS users, no WAF, no load bala
 5. **nginx is the lower-supply-chain-risk option**: `limit_req`/`limit_conn` are in the base distro,
    no custom build, but they are per-zone memory-bounded leaky buckets that answer `503` by default
    with no `Retry-After`, and TLS becomes the operator's problem (certbot/acme.sh).
-6. Neither option closes the existing activation gate in `staging_mcp/DEPLOYMENT.md`. Proxying
+6. Neither option closes the existing activation gate in `docs/staging_mcp/DEPLOYMENT.md`. Proxying
    limits are coarse abuse control, not authentication, and not per-user fairness.
 
 ---
@@ -157,12 +157,12 @@ trade-off.
 
 `request_body` wraps the body in `http.MaxBytesReader`; the 413 is produced only when a later
 handler *reads* past `max_size`, and the upstream may still receive up to the limit. It does bound
-what the Python app can be made to read, which is the intent in `staging_mcp/DEPLOYMENT.md`, but it
+what the Python app can be made to read, which is the intent in `docs/staging_mcp/DEPLOYMENT.md`, but it
 does not stop a client from uploading 64 KB per request, and the observed status can be 200-with-
 empty-body rather than 413 when the backend answers early. Treat it as a backend-exposure limit,
 not a DoS defence.
 
-Side finding that corrects the repository: `staging_mcp/DEPLOYMENT.md` asks the operator to
+Side finding that corrects the repository: `docs/staging_mcp/DEPLOYMENT.md` asks the operator to
 "Confirm Caddy supports `request_body` (Caddy 2.10+)". The directive is far older — the
 `request_body` module is present in Caddy tags `v2.4.6` through `v2.10.0` — so the version gate is
 unnecessary (only the experimental `set` subdirective is v2.10.0+). The behaviour caveat above is
@@ -295,7 +295,7 @@ terminator* (Caddy plugin) versus *a second, hand-managed config surface and man
 Concretely:
 
 - **If the operator wants to keep Caddy for automatic HTTPS (the direction implied by
-  `DIGITAL_OCEAN.md` §Reverse Proxy and `PLAN.md`),** adopt `mholt/caddy-ratelimit` **only** together
+  `docs/DIGITAL_OCEAN.md` §Reverse Proxy and `docs/PLAN.md`),** adopt `mholt/caddy-ratelimit` **only** together
   with: a digest-pinned builder image, a commit-pinned plugin, a documented rebuild-on-Caddy-release
   procedure, `{client_ip}` as the key **with no `trusted_proxies`** for this single-node layout,
   `ipv6_prefix 64`, a global per-site zone as a backstop, `disable_metrics` unless monitoring needs
@@ -424,5 +424,5 @@ nginx — official documentation
 
 Repository context
 
-- `staging_mcp/Caddyfile.example`, `staging_mcp/DEPLOYMENT.md` (activation gate, 64 KB body cap,
-  logging posture), `DIGITAL_OCEAN.md` §Reverse Proxy, `PLAN.md` §Pilot access and HTTPS.
+- `staging_mcp/Caddyfile.example`, `docs/staging_mcp/DEPLOYMENT.md` (activation gate, 64 KB body cap,
+  logging posture), `docs/DIGITAL_OCEAN.md` §Reverse Proxy, `docs/PLAN.md` §Pilot access and HTTPS.

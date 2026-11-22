@@ -57,16 +57,16 @@ participants. Broader availability and paid subscriptions are separate milestone
 Defer new billing, a second authentication stack, dual-host application support,
 replacement hosting, and replacement of nginx.
 
-`PLAN.md` requires legal review, independent security review, privacy disclosures,
+`docs/PLAN.md` requires legal review, independent security review, privacy disclosures,
 US eligibility/processing controls, and client validation before the pilot.
-`staging_mcp/DEPLOYMENT.md` describes an active non-sensitive pilot with accepted
+`docs/staging_mcp/DEPLOYMENT.md` describes an active non-sensitive pilot with accepted
 residual risks. This review cannot determine whether those requirements were
 met or explicitly revised. Before customer-facing cutover, record the applicable
 scope and evidence, and reconcile the documents through an explicit project
 decision. This plan does not waive those requirements or approve general launch.
 
 If team/account features are deferred for the narrow allowlisted release, record
-that scope decision against `PLAN.md`; do not silently redefine its requirements.
+that scope decision against `docs/PLAN.md`; do not silently redefine its requirements.
 Account for the identity data held by WorkOS even though the MCP application
 does not persist ideation sessions or run the prototype's metrics lifecycle.
 
@@ -211,7 +211,7 @@ configuration.
 | Discovery | Protected-resource metadata advertises the exact new resource and selected issuer; the 401 challenge supports client discovery. |
 | Authorization | Anonymous requests return 401; wrong-issuer, wrong/old-audience, expired, invalid, and non-allowlisted tokens fail. |
 | Host boundary | Missing/unknown SNI and unexpected Host cannot reach either backend on the reviewed listeners. |
-| Real clients | Successful reauthorization, discovery, `ping`, all four guidance tools, and stage filtering in the clients required by the agreed launch scope. Preserve PLAN.md's requirements unless explicitly revised. |
+| Real clients | Successful reauthorization, discovery, `ping`, all four guidance tools, and stage filtering in the clients required by the agreed launch scope. Preserve docs/PLAN.md's requirements unless explicitly revised. |
 | Input/privacy | Invalid tool inputs fail without echoing submitted content; synthetic checks find no tokens or content in effective logs. |
 | Operations | Public rate limiting, acceptable client backoff, refresh/expiry, and removal of an approved subject are verified. Healthcheck 401 alone is insufficient. |
 | Isolation | Ports 8001/8765 remain externally inaccessible; unrelated sites and the private service retain baseline health. |

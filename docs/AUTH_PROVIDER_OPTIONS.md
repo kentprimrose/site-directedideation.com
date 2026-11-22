@@ -6,7 +6,7 @@ was accessed on **2026-11-02** (UTC). Prices, plan gates, preview features, and 
 behaviour change frequently; re-verify before committing. Where a page is silent, the gap is
 recorded under *Unknowns* rather than filled in.
 
-Scope: the invite-only US pilot described in `PLAN.md` — one Python MCP server (FastMCP over
+Scope: the invite-only US pilot described in `docs/PLAN.md` — one Python MCP server (FastMCP over
 Streamable HTTP) at `mcp.directedideation.com`, roughly 2–5 users, email/password accounts
 with verification and recovery, MCP-compatible OAuth from an established authorization
 server, and real connections from Pi, Claude, and ChatGPT. This note compares **WorkOS
@@ -360,7 +360,7 @@ tenant has been exercised.
    and to Claude's per-plan connector limits beyond "Free: one".
 6. **Subprocessors and support access.** WorkOS's subprocessor list is behind a client-rendered
    trust center; Okta's equivalent was not enumerated. Neither provider's DPA was reviewed for
-   staff access locations, backup regions, or email-delivery subprocessors, which `PLAN.md`
+   staff access locations, backup regions, or email-delivery subprocessors, which `docs/PLAN.md`
    requires disclosing.
 7. **EU residency.** No WorkOS documentation page describing a data-residency option was found
    (candidate URLs redirect to `/docs/`); the DPA points to US storage. Auth0 documents region

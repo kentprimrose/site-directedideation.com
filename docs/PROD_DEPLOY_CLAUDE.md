@@ -1,6 +1,6 @@
 # Plan: move the pilot to `mcp.directedideation.com`
 
-Reviewed 2026-11-04 from the repository only (PLAN.md, HANDOFF.md, staging_mcp/*,
+Reviewed 2026-11-04 from the repository only (docs/PLAN.md, docs/HANDOFF.md, staging_mcp/*,
 tests). Nothing was checked on the droplet, DNS or WorkOS. The test suite passed
 (188 tests) at review time.
 
@@ -8,7 +8,7 @@ tests). Nothing was checked on the droplet, DNS or WorkOS. The test suite passed
 
 **A. Pilot rename** to `mcp.directedideation.com`:
 - Same WorkOS *staging* issuer, same subject allowlist, same 2-5 users.
-- Already scoped this way in `staging_mcp/DEPLOYMENT.md` ("Planned pilot hostname
+- Already scoped this way in `docs/staging_mcp/DEPLOYMENT.md` ("Planned pilot hostname
   migration"). `server.py` supports it through `STAGING_MCP_HOST`.
 - Small, tested, the shortest safe path.
 

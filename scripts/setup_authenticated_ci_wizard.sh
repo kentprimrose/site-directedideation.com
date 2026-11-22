@@ -223,7 +223,7 @@ cat <<'TEXT'
     sudo test ! -e /etc/di-staging/.env && sudo test ! -L /etc/di-staging/.env
   Both hashes must equal the receiver's COMPOSE_SHA; never overwrite live compose
   to make this pass. Confirm x86_64, container identity/configuration and prerequisites
-  against staging_mcp/AUTHENTICATED_CI.md without printing credentials. Coordinate
+  against docs/staging_mcp/AUTHENTICATED_CI.md without printing credentials. Coordinate
   users of /run/lock/di-staging-allowlist.lock. Stop on any mismatch.
 TEXT
 confirm "All checks and review passed?" || exit 1

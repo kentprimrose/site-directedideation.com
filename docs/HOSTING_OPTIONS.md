@@ -23,7 +23,7 @@ Facts taken from this repository, not from providers:
   A Postgres-only host therefore implies an engine port and new concurrency tests, or a
   self-hosted MySQL.
 - **Metrics storage**: the aggregate call counters use **SQLite on a local filesystem**
-  (`src/site_directedideation_com/metrics.py`, and `SETUP.md`: "The database must be on a local
+  (`src/site_directedideation_com/metrics.py`, and `docs/SETUP.md`: "The database must be on a local
   filesystem"). On any PaaS with an ephemeral filesystem this data is lost on every deploy,
   restart, or scale event. Any host choice must either provide a durable disk or move metrics
   onto MySQL alongside auth.
@@ -276,7 +276,7 @@ and backup tooling and no platform-imposed streaming limits, at the cost of owni
    rendered client-side and were not machine-verified), Vultr, Akamai/Linode, Northflank, Koyeb,
    Heroku, Google Cloud Run + Cloud SQL. Any of them could beat the options above; they need their
    own primary-source pass.
-9. **Compliance scope**: `PLAN.md` requires US hosting/processing for the pilot. All options above
+9. **Compliance scope**: `docs/PLAN.md` requires US hosting/processing for the pilot. All options above
    can be placed in a US region, but subprocessor disclosure, DPA availability, and data-residency
    guarantees for each provider's managed database were **not** verified here and are prerequisites
    before inviting users.

@@ -8,7 +8,7 @@ separately; the unauthenticated MCP server remains a loopback-only prototype, no
 a hosted production service. Recheck `git status` and history before resuming; do
 not assume this handoff describes the current working tree.
 
-Read `PLAN.md` for the product contract and `docs/CAPABILITY_PROBE.md` for the
+Read `docs/PLAN.md` for the product contract and `docs/CAPABILITY_PROBE.md` for the
 surface, protocol evidence, client checks, and security limits.
 
 ## Implemented surface
@@ -46,14 +46,14 @@ See the probe document for models, call arguments, and reproduction guidance.
 
 The latest full suite run passed **92 tests**, with one `beartype`/`key_value`
 protocol-checking deprecation warning under Python 3.15. Ruff lint/format, ty,
-and `git diff --check` passed after formatting the Python example in `SETUP.md`.
+and `git diff --check` passed after formatting the Python example in `docs/SETUP.md`.
 The historical client conversations and independent reviews were not rerun in
 that check.
 
 Earlier independent review identified a missing supplementary-retrieval policy
 in the complete method; it was added and pinned by protocol assertions. Negative
 tests cover invalid stages and extra context fields for every supplementary tool
-on both transports. The reviewed policy has since been superseded in `PLAN.md`:
+on both transports. The reviewed policy has since been superseded in `docs/PLAN.md`:
 agent-initiated supplementary retrieval is permitted when useful or needed. The
 MCP method response and its documented response and protocol tests now reflect
 that policy.
@@ -68,7 +68,7 @@ that policy.
   separate work; the current tests are not evidence of hosted security readiness.
 - Successful calls increment independent bounded tool and stage-filter totals in
   SQLite; a separate read-only admin dashboard displays them. Configure both with
-  explicit metrics settings and protect the database and backups. See `SETUP.md`
+  explicit metrics settings and protect the database and backups. See `docs/SETUP.md`
   for dashboard authentication and its production limitations.
 - Client validation used temporary isolated settings and real model requests.
   Persistent Pi/Codex configuration was not changed, and temporary credential
@@ -112,7 +112,7 @@ independent reviews have not been repeated for the latest changes.
    `docs/CAPABILITY_PROBE.md`; complete adaptive flows remain open.
 3. Plan and implement the secure hosted service slice, then complete the legal,
    operational, privacy and independent security work required for the US pilot
-   in `PLAN.md`. Do not expose the current MCP prototype publicly.
+   in `docs/PLAN.md`. Do not expose the current MCP prototype publicly.
 
 Detailed technique guidance, agent-initiated discovery, account/team service
 features, and hosted pilot readiness are not implemented by this local

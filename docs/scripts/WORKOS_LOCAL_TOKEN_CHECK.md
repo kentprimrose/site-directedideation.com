@@ -13,7 +13,7 @@ state, not a token, authorization code, or verifier. Browser history, extensions
 OS diagnostics and the provider are outside this script's control.
 
 1. Start the staging service locally, bound **only** to `127.0.0.1`; follow
-   `staging_mcp/README.md`, including the disposable issuer, allowlist and exact
+   `docs/staging_mcp/README.md`, including the disposable issuer, allowlist and exact
    resource indicator. Avoid server/framework logging of credentials. Do not
    start a public listener, tunnel or proxy for this check.
 2. Enable WorkOS CIMD. The client ID is Pi's published native-client metadata

@@ -1,7 +1,7 @@
 # Pilot cutover package and runbook (steps 4–5 of `PROD_DEPLOY_PLAN.md`)
 
 Standalone companion to `docs/PROD_DEPLOY_PLAN.md`. It does not replace or edit
-that plan, `PLAN.md` or `staging_mcp/DEPLOYMENT.md`.
+that plan, `docs/PLAN.md` or `docs/staging_mcp/DEPLOYMENT.md`.
 
 **Pilot status.** The production host has been cut over for trusted users.
 The backend record and apply steps and nginx cutover were run on the host;

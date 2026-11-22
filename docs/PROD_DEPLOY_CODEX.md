@@ -23,7 +23,7 @@ environments are isolated, and users do not automatically carry over.
 Source: [WorkOS environment guidance](https://workos.com/docs/authkit/environments).
 
 The broader launch still requires the security, legal/privacy, operational, and
-client-validation gates documented in `PLAN.md`. The hostname move itself does
+client-validation gates documented in `docs/PLAN.md`. The hostname move itself does
 not require new hosting, a replacement reverse proxy, billing, or the entire
 team-management roadmap. Any narrower launch scope must be reconciled explicitly
 with those documented gates.
@@ -188,5 +188,5 @@ establish live deployment readiness, production WorkOS interoperability, public
 abuse protection, or a completed independent security review.
 
 No live infrastructure was inspected or changed. Before execution, reconcile
-this plan with the actual host state and the launch gates in `PLAN.md` and
-`staging_mcp/DEPLOYMENT.md`.
+this plan with the actual host state and the launch gates in `docs/PLAN.md` and
+`docs/staging_mcp/DEPLOYMENT.md`.

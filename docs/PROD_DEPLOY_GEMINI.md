@@ -23,24 +23,24 @@ The repository currently maintains two distinct service tracks alongside the sta
 
 ## 2. Evaluation of the Production & Hostname Migration Plan
 
-`PLAN.md` and `staging_mcp/DEPLOYMENT.md` wisely separate **two different milestones**:
+`docs/PLAN.md` and `docs/staging_mcp/DEPLOYMENT.md` wisely separate **two different milestones**:
 
 1. **Moving the deployed authenticated pilot to the non-staging URL (`https://mcp.directedideation.com/mcp`):**
    - Kept strictly as the **invite-only, allowlisted US pilot** using the existing hardened `staging_mcp` container and WorkOS AuthKit + `WORKOS_STAGING_ALLOWED_SUBJECTS` allowlist.
    - **Never expose port `8001` (`directed-ideation` private service)** to `mcp.directedideation.com`—it has no auth or rate limits.
 2. **General Production Launch (Broad / Self-Serve / Commercial Availability):**
-   - Appropriately **blocked** in `PLAN.md` on:
+   - Appropriately **blocked** in `docs/PLAN.md` on:
      - Switching from a WorkOS Staging environment to a **WorkOS Production environment** (`WORKOS_STAGING_ISSUER` is just an env var name in `staging_mcp` and can hold any canonical HTTPS issuer origin, though renaming or aliasing it later is cleaner).
      - Legal review and publishing the plain-language privacy/security & subprocessor disclosures on the site before user signup.
      - Independent security review / penetration testing.
      - Interactive client validation across Claude chat, ChatGPT, and Codex against the remote endpoint.
-     - Account/team/subscription persistence (note: `docs/AUTH_FOUNDATION.md` describes an internal password/Argon2id auth library that is not wired to HTTP/MCP and overlaps with WorkOS AuthKit—keep WorkOS AuthKit as the canonical OAuth provider per `PLAN.md` rather than maintaining dual auth stacks).
+     - Account/team/subscription persistence (note: `docs/AUTH_FOUNDATION.md` describes an internal password/Argon2id auth library that is not wired to HTTP/MCP and overlaps with WorkOS AuthKit—keep WorkOS AuthKit as the canonical OAuth provider per `docs/PLAN.md` rather than maintaining dual auth stacks).
 
 ---
 
-## 3. Critical Findings in the Current Cutover Plan (`staging_mcp/DEPLOYMENT.md`)
+## 3. Critical Findings in the Current Cutover Plan (`docs/staging_mcp/DEPLOYMENT.md`)
 
-Reviewing `staging_mcp/DEPLOYMENT.md` against the codebase and helper scripts reveals **three important operational traps** to avoid during the URL move:
+Reviewing `docs/staging_mcp/DEPLOYMENT.md` against the codebase and helper scripts reveals **three important operational traps** to avoid during the URL move:
 
 1. **Single-Host / Single-Audience Pinning (Hard Cutover):**
    - In `staging_mcp/server.py`, setting `STAGING_MCP_HOST=mcp.directedideation.com` simultaneously switches:

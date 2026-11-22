@@ -15,7 +15,7 @@ particular identity-bootstrap flow is supported or that any verification has pas
 
 | Gate | Decision | Consequence |
 |---|---|---|
-| **G1: pilot approval** | The pilot runs under **accepted risk**, with **trusted users only**, added by explicit allowlist. | The `PLAN.md` phase 3 items (legal review, independent security review, privacy/subprocessor disclosures, US eligibility controls, broad client validation) are **deferred for the pilot, not waived**. They are **mandatory before any commercial release or any user outside the trusted set.** Record this in `PLAN.md` and `staging_mcp/DEPLOYMENT.md` so the two documents agree. |
+| **G1: pilot approval** | The pilot runs under **accepted risk**, with **trusted users only**, added by explicit allowlist. | The `docs/PLAN.md` phase 3 items (legal review, independent security review, privacy/subprocessor disclosures, US eligibility controls, broad client validation) are **deferred for the pilot, not waived**. They are **mandatory before any commercial release or any user outside the trusted set.** Record this in `docs/PLAN.md` and `docs/staging_mcp/DEPLOYMENT.md` so the two documents agree. |
 | **G2: identity environment** | **WorkOS production**, directly. No intermediate staging rename. | One reauthorization for users (new host and new issuer together). New issuer, new `user_...` IDs, new allowlist. Staging stays registered for rollback only. |
 
 Scope: about 2-5 trusted users. General availability, billing and a second auth
@@ -59,7 +59,7 @@ healthcheck (188 tests pass offline).
 
 ### A. Prepare (local work and read-only inventory; artifact preservation requires live approval)
 
-1. **Record G1/G2** in `PLAN.md` and `staging_mcp/DEPLOYMENT.md` (complete).
+1. **Record G1/G2** in `docs/PLAN.md` and `docs/staging_mcp/DEPLOYMENT.md` (complete).
 2. **Read-only live inventory:**
    - running image ID and tag, and whether it supports `STAGING_MCP_HOST`
    - installed `/etc/di-staging/compose.yaml` digest, owner, mode, and whether it
@@ -185,7 +185,7 @@ Mandatory, and not covered by this pilot:
 - token-semantics review beyond the one sampled ID token
 - abuse and request-limit review, monitoring, incident response, patching
 - team/account features, if the product scope requires them (record the scope
-  decision against `PLAN.md` rather than redefining its requirements)
+  decision against `docs/PLAN.md` rather than redefining its requirements)
 - billing
 
 ## 5. Evidence limits

@@ -14,7 +14,7 @@ ports to adjacent networks; require Docker Engine 28+ and independently verify
 host/cloud firewalls and external IPv4/IPv6 reachability. Docker's firewall
 rules can bypass ordinary UFW expectations. No application authentication,
 rate limit, TLS, or production security review is provided here. Pilot/public
-access requires the later PLAN.md gates.
+access requires the later docs/PLAN.md gates.
 
 ## Prerequisites and first installation
 

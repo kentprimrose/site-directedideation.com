@@ -2,7 +2,9 @@
 
 from pathlib import Path
 
-STAGING = Path(__file__).resolve().parents[1] / "staging_mcp"
+ROOT = Path(__file__).resolve().parents[1]
+STAGING = ROOT / "staging_mcp"
+DEPLOYMENT = ROOT / "docs/staging_mcp/DEPLOYMENT.md"
 
 
 def test_staging_compose_is_loopback_only_and_has_no_mounts():
@@ -52,7 +54,7 @@ def test_proxy_example_only_targets_staging():
 
 def test_proxy_activation_and_certificate_bootstrap_are_gated():
     """Require activation, listener review, and safe certificate bootstrap gates."""
-    deployment = " ".join((STAGING / "DEPLOYMENT.md").read_text().split())
+    deployment = " ".join(DEPLOYMENT.read_text().split())
     assert "General production remains blocked" in deployment
     assert "60 requests/minute with a burst of 20" in deployment
     assert "certonly" in deployment and "--webroot" in deployment
@@ -85,7 +87,7 @@ def test_http01_example_is_isolated_and_fail_closed():
 
 def test_pilot_rollback_and_production_gates():
     """The closed test is distinct from the pilot and production gates."""
-    deployment = " ".join((STAGING / "DEPLOYMENT.md").read_text().split())
+    deployment = " ".join(DEPLOYMENT.read_text().split())
     for required in (
         "prior one-time ping-only test is closed",
         "The authorized small public pilot is active for non-sensitive use",
@@ -99,7 +101,7 @@ def test_pilot_rollback_and_production_gates():
 
 def test_http01_bootstrap_and_renewal_are_separately_gated():
     """Certificate operations remain gated separately from MCP access."""
-    deployment = " ".join((STAGING / "DEPLOYMENT.md").read_text().split())
+    deployment = " ".join(DEPLOYMENT.read_text().split())
     for required in (
         "public ACME-only HTTP route",
         "no AAAA record",

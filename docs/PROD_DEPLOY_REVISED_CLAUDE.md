@@ -34,7 +34,7 @@ live change.
 | Separate new nginx file beside the old one? (Gemini) | **Unsafe.** The live file `di-staging-public-test.conf` holds the `default_server` block and the `staging_mcp_req/conn` zones. `di-shared-test` rollback only unlinks that one file, so a second file would stay public after "rollback" succeeded. A second file also duplicates zones and the default listener. Codex is right. |
 | Edit the old file in place? | Changes its digest; `di-shared-test` then refuses with "unexpected public configuration". Needs a script update first (see 3). |
 | Stay on WorkOS staging? (Claude, Gemini, Pi: yes; Codex: only for testing) | Both hold. Staging is acceptable **only** for the same explicitly approved, non-sensitive pilot allowlist. Anything customer-facing needs WorkOS production (new issuer, new user IDs, new allowlist). See gate G2. |
-| Pilot approval discrepancy (Pi only) | **Valid and new.** `PLAN.md` phase 3 requires legal review, independent security review and disclosures before inviting pilot users; `DEPLOYMENT.md` describes an active pilot under accepted risks. A rename does not resolve this. See gate G1. |
+| Pilot approval discrepancy (Pi only) | **Valid and new.** `docs/PLAN.md` phase 3 requires legal review, independent security review and disclosures before inviting pilot users; `DEPLOYMENT.md` describes an active pilot under accepted risks. A rename does not resolve this. See gate G1. |
 | Pushing `main`? (Pi, Codex) | `main` is 5 ahead of origin and a push triggers `private-deploy.yml`, which deploys the separate `8001` service, not this pilot. Push is not a deployment step here; do it deliberately. |
 
 ## 3. Recommended nginx approach (resolves the main operational trap)
@@ -59,7 +59,7 @@ No duplicate zones, no second default, one digest to verify.
 
 ## 4. Gates to resolve before touching anything live
 
-- **G1 (approval).** Confirm whether the original `PLAN.md` pilot gates (legal
+- **G1 (approval).** Confirm whether the original `docs/PLAN.md` pilot gates (legal
   review, independent security review, disclosures) were satisfied or explicitly
   waived for the existing pilot. The rename changes neither.
 - **G2 (identity environment).** Decide: *same pilot, staging WorkOS* (rename
@@ -134,7 +134,7 @@ show live routing, production WorkOS interoperability, public abuse protection,
 client coverage beyond Pi (Claude chat, ChatGPT untested), token-type semantics
 beyond one sampled ID token, or completed independent security review. This is a
 limited pilot on a cleaner URL; general production (section 4 of the original plan
-and `PLAN.md` phase 4) stays blocked.
+and `docs/PLAN.md` phase 4) stays blocked.
 
 **Next action:** resolve G1 and G2, then do the read-only live inventory. Live
 changes need separate authorization.
