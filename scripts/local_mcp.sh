@@ -3,4 +3,4 @@
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
 cd "$root"
-exec uv run mcp-local "$@"
+exec uv run local-mcp "$@"

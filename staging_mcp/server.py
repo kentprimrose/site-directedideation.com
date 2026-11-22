@@ -22,6 +22,8 @@ from site_directedideation_com.mcp import (
     get_directed_ideation_method,
     get_interview_guidance,
     get_lateral_thinking_guidance,
+    get_requirements_clarification_guidance,
+    get_strategic_thinking_guidance,
 )
 
 BASE = "https://mcp-staging.directedideation.com"
@@ -107,6 +109,8 @@ class ToolInputBoundary(Middleware):
             "ping",
             "get_directed_ideation_method",
             "get_lateral_thinking_guidance",
+            "get_requirements_clarification_guidance",
+            "get_strategic_thinking_guidance",
         }:
             valid = not arguments
         elif message.name in {
@@ -218,6 +222,8 @@ def create_app():
         get_directed_ideation_method,
         get_interview_guidance,
         get_lateral_thinking_guidance,
+        get_requirements_clarification_guidance,
+        get_strategic_thinking_guidance,
         get_diagnostic_checks,
         get_alternative_techniques,
     ):

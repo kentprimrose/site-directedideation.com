@@ -50,6 +50,10 @@ _REJECTED_INPUT_CASES = [
     ("tool", "get_directed_ideation_method", {"extra": "SENTINEL_PROBE"}),
     ("tool", "get_lateral_thinking_guidance", {"context": "SENTINEL_PROBE"}),
     ("tool", "get_lateral_thinking_guidance", {"stage": "SENTINEL_PROBE"}),
+    ("tool", "get_requirements_clarification_guidance", {"context": "SENTINEL_PROBE"}),
+    ("tool", "get_requirements_clarification_guidance", {"stage": "SENTINEL_PROBE"}),
+    ("tool", "get_strategic_thinking_guidance", {"context": "SENTINEL_PROBE"}),
+    ("tool", "get_strategic_thinking_guidance", {"stage": "SENTINEL_PROBE"}),
     *[
         ("tool", tool, args)
         for tool in _SUPPLEMENTARY_TOOLS
@@ -154,6 +158,8 @@ def test_aggregate_counts_are_bounded_and_exclude_rejections(
     async def check(client: Client) -> None:
         text(await client.call_tool("get_directed_ideation_method", {}))
         text(await client.call_tool("get_lateral_thinking_guidance", {}))
+        text(await client.call_tool("get_requirements_clarification_guidance", {}))
+        text(await client.call_tool("get_strategic_thinking_guidance", {}))
         text(await client.call_tool("get_interview_guidance", {}))
         text(await client.call_tool("get_interview_guidance", {"stage": None}))
         text(
@@ -176,6 +182,8 @@ def test_aggregate_counts_are_bounded_and_exclude_rejections(
         "get_diagnostic_checks": 1,
         "get_alternative_techniques": 0,
         "get_lateral_thinking_guidance": 1,
+        "get_requirements_clarification_guidance": 1,
+        "get_strategic_thinking_guidance": 1,
     }
     assert {
         k: after["stage_filters"][k] - v for k, v in before["stage_filters"].items()
@@ -204,6 +212,8 @@ def test_discovery_and_annotations(transport: Transport) -> None:
             "get_diagnostic_checks",
             "get_alternative_techniques",
             "get_lateral_thinking_guidance",
+            "get_requirements_clarification_guidance",
+            "get_strategic_thinking_guidance",
         }
         for tool in tools:
             assert tool.annotations is not None
@@ -222,6 +232,18 @@ def test_discovery_and_annotations(transport: Transport) -> None:
         lateral = next(t for t in tools if t.name == "get_lateral_thinking_guidance")
         assert lateral.input_schema.get("additionalProperties") is False
         assert not lateral.input_schema.get("properties")
+
+        clarification = next(
+            t for t in tools if t.name == "get_requirements_clarification_guidance"
+        )
+        assert clarification.input_schema.get("additionalProperties") is False
+        assert not clarification.input_schema.get("properties")
+
+        strategic = next(
+            t for t in tools if t.name == "get_strategic_thinking_guidance"
+        )
+        assert strategic.input_schema.get("additionalProperties") is False
+        assert not strategic.input_schema.get("properties")
 
         for name in {
             "get_interview_guidance",
@@ -285,6 +307,15 @@ def test_complete_method(transport: Transport) -> None:
         assert "get_diagnostic_checks" in result
         assert "get_alternative_techniques" in result
         assert "get_lateral_thinking_guidance" in result
+        assert "get_requirements_clarification_guidance" in result
+        assert "get_strategic_thinking_guidance" in result
+        assert "none of these is a stage of" in result.lower()
+        assert "additional tools" in result.lower()
+        assert "blockages" in result.lower()
+        assert "five whys" in result.lower()
+        assert "william dettmer" in result.lower()
+        assert "roger von oech" in result.lower()
+        assert "edward de bono" in result.lower()
         assert "context-free" in result
         assert "no session content" in result.lower()
         assert "does not track or store session state" in result.lower()
@@ -413,6 +444,8 @@ def test_documented_tool_responses_match_implementation() -> None:
         get_directed_ideation_method,
         get_interview_guidance,
         get_lateral_thinking_guidance,
+        get_requirements_clarification_guidance,
+        get_strategic_thinking_guidance,
     )
 
     reference = (
@@ -424,6 +457,8 @@ def test_documented_tool_responses_match_implementation() -> None:
         get_diagnostic_checks,
         get_alternative_techniques,
         get_lateral_thinking_guidance,
+        get_requirements_clarification_guidance,
+        get_strategic_thinking_guidance,
     ):
         assert f"## `{tool.__name__}`\n\n```text\n{tool().rstrip()}\n```" in reference
 
@@ -439,10 +474,20 @@ def test_lateral_guidance_protocol(transport: Transport) -> None:
             await client.call_tool("get_lateral_thinking_guidance", {})
         ).lower()
         for phrase in (
+            "additional tool separate from the core three-stage",
+            "blockage encountered during the directed-ideation",
+            "not a stage of directed",
             "thinking exercise",
             "one question at a time",
             "skip, stop",
             "edward de bono",
+            "roger von oech",
+            "mental locks",
+            "second right answer",
+            "artist",
+            "judge",
+            "warrior",
+            "alternatives, possibilities, choices",
             "provocation",
             "reverse assumptions",
             "random stimulus",
@@ -456,3 +501,98 @@ def test_lateral_guidance_protocol(transport: Transport) -> None:
             assert phrase in result
 
     run_check(transport, check)
+
+
+@pytest.mark.parametrize(
+    "transport", ["memory", pytest.param("http", marks=pytest.mark.integration)]
+)
+def test_requirements_clarification_protocol(transport: Transport) -> None:
+    """Six Sigma-inspired clarification guidance works over each transport."""
+
+    async def check(client: Client) -> None:
+        result = text(
+            await client.call_tool("get_requirements_clarification_guidance", {})
+        ).lower()
+        for phrase in (
+            "additional tool separate from the core",
+            "not a stage of directed ideation",
+            "clarifying exercise",
+            "one question at a time",
+            "skip, stop",
+            "five whys",
+            "voc to ctq",
+            "sipoc",
+            "ishikawa / fishbone",
+            "operational definition",
+            "lightweight fmea",
+            "observations from assumptions",
+            "active stage",
+            "private context",
+        ):
+            assert phrase in result
+
+    run_check(transport, check)
+
+
+@pytest.mark.parametrize(
+    "transport", ["memory", pytest.param("http", marks=pytest.mark.integration)]
+)
+def test_strategic_thinking_protocol(transport: Transport) -> None:
+    """Dettmer, de Bono, and von Oech strategic guidance works over each transport."""
+
+    async def check(client: Client) -> None:
+        result = text(
+            await client.call_tool("get_strategic_thinking_guidance", {})
+        ).lower()
+        for phrase in (
+            "additional tool separate from the core",
+            "not a stage of directed",
+            "strategic exercise",
+            "one question at a time",
+            "skip, stop",
+            "william dettmer",
+            "logical thinking process",
+            "goal tree",
+            "current reality tree",
+            "evaporating cloud",
+            "future reality tree",
+            "negative branch",
+            "prerequisite tree",
+            "transition tree",
+            "categories of legitimate",
+            "edward de bono",
+            "six thinking hats",
+            "consider all factors",
+            "plus, minus, interesting",
+            "alternatives, possibilities, choices",
+            "roger von oech",
+            "explorer",
+            "artist",
+            "judge",
+            "warrior",
+            "observations from assumptions",
+            "active stage",
+            "private",
+        ):
+            assert phrase in result
+
+    run_check(transport, check)
+
+
+def test_alternative_techniques_include_creative_and_strategic_thinkers() -> None:
+    """Stage-filtered alternative techniques surface Dettmer, de Bono, and von Oech."""
+    from site_directedideation_com.mcp import get_alternative_techniques
+
+    unfiltered = get_alternative_techniques().lower()
+    for phrase in (
+        "current reality tree (dettmer)",
+        "goal tree and evaporating cloud (dettmer)",
+        "future reality and prerequisite trees (dettmer)",
+        "consider all factors / caf (de bono)",
+        "pmi and six thinking hats (de bono)",
+        "po provocation and apc (de bono)",
+        "explorer role (von oech)",
+        "judge role (von oech)",
+        "artist-to-warrior handoff and mental locks (von oech)",
+    ):
+        assert phrase in unfiltered

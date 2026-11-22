@@ -17,6 +17,8 @@ dependencies = [
 [project.scripts]
 dev = "site_directedideation_com.dev:main"
 servers = "site_directedideation_com.dev:main"
+local-mcp = "site_directedideation_com.mcp_control:main"
+local-site = "site_directedideation_com.site_control:main"
 mcp-local = "site_directedideation_com.mcp_control:main"
 
 [dependency-groups]

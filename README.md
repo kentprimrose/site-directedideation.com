@@ -1,6 +1,6 @@
 # site-directedideation.com
 
-A static, single-page field guide to directed ideation. The deployable site is in `site/public/` and consists of plain HTML and CSS; it has no framework or backend runtime.
+A static field guide and resources site for directed ideation. The deployable site is in `site/public/` and consists of plain HTML and CSS; it has no framework or backend runtime.
 
 ## Local development
 
@@ -89,14 +89,24 @@ services.
 The local MCP server exposes one canonical explicit-invocation tool,
 `get_directed_ideation_method`, plus three stage-filtered supplementary read-only tools:
 `get_interview_guidance`, `get_diagnostic_checks`, and `get_alternative_techniques`.
-The distinct, stage-independent `get_lateral_thinking_guidance` tool takes no
-arguments and offers optional thinking exercises, including for a creative block.
+Separate from the core three-stage method, three additional no-argument tools assist
+users past blockages encountered during the MCP process (or when explicitly requested):
+`get_lateral_thinking_guidance` (Edward de Bono lateral thinking/provocations and
+Roger von Oech mental locks and creative roles for creative or framing blockages),
+`get_requirements_clarification_guidance` (Six Sigma-inspired exercises such as Five
+Whys, VOC to CTQ trees, SIPOC, Ishikawa/Fishbone, scope and operational definitions,
+and lightweight FMEA for ambiguity or root-cause blockages), and
+`get_strategic_thinking_guidance` (William Dettmer's Logical Thinking Process, Edward
+de Bono's Six Thinking Hats/CAF/PMI/APC, and Roger von Oech's Explorer–Artist–Judge–Warrior
+role pacing for entrenched conflicts, systems root causes, negative side effects, or
+execution obstacles).
 The method uses three revisable loops: observe and reframe opportunities, decide
 and sharpen goals, then diverge, converge and learn from ideas. The chosen goal
 is a compass rather than a fixed track; the user can revisit earlier framing as
 evidence emerges. See [MCP tool responses](docs/MCP_TOOL_RESPONSES.md) for the
 complete guidance. All context stays client-side; the tools accept no session content and the
-three stage-filtered tools accept only an optional stage filter; lateral-thinking guidance accepts no arguments. See
+three stage-filtered tools accept only an optional stage filter; the additional unblocking
+tools accept no arguments. See
 `docs/CAPABILITY_PROBE.md` for the full surface, test results, and successful
 Pi/Codex conversational validation, including its limitations.
 
@@ -119,7 +129,7 @@ The MCP server remains a local-only prototype, not a public production service.
 
 ## Deploy to NameHero
 
-Upload the **contents** of `site/public/` to the document root for the domain in NameHero cPanel. For the primary domain this is usually `public_html`; addon domains and subdomains use their configured document root. The document root should contain `index.html` and a `site/` subdirectory with the stylesheet. No build, Node installation, or server-side application is required on the hosting account.
+Upload the **contents** of `site/public/` to the document root for the domain in NameHero cPanel. For the primary domain this is usually `public_html`; addon domains and subdomains use their configured document root. The document root should contain `index.html`, `resources.html`, and a `site/` subdirectory with the stylesheet. No build, Node installation, or server-side application is required on the hosting account.
 
 
 ## Requirements
@@ -185,11 +195,11 @@ unauthenticated and intended only for local use.
 After configuring metrics as above, run just the MCP server (no Node services):
 
 ```bash
-./scripts/mcp_local.sh start             # localhost:8001
-./scripts/mcp_local.sh start --port 8011 # optional alternative port
-./scripts/mcp_local.sh restart            # retain the current port
-./scripts/mcp_local.sh log                # follow the log; Ctrl-C to exit
-./scripts/mcp_local.sh stop
+./scripts/local_mcp.sh start             # localhost:8001
+./scripts/local_mcp.sh start --port 8011 # optional alternative port
+./scripts/local_mcp.sh restart            # retain the current port
+./scripts/local_mcp.sh log                # follow the log; Ctrl-C to exit
+./scripts/local_mcp.sh stop
 ```
 
 Start fails if the tracked server is already running; stop and restart require it
@@ -199,6 +209,24 @@ ports rather than stopping other processes. State and append-only logs live in
 only signals a process whose recorded identity can be verified; if verification
 fails, it retains the state for investigation. An alternate port also requires
 updating the MCP client endpoint.
+
+## Local website only (live reload)
+
+Run just the static website locally with automatic browser reload whenever files
+under `site/public/` change (no Node services required):
+
+```bash
+./scripts/local_site.sh start             # localhost:3000
+./scripts/local_site.sh start --port 3030 # optional alternative port
+./scripts/local_site.sh restart            # retain the current port
+./scripts/local_site.sh log                # follow the log; Ctrl-C to exit
+./scripts/local_site.sh stop
+```
+
+State and append-only logs live in `.dev/site-control/`, separate from `uv run dev`
+and `./scripts/local_mcp.sh`. HTML responses inject a local SSE live-reload script
+in memory without modifying `site/public/` on disk, and all responses send
+`Cache-Control: no-store`.
 
 Authenticated production CI setup and recovery are described in
 [docs/staging_mcp/AUTHENTICATED_CI.md](docs/staging_mcp/AUTHENTICATED_CI.md).

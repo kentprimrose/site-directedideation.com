@@ -281,6 +281,8 @@ def test_authenticated_canonical_tools_and_input_boundary(monkeypatch):
         get_directed_ideation_method,
         get_interview_guidance,
         get_lateral_thinking_guidance,
+        get_requirements_clarification_guidance,
+        get_strategic_thinking_guidance,
     )
 
     monkeypatch.setenv("WORKOS_STAGING_ISSUER", ISSUER)
@@ -309,6 +311,8 @@ def test_authenticated_canonical_tools_and_input_boundary(monkeypatch):
         get_directed_ideation_method,
         get_interview_guidance,
         get_lateral_thinking_guidance,
+        get_requirements_clarification_guidance,
+        get_strategic_thinking_guidance,
         get_diagnostic_checks,
         get_alternative_techniques,
     )
@@ -334,7 +338,13 @@ def test_authenticated_canonical_tools_and_input_boundary(monkeypatch):
         for tool in tools:
             stages = (
                 (None,)
-                if tool in (get_directed_ideation_method, get_lateral_thinking_guidance)
+                if tool
+                in (
+                    get_directed_ideation_method,
+                    get_lateral_thinking_guidance,
+                    get_requirements_clarification_guidance,
+                    get_strategic_thinking_guidance,
+                )
                 else supported_stages
             )
             for stage in stages:
