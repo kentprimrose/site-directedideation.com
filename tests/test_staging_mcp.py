@@ -276,11 +276,14 @@ def test_body_limit_installed_on_app(monkeypatch):
 def test_authenticated_canonical_tools_and_input_boundary(monkeypatch):
     """Expose canonical results and reject invalid input without echoing it."""
     from site_directedideation_com.mcp import (
+        INTERVIEW_STAGES,
+        PHASE_METHODS,
         get_alternative_techniques,
         get_diagnostic_checks,
         get_directed_ideation_method,
         get_interview_guidance,
         get_lateral_thinking_guidance,
+        get_phase_guidance,
         get_requirements_clarification_guidance,
         get_strategic_thinking_guidance,
     )
@@ -328,13 +331,12 @@ def test_authenticated_canonical_tools_and_input_boundary(monkeypatch):
         listing = json.loads(rpc("tools/list", {}).text.split("data: ", 1)[1])[
             "result"
         ]["tools"]
-        assert {t["name"] for t in listing} == {"ping", *(t.__name__ for t in tools)}
-        supported_stages: tuple[Stage | None, ...] = (
-            None,
-            "identify-opportunities",
-            "select-goals",
-            "ideate-with-purpose",
-        )
+        assert {t["name"] for t in listing} == {
+            "ping",
+            "get_phase_guidance",
+            *(t.__name__ for t in tools),
+        }
+        supported_stages: tuple[Stage | None, ...] = (None, *INTERVIEW_STAGES)
         for tool in tools:
             stages = (
                 (None,)
@@ -371,6 +373,46 @@ def test_authenticated_canonical_tools_and_input_boundary(monkeypatch):
                 ).status_code
                 == 401
             )
+
+        for phase, methods in PHASE_METHODS.items():
+            response = rpc(
+                "tools/call",
+                {"name": "get_phase_guidance", "arguments": {"phase": phase}},
+            )
+            assert json.loads(response.text.split("data: ", 1)[1])["result"]["content"][
+                0
+            ]["text"] == get_phase_guidance(phase)
+            first_method = next(iter(methods))
+            focused = rpc(
+                "tools/call",
+                {
+                    "name": "get_phase_guidance",
+                    "arguments": {"phase": phase, "method": first_method},
+                },
+            )
+            assert json.loads(focused.text.split("data: ", 1)[1])["result"]["content"][
+                0
+            ]["text"] == get_phase_guidance(phase, first_method)
+        for bad_args in (
+            {},
+            {"phase": "SENTINEL_PRIVATE"},
+            {"phase": "frame", "method": "SENTINEL_PRIVATE"},
+            {"phase": "frame", "method": "ooda-loop"},
+        ):
+            response = rpc(
+                "tools/call",
+                {"name": "get_phase_guidance", "arguments": bad_args},
+            )
+            assert "SENTINEL_PRIVATE" not in response.text
+            assert "Invalid parameters" in response.text
+        assert (
+            rpc(
+                "tools/call",
+                {"name": "get_phase_guidance", "arguments": {"phase": "frame"}},
+                HEADERS,
+            ).status_code
+            == 401
+        )
 
 
 def test_pilot_hostname_switch_pins_host_audience_and_metadata(monkeypatch):

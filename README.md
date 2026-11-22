@@ -87,9 +87,12 @@ services.
 ### MCP prototype surface
 
 The local MCP server exposes one canonical explicit-invocation tool,
-`get_directed_ideation_method`, plus three stage-filtered supplementary read-only tools:
+`get_directed_ideation_method`, one phase-and-method facilitation tool,
+`get_phase_guidance` (requiring `phase` from `frame`, `diagnose`, `generate`,
+`evaluate`, or `decide-and-stress-test`, plus an optional bounded `method`
+selector for that phase), and three phase-filtered supplementary read-only tools:
 `get_interview_guidance`, `get_diagnostic_checks`, and `get_alternative_techniques`.
-Separate from the core three-stage method, three additional no-argument tools assist
+Separate from the core five-phase method, three additional no-argument tools assist
 users past blockages encountered during the MCP process (or when explicitly requested):
 `get_lateral_thinking_guidance` (Edward de Bono lateral thinking/provocations and
 Roger von Oech mental locks and creative roles for creative or framing blockages),
@@ -100,13 +103,13 @@ and lightweight FMEA for ambiguity or root-cause blockages), and
 de Bono's Six Thinking Hats/CAF/PMI/APC, and Roger von Oech's Explorer–Artist–Judge–Warrior
 role pacing for entrenched conflicts, systems root causes, negative side effects, or
 execution obstacles).
-The method uses three revisable loops: observe and reframe opportunities, decide
-and sharpen goals, then diverge, converge and learn from ideas. The chosen goal
-is a compass rather than a fixed track; the user can revisit earlier framing as
-evidence emerges. See [MCP tool responses](docs/MCP_TOOL_RESPONSES.md) for the
-complete guidance. All context stays client-side; the tools accept no session content and the
-three stage-filtered tools accept only an optional stage filter; the additional unblocking
-tools accept no arguments. See
+The method uses five revisable phases: frame (including Cynefin routing), diagnose,
+generate, evaluate, and decide and stress-test. The chosen direction is a compass
+rather than a fixed track; the user can revisit earlier phases as evidence emerges.
+See [MCP tool responses](docs/MCP_TOOL_RESPONSES.md) for the complete guidance. All
+context stays client-side; the tools accept no session content, `get_phase_guidance`
+accepts only bounded phase/method selectors, the three supplementary tools accept
+only an optional phase filter, and the additional unblocking tools accept no arguments. See
 `docs/CAPABILITY_PROBE.md` for the full surface, test results, and successful
 Pi/Codex conversational validation, including its limitations.
 

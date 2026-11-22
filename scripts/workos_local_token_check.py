@@ -235,7 +235,7 @@ GUIDANCE_TOOLS = {
     "get_diagnostic_checks",
     "get_alternative_techniques",
 }
-GUIDANCE_STAGE = "identify-opportunities"
+GUIDANCE_STAGE = "frame"
 GUIDANCE_PROTOCOL_VERSION = "2025-03-26"
 
 

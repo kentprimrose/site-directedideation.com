@@ -4,158 +4,300 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101c39">
-  <meta name="description" content="Resources and source references behind Directed Ideation's companion creative, strategic, and requirements-clarification tools.">
+  <meta name="description" content="Resources and phase-by-phase source references for the five-step Directed Ideation process and MCP companion tools.">
   <title>Resources — Directed Ideation</title>
   <link rel="stylesheet" href="site/style.css">
+  <script src="site/nav.js" defer></script>
 </head>
 
 <body>
-  <header id="top">
+  <header class="site-header">
     <div class="wrap topbar">
       <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">△</span> Directed Ideation</a>
-      <nav aria-label="Primary">
-        <a href="index.html#opportunities">Find opportunities</a>
-        <a href="index.html#goals">Choose goals</a>
-        <a href="index.html#ideas">Generate ideas</a>
-        <a href="index.html#tools">Additional tools</a>
-        <a href="index.html#security">Security design</a>
-        <a href="resources.html" aria-current="page">Resources</a>
+      <nav class="site-nav" aria-label="Primary">
+        <div class="nav-inline">
+          <a href="index.html#frame">Frame</a>
+          <a href="index.html#diagnose">Diagnose</a>
+          <a href="index.html#generate">Generate</a>
+          <a href="index.html#evaluate">Evaluate</a>
+          <a href="index.html#decide">Decide</a>
+          <a href="index.html#tools">Tools</a>
+        </div>
+        <button class="menu-button" type="button" popovertarget="site-menu" popovertargetaction="toggle" aria-controls="site-menu" aria-label="Menu">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M3 5h14M3 10h14M3 15h14"/>
+          </svg>
+        </button>
+        <ul id="site-menu" class="site-menu" popover="auto">
+          <li class="compact-only"><a href="index.html#frame">Frame</a></li>
+          <li class="compact-only"><a href="index.html#diagnose">Diagnose</a></li>
+          <li class="compact-only"><a href="index.html#generate">Generate</a></li>
+          <li class="compact-only"><a href="index.html#evaluate">Evaluate</a></li>
+          <li class="compact-only"><a href="index.html#decide">Decide</a></li>
+          <li class="compact-only"><a href="index.html#tools">Tools</a></li>
+          <li><a href="index.html#security">Security</a></li>
+          <li><a href="resources.html" aria-current="page">Resources</a></li>
+        </ul>
       </nav>
     </div>
-    <div class="wrap hero">
-      <div class="hero-content">
-        <span class="eyebrow">Resources / Sources &amp; references</span>
-        <h1>Sources behind the <em>companion</em> tools.</h1>
-        <p>The Directed Ideation field guide stays focused on finding opportunities, selecting goals, and testing ideas. The MCP’s optional companion tools and broader technique menus draw on the established creative, strategic, and quality-improvement works listed below.</p>
-        <div class="hero-actions">
-          <a class="button primary" href="#creative">Browse references</a>
-          <a class="button" href="index.html">Back to field guide</a>
+  </header>
+  <main id="top">
+    <section class="hero-band">
+      <div class="wrap hero">
+        <div class="hero-content">
+          <span class="eyebrow">Resources / Phase-by-phase references</span>
+          <h1>Sources behind the <em>five-step</em> process.</h1>
+          <p>The main field guide keeps the five-step workflow focused on practical questions. Below is the phase-by-phase reference map of the thinkers, methods, and primary publications behind the Directed Ideation MCP tools.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#frame">Browse by phase</a>
+            <a class="button" href="index.html">Back to field guide</a>
+          </div>
         </div>
       </div>
-    </div>
-  </header>
-  <main>
+    </section>
     <div class="rail">
       <div class="wrap rail-inner">
-        <a href="#creative"><span>01</span> Creative &amp; parallel thinking</a>
-        <a href="#strategic"><span>02</span> Strategic &amp; systems thinking</a>
-        <a href="#clarification"><span>03</span> Quality &amp; framing methods</a>
+        <a href="#frame"><span>01</span> Frame</a>
+        <a href="#diagnose"><span>02</span> Diagnose</a>
+        <a href="#generate"><span>03</span> Generate</a>
+        <a href="#evaluate"><span>04</span> Evaluate</a>
+        <a href="#decide"><span>05</span> Decide &amp; stress-test</a>
       </div>
     </div>
 
-    <section class="section" id="creative">
+    <section class="section" id="frame">
       <div class="wrap">
         <div class="section-head">
-          <span class="eyebrow">01 / Creative &amp; parallel thinking</span>
+          <span class="eyebrow">01 / Frame</span>
           <div>
-            <h2>Breaking habitual patterns and separating modes of thought.</h2>
-            <p class="lede">These works inform the MCP’s lateral-thinking exercises, mental-lock prompts, and parallel evaluation modes.</p>
+            <h2>Define the real question.</h2>
+            <p class="lede">Tools for classifying complexity, separating what the problem is from what it is not, and probing purpose, assumptions, and evidence.</p>
           </div>
         </div>
-        <div class="methods">
-          <article class="method">
-            <span class="tag">Edward de Bono</span>
-            <h3>Lateral Thinking, Six Thinking Hats &amp; Direct Attention</h3>
-            <p>Provocations (“po”) and movement, random entry, parallel thinking across the Six Thinking Hats (White, Red, Black, Yellow, Green, and Blue), and CoRT / Direct Attention tools: Consider All Factors (CAF), Plus, Minus, Interesting (PMI), and Alternatives, Possibilities, Choices (APC).</p>
+        <div class="grid">
+          <article class="card">
+            <span class="num">Complexity routing</span>
+            <h3>Cynefin framework</h3>
+            <p>Sorts a situation into Clear/Simple, Complicated, Complex, or Chaotic so later phases match the domain.</p>
             <ul class="sources">
-              <li>Edward de Bono, <cite>Lateral Thinking: Creativity Step by Step</cite> (Harper &amp; Row, 1970).</li>
-              <li>Edward de Bono, <cite>Six Thinking Hats</cite> (Little, Brown and Company, 1985).</li>
-              <li>Edward de Bono, <cite>CoRT Thinking Program</cite> and Direct Attention Thinking Tools (CAF, PMI, APC).</li>
+              <li>David J. Snowden &amp; Mary E. Boone, “A Leader’s Framework for Decision Making,” <cite>Harvard Business Review</cite> (November 2007).</li>
             </ul>
           </article>
-          <article class="method">
-            <span class="tag">Roger von Oech</span>
-            <h3>Mental Locks &amp; Four Creative Roles</h3>
-            <p>Recognizing and loosening the Ten Mental Locks—such as stopping at the first “right answer,” mistaking conventions for fixed rules, or judging ideas too early—and pacing work deliberately across the Explorer, Artist, Judge, and Warrior roles.</p>
+          <article class="card">
+            <span class="num">Scope &amp; priority</span>
+            <h3>Kepner-Tregoe Situation Appraisal</h3>
+            <p>Separates what the problem is from what it is not and sets priorities before deeper analysis.</p>
             <ul class="sources">
-              <li>Roger von Oech, <cite>A Whack on the Side of the Head: How You Can Be More Creative</cite> (Warner Books, 1983).</li>
-              <li>Roger von Oech, <cite>A Kick in the Seat of the Pants: Using Your Explorer, Artist, Judge, and Warrior to Be More Creative</cite> (Harper &amp; Row, 1986).</li>
+              <li>Charles H. Kepner &amp; Benjamin B. Tregoe, <cite>The Rational Manager</cite> (McGraw-Hill, 1965).</li>
+            </ul>
+          </article>
+          <article class="card">
+            <span class="num">Critical inquiry</span>
+            <h3>Socratic questioning &amp; elements of reasoning</h3>
+            <p>Probes purpose, exact questions, observed information, inferences, assumptions, and overlooked viewpoints.</p>
+            <ul class="sources">
+              <li>Richard Paul &amp; Linda Elder, <cite>The Miniature Guide to Critical Thinking: Concepts and Tools</cite> (Foundation for Critical Thinking).</li>
             </ul>
           </article>
         </div>
       </div>
     </section>
 
-    <section class="section dark-section" id="strategic">
+    <section class="section dark-section" id="diagnose">
       <div class="wrap">
         <div class="section-head">
-          <span class="eyebrow">02 / Strategic &amp; systems thinking</span>
+          <span class="eyebrow">02 / Diagnose</span>
           <div>
-            <h2>Tracing root causes, dissolving conflicts, and mapping change.</h2>
-            <p class="lede">These works inform the MCP’s strategic-thinking tool for systems-level cause-and-effect analysis, conflict resolution, and execution planning.</p>
+            <h2>Find root causes and structure.</h2>
+            <p class="lede">Tools for tracing symptoms to core causes, analyzing variation, and identifying high-leverage system dynamics.</p>
           </div>
         </div>
         <div class="resource-grid">
           <article class="criterion">
-            <div class="index">H. William Dettmer</div>
-            <h3>The Logical Thinking Process</h3>
-            <p>A systems approach structured around what to change, what to change to, and how to cause the change: Goal Tree, Current Reality Tree (CRT), Evaporating Cloud (Conflict Resolution Diagram), Future Reality Tree (FRT) with Negative Branch Reservation, Prerequisite Tree (PRT), Transition Tree (TT), and Categories of Legitimate Reservation (CLR).</p>
+            <div class="index">Root cause</div>
+            <h3>Five Whys</h3>
+            <p>Iterative root-cause questioning from concrete observed events while marking observed versus assumed links.</p>
             <ul class="sources">
-              <li>H. William Dettmer, <cite>The Logical Thinking Process: A Systems Approach to Complex Problem Solving</cite> (ASQ Quality Press, 2007).</li>
+              <li>Taiichi Ohno, <cite>Toyota Production System: Beyond Large-Scale Production</cite> (Productivity Press, 1988; Japanese edition 1978).</li>
             </ul>
           </article>
           <article class="criterion">
-            <div class="index">Eliyahu M. Goldratt</div>
-            <h3>Theory of Constraints Thinking Processes</h3>
-            <p>Foundational Theory of Constraints thinking-process lineage from which Dettmer’s streamlined Logical Thinking Process evolved, focusing system improvement on core constraints and underlying conflict assumptions.</p>
+            <div class="index">Measure &amp; Analyze</div>
+            <h3>Six Sigma DMAIC tools</h3>
+            <p>Pareto charts, cause-and-effect (fishbone) diagrams, control charts, VOC-to-CTQ trees, and SIPOC boundaries.</p>
             <ul class="sources">
+              <li>Kaoru Ishikawa, <cite>Guide to Quality Control</cite> (Asian Productivity Organization, 1968 Japanese / 1976 English edition).</li>
+              <li>Peter S. Pande, Robert P. Neuman, &amp; Roland R. Cavanagh, <cite>The Six Sigma Way</cite> (McGraw-Hill, 2000).</li>
+            </ul>
+          </article>
+          <article class="criterion">
+            <div class="index">Causal chains</div>
+            <h3>Current Reality Tree (Logical Thinking Process)</h3>
+            <p>Maps observed Undesirable Effects through cause-and-effect chains to identify the core problem, alongside Goal Trees, Evaporating Clouds, Future Reality Trees, Prerequisite Trees, and Categories of Legitimate Reservation.</p>
+            <ul class="sources">
+              <li>H. William Dettmer, <cite>The Logical Thinking Process: A Systems Approach to Complex Problem Solving</cite> (ASQ Quality Press, 2007).</li>
               <li>Eliyahu M. Goldratt, <cite>It’s Not Luck</cite> (North River Press, 1994).</li>
+            </ul>
+          </article>
+          <article class="criterion">
+            <div class="index">System dynamics</div>
+            <h3>Systems thinking &amp; leverage points</h3>
+            <p>Feedback loops, stocks and flows, delays, and leverage points where focused changes shift system outcomes.</p>
+            <ul class="sources">
+              <li>Donella H. Meadows, <cite>Thinking in Systems: A Primer</cite> (Chelsea Green Publishing, 2008).</li>
+              <li>Peter M. Senge, <cite>The Fifth Discipline: The Art and Practice of the Learning Organization</cite> (Doubleday, 1990).</li>
             </ul>
           </article>
         </div>
       </div>
     </section>
 
-    <section class="section" id="clarification">
+    <section class="section" id="generate">
       <div class="wrap">
         <div class="section-head">
-          <span class="eyebrow">03 / Quality &amp; framing methods</span>
+          <span class="eyebrow">03 / Generate</span>
           <div>
-            <h2>Separating symptoms from causes and sharpening options.</h2>
-            <p class="lede">These works inform the MCP’s requirements-clarification tool and broader stage-filtered technique menus.</p>
+            <h2>Produce genuinely different options.</h2>
+            <p class="lede">Creative divergence, analogy, combinatorial design, contradiction resolution, and unblocking methods.</p>
           </div>
         </div>
         <div class="methods">
           <article class="method">
-            <span class="tag">Six Sigma &amp; Lean</span>
-            <h3>Root-Cause &amp; Requirements Clarification</h3>
-            <p>Five Whys root-cause inquiry, Voice of the Customer to Critical-to-Quality (VOC-to-CTQ) trees, SIPOC process boundaries, Ishikawa (Fishbone) cause-and-effect diagrams, operational definitions, and Failure Mode and Effects Analysis (FMEA).</p>
-            <ul class="sources">
-              <li>Taiichi Ohno, <cite>Toyota Production System: Beyond Large-Scale Production</cite> (Productivity Press, 1988; Japanese edition 1978).</li>
-              <li>Kaoru Ishikawa, <cite>Guide to Quality Control</cite> (Asian Productivity Organization, 1976).</li>
-              <li>Peter S. Pande, Robert P. Neuman, and Roland R. Cavanagh, <cite>The Six Sigma Way</cite> (McGraw-Hill, 2000).</li>
-            </ul>
-          </article>
-          <article class="method">
-            <span class="tag">Idea Transformation</span>
-            <h3>SCAMPER</h3>
-            <p>A structured checklist—Substitute, Combine, Adapt, Modify, Put to other uses, Eliminate, and Reverse—for generating genuinely distinct mechanisms during divergence.</p>
+            <span class="tag">Divergence</span>
+            <h3>Brainstorming rules &amp; SCAMPER</h3>
+            <p>Deferred-judgment brainstorming checklists and systematic transformations: Substitute, Combine, Adapt, Modify, Put to other uses, Eliminate, and Reverse.</p>
             <ul class="sources">
               <li>Alex F. Osborn, <cite>Applied Imagination</cite> (Charles Scribner’s Sons, 1953).</li>
-              <li>Bob Eberle, <cite>SCAMPER: Games for Imagination Development</cite> (D.O.K. Publishers, 1971).</li>
+              <li>Bob Eberle, <cite>SCAMPER: Games for Imagination Development</cite> (D.O.K. Publishers, 1971; Prufrock Press, 1996).</li>
             </ul>
           </article>
           <article class="method">
-            <span class="tag">Opportunity Framing</span>
-            <h3>Jobs to Be Done</h3>
-            <p>Understanding opportunities through the progress a person is trying to make in a specific circumstance rather than starting from product features or internal categories.</p>
+            <span class="tag">Analogy &amp; combinations</span>
+            <h3>Synectics analogies &amp; Morphological analysis</h3>
+            <p>Direct, personal, symbolic, and fantasy analogies alongside systematic combination of independent solution dimensions.</p>
             <ul class="sources">
-              <li>Clayton M. Christensen, Taddy Hall, Karen Dillon, and David S. Duncan, <cite>Competing Against Luck</cite> (HarperBusiness, 2016).</li>
+              <li>William J. J. Gordon, <cite>Synectics: The Development of Creative Capacity</cite> (Harper &amp; Row, 1961).</li>
+              <li>Fritz Zwicky, <cite>Discovery, Invention, Research through the Morphological Approach</cite> (Macmillan, 1969).</li>
             </ul>
           </article>
           <article class="method">
-            <span class="tag">Risk &amp; Prioritization</span>
-            <h3>Premortem &amp; ICE Scoring</h3>
-            <p>Prospective hindsight (imagining a goal or experiment failed to surface blind spots before acting) and lightweight Impact, Confidence, and Ease scoring when comparing candidate directions.</p>
+            <span class="tag">Contradictions</span>
+            <h3>TRIZ inventive principles</h3>
+            <p>Resolves technical and operational contradictions—such as needing X and Y when they conflict—without weak compromise.</p>
+            <ul class="sources">
+              <li>Genrich Altshuller, <cite>40 Principles: TRIZ Keys to Technical Innovation</cite> (Technical Innovation Center, 1997).</li>
+            </ul>
+          </article>
+          <article class="method">
+            <span class="tag">Unblocking</span>
+            <h3>Lateral provocation, mental locks &amp; creative roles</h3>
+            <p>Deliberate “po” provocations and movement, unlocking habitual mental locks (seeking the “second right answer”), and separating the Explorer, Artist, Judge, and Warrior roles.</p>
+            <ul class="sources">
+              <li>Edward de Bono, <cite>Lateral Thinking: Creativity Step by Step</cite> (Harper &amp; Row, 1970).</li>
+              <li>Roger von Oech, <cite>A Whack on the Side of the Head</cite> (Warner Books, 1983) and <cite>A Kick in the Seat of the Pants</cite> (Harper &amp; Row, 1986).</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section dark-section" id="evaluate">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">04 / Evaluate</span>
+          <div>
+            <h2>Test options against evidence and scenarios.</h2>
+            <p class="lede">Argument auditing, anti-bias hypothesis testing, scenario stress-testing, and parallel perspective reviews.</p>
+          </div>
+        </div>
+        <div class="resource-grid">
+          <article class="criterion">
+            <div class="index">Argument structure</div>
+            <h3>Toulmin model &amp; Pyramid Principle</h3>
+            <p>Auditing whether claim, grounds, warrant, backing, qualifier, and rebuttal support a recommendation, paired with conclusion-first MECE argument structure.</p>
+            <ul class="sources">
+              <li>Stephen E. Toulmin, <cite>The Uses of Argument</cite> (Cambridge University Press, 1958).</li>
+              <li>Barbara Minto, <cite>The Pyramid Principle: Logic in Writing and Thinking</cite> (Minto International, 1987; expanded edition 1996).</li>
+            </ul>
+          </article>
+          <article class="criterion">
+            <div class="index">Bias reduction</div>
+            <h3>Analysis of Competing Hypotheses (ACH)</h3>
+            <p>Weighs each piece of evidence against every competing explanation or option—emphasizing disconfirming evidence to counter confirmation bias.</p>
+            <ul class="sources">
+              <li>Richards J. Heuer Jr., <cite>Psychology of Intelligence Analysis</cite> (Center for the Study of Intelligence, Central Intelligence Agency, 1999).</li>
+            </ul>
+          </article>
+          <article class="criterion">
+            <div class="index">Plausible futures</div>
+            <h3>Scenario planning</h3>
+            <p>Stress-tests candidate options across several distinct plausible futures rather than optimizing for a single forecast.</p>
+            <ul class="sources">
+              <li>Peter Schwartz, <cite>The Art of the Long View</cite> (Doubleday, 1991).</li>
+              <li>Kees van der Heijden, <cite>Scenarios: The Art of Strategic Conversation</cite> (Wiley, 1996).</li>
+            </ul>
+          </article>
+          <article class="criterion">
+            <div class="index">Parallel thinking</div>
+            <h3>Six Thinking Hats &amp; Direct Attention</h3>
+            <p>Separates White (facts), Red (intuition), Black (caution), Yellow (benefits), Green (alternatives), and Blue (process) perspectives alongside CAF, PMI, and APC.</p>
+            <ul class="sources">
+              <li>Edward de Bono, <cite>Six Thinking Hats</cite> (Little, Brown and Company, 1985).</li>
+              <li>Edward de Bono, <cite>CoRT Thinking Program</cite> / Direct Attention Thinking Tools (CAF, PMI, APC).</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="decide">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">05 / Decide &amp; stress-test</span>
+          <div>
+            <h2>Commit and check failure modes.</h2>
+            <p class="lede">Weighted decision criteria, probabilistic tradeoffs, prospective failure analysis, risk scoring, and fast adaptive loops.</p>
+          </div>
+        </div>
+        <div class="methods">
+          <article class="method">
+            <span class="tag">Decision rigor</span>
+            <h3>Kepner-Tregoe Decision Analysis &amp; Potential Problem Analysis</h3>
+            <p>Applies non-negotiable MUST limits and weighted WANT criteria to alternatives, then maps preventive and contingent actions for likely threats.</p>
+            <ul class="sources">
+              <li>Charles H. Kepner &amp; Benjamin B. Tregoe, <cite>The New Rational Manager</cite> (Princeton Research Press, 1981).</li>
+            </ul>
+          </article>
+          <article class="method">
+            <span class="tag">Uncertainty</span>
+            <h3>Decision trees &amp; expected value</h3>
+            <p>Quantifies uncertain branches, probabilities, and payoffs—and helps assess when a small test is worth running before committing.</p>
+            <ul class="sources">
+              <li>Howard Raiffa, <cite>Decision Analysis: Introductory Lectures on Choices Under Uncertainty</cite> (Addison-Wesley, 1968).</li>
+            </ul>
+          </article>
+          <article class="method">
+            <span class="tag">Failure modes</span>
+            <h3>Premortem &amp; FMEA</h3>
+            <p>Works backward from an assumed failure to expose blind spots before launch, and scores failure modes by Severity, Occurrence, and Detection.</p>
             <ul class="sources">
               <li>Gary Klein, “Performing a Project Premortem,” <cite>Harvard Business Review</cite> (September 2007).</li>
-              <li>Sean Ellis, ICE prioritization framework (Impact, Confidence, Ease).</li>
+              <li>AIAG &amp; VDA, <cite>AIAG &amp; VDA FMEA Handbook</cite> (1st ed., 2019).</li>
+            </ul>
+          </article>
+          <article class="method">
+            <span class="tag">Fast adaptation</span>
+            <h3>OODA loop</h3>
+            <p>Observe, Orient, Decide, and Act in rapid cycles under changing conditions, feeding observed evidence back into framing and diagnosis.</p>
+            <ul class="sources">
+              <li>John R. Boyd, “Patterns of Conflict” (briefing, 1986).</li>
+              <li>Robert Coram, <cite>Boyd: The Fighter Pilot Who Changed the Art of War</cite> (Little, Brown and Company, 2002).</li>
             </ul>
           </article>
         </div>
         <div class="aside-strip">
-          <strong>Attribution note</strong>
-          <p>Directed Ideation is an independent field guide and MCP toolset. Works and frameworks are cited here for attribution and further study; listing a source does not imply endorsement by its author or publisher.</p>
+          <strong>Attribution &amp; trademark notice</strong>
+          <p>Directed Ideation is an independent field guide and MCP toolset. Publications, frameworks, and third-party names—including marks such as Kepner-Tregoe, Synectics, Cynefin, Six Thinking Hats, and TRIZ—belong to their respective owners and are referenced strictly for attribution and further study; inclusion does not imply endorsement.</p>
         </div>
       </div>
     </section>

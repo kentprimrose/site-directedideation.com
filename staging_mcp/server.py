@@ -22,8 +22,10 @@ from site_directedideation_com.mcp import (
     get_directed_ideation_method,
     get_interview_guidance,
     get_lateral_thinking_guidance,
+    get_phase_guidance,
     get_requirements_clarification_guidance,
     get_strategic_thinking_guidance,
+    is_valid_phase_method,
 )
 
 BASE = "https://mcp-staging.directedideation.com"
@@ -121,6 +123,14 @@ class ToolInputBoundary(Middleware):
             stage = arguments.get("stage")
             valid = set(arguments) <= {"stage"} and (
                 stage is None or (isinstance(stage, str) and stage in INTERVIEW_STAGES)
+            )
+        elif message.name == "get_phase_guidance":
+            valid = (
+                "phase" in arguments
+                and set(arguments) <= {"phase", "method"}
+                and is_valid_phase_method(
+                    arguments.get("phase"), arguments.get("method")
+                )
             )
         else:
             valid = False
@@ -220,6 +230,7 @@ def create_app():
     mcp.add_middleware(ToolInputBoundary())
     for tool in (
         get_directed_ideation_method,
+        get_phase_guidance,
         get_interview_guidance,
         get_lateral_thinking_guidance,
         get_requirements_clarification_guidance,

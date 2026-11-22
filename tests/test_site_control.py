@@ -190,20 +190,57 @@ def test_log_follows_from_beginning(
 
 
 def test_public_site_separates_main_guide_from_resources() -> None:
-    """Main page omits specific authors/methods; resources page cites sources."""
+    """Main page uses five steps without authors/methods or 'planned' wording."""
     public = site_server.DEFAULT_SITE_ROOT
     index_html = (public / "index.html").read_text(encoding="utf-8")
     resources_html = (public / "resources.html").read_text(encoding="utf-8")
 
     lower_index = index_html.lower()
+    for required_section in (
+        'id="frame"',
+        'id="diagnose"',
+        'id="generate"',
+        'id="evaluate"',
+        'id="decide"',
+    ):
+        assert required_section in index_html
+
     for forbidden in (
+        "planned",
+        "still being developed",
+        "until the service is available",
+        "snowden",
+        "boone",
+        "kepner",
+        "tregoe",
+        "paul &",
+        "elder",
         "dettmer",
+        "meadows",
+        "senge",
+        "osborn",
+        "eberle",
+        "gordon",
+        "zwicky",
+        "altshuller",
+        "toulmin",
+        "minto",
+        "heuer",
+        "schwartz",
+        "van der heijden",
+        "raiffa",
+        "klein",
+        "boyd",
+        "coram",
         "von oech",
         "de bono",
         "ohno",
         "ishikawa",
         "goldratt",
+        "cynefin",
+        "socratic",
         "six sigma",
+        "dmaic",
         "five whys",
         "sipoc",
         "fishbone",
@@ -211,32 +248,74 @@ def test_public_site_separates_main_guide_from_resources() -> None:
         "voc-to-ctq",
         "logical thinking process",
         "goal tree",
+        "current reality tree",
         "evaporating cloud",
         "prerequisite tree",
         "six thinking hats",
         "scamper",
+        "synectics",
+        "morphological",
+        "triz",
+        "pyramid principle",
+        "competing hypotheses",
+        "premortem",
+        "ooda",
         "mental locks",
     ):
         assert forbidden not in lower_index, f"Unexpected main-page term: {forbidden}"
     assert 'href="resources.html"' in index_html
+    assert 'class="site-header"' in index_html
+    assert ">Tools</a>" in index_html
+    assert ">Additional tools</a>" not in index_html
+    assert 'id="site-menu" class="site-menu" popover="auto"' in index_html
+    assert 'href="#security"' in index_html
+    assert 'class="compact-only"><a href="#tools">Tools</a>' in index_html
+    assert 'src="site/nav.js"' in index_html
 
     lower_resources = resources_html.lower()
+    assert "planned" not in lower_resources
     assert 'href="resources.html" aria-current="page"' in resources_html
+    assert 'class="site-header"' in resources_html
+    assert ">Tools</a>" in resources_html
+    assert ">Additional tools</a>" not in resources_html
+    assert 'id="site-menu" class="site-menu" popover="auto"' in resources_html
     for expected in (
-        "edward de bono",
-        "lateral thinking: creativity step by step",
-        "six thinking hats",
-        "roger von oech",
-        "a whack on the side of the head",
-        "a kick in the seat of the pants",
-        "h. william dettmer",
-        "the logical thinking process",
-        "eliyahu m. goldratt",
+        "cynefin framework",
+        "snowden",
+        "kepner-tregoe situation appraisal",
+        "the rational manager",
+        "socratic questioning",
+        "miniature guide to critical thinking",
+        "five whys",
         "taiichi ohno",
+        "six sigma dmaic",
         "kaoru ishikawa",
-        "the six sigma way",
+        "current reality tree",
+        "h. william dettmer",
+        "thinking in systems",
+        "the fifth discipline",
+        "applied imagination",
         "scamper",
-        "competing against luck",
+        "synectics",
+        "morphological analysis",
+        "triz inventive principles",
+        "lateral thinking: creativity step by step",
+        "roger von oech",
+        "toulmin",
+        "the pyramid principle",
+        "analysis of competing hypotheses",
+        "richards j. heuer",
+        "scenario planning",
+        "the art of the long view",
+        "six thinking hats",
+        "kepner-tregoe decision analysis",
+        "the new rational manager",
+        "decision trees",
+        "howard raiffa",
         "performing a project premortem",
+        "aiag &amp; vda fmea handbook",
+        "ooda loop",
+        "patterns of conflict",
+        "robert coram",
     ):
-        assert expected in lower_resources
+        assert expected in lower_resources, f"Missing resource reference: {expected}"

@@ -2,12 +2,12 @@
 
 This document captures the text returned by the local directed-ideation MCP prototype. The implementation in `src/site_directedideation_com/mcp/__init__.py` is authoritative; update this reference when its responses change.
 
-The three supplementary tools accept an optional `stage`: `identify-opportunities`, `select-goals`, or `ideate-with-purpose`. The outputs below omit the filter (equivalent to `null`); supplying a stage returns the same menu title and only that stage’s section. Separately from the core three-stage method, the additional `get_lateral_thinking_guidance`, `get_requirements_clarification_guidance`, and `get_strategic_thinking_guidance` tools accept no arguments or stage filter and assist users past blockages encountered during the process. No session context is sent to the tools.
+The three supplementary tools accept an optional `stage`: `frame`, `diagnose`, `generate`, `evaluate`, or `decide-and-stress-test`. The outputs below omit the filter (equivalent to `null`); supplying a stage returns the same menu title and only that phase’s section. `get_phase_guidance` requires a `phase` from the same five phases and accepts an optional `method` selector valid for that phase (shown below with `method=null`; supplying a `method` returns that method’s focused facilitation guidance). Separately from the core five-phase method, the additional `get_lateral_thinking_guidance`, `get_requirements_clarification_guidance`, and `get_strategic_thinking_guidance` tools accept no arguments or stage filter and assist users past blockages encountered during the process. No session context is sent to the tools.
 
 ## `get_directed_ideation_method`
 
 ```text
-# Directed Ideation — complete method
+# Directed Ideation — complete five-phase method
 
 Use this method when the user explicitly asks for directed ideation or agrees to
 try it. Do not start the method without the user's request. All session context
@@ -23,147 +23,256 @@ stays with the calling agent; this tool returns only reusable guidance.
 3. If you have no relevant context, ask: "What would you like to explore?" Wait
    for the answer before continuing.
 
-## Three iterative loops: direction is a compass, not a track
+## Five iterative loops: direction is a compass, not a track
 
-Use these loops to orient the work, not as a rigid sequence or a promise to stay
-on the first path. The user chooses the direction and can revise any output.
-Work with what is known, distinguish observations from assumptions, and revisit
-an earlier loop whenever new evidence or the user's priorities warrant it.
+Use these five phases to orient the work, not as a rigid sequence or a promise
+to stay on the first path. The user chooses the direction and can revise any
+output. Work with what is known, distinguish observations from assumptions, and
+revisit an earlier phase whenever new evidence or the user's priorities warrant
+it.
 
-## Stage 1: Identify opportunities (observe and reframe)
+## Phase 1: Frame (define the real question)
 
-Goal: develop a concrete, evidence-based opportunity to work on.
+Goal: clarify what kind of situation this is, separate what the problem is from
+what it is not, and confirm a worthwhile, testable direction.
 
 - Ask one question at a time; offer a small group only if the user asks to go
-  faster. Start with a recent, specific instance of friction.
-- Explore friction, recent change, and overlooked perspectives. Capture what
-  happened, who is affected, and what is observed versus assumed.
-- Reframe observations as needs or tensions rather than solutions. For example,
-  "New team members cannot tell which decision is current," not "We need a new
-  dashboard." Consider alternative framings and what each makes visible.
-- Loop between observation and reframing: identify a gap, seek another example
-  or perspective, and revise the framing. Do not invent evidence.
-- If there are multiple opportunities, briefly list them and ask the user which
-  to focus on first; do not choose for them.
-- Output: summarize the observations, assumptions and chosen opportunity
-  framing. Ask the user to confirm it or revise it before proceeding; retain it
-  as a working framing, open to revision.
+  faster. Start with a recent, specific instance of friction or a concrete
+  decision to make.
+- Classify the situation's complexity (Cynefin: Clear/Simple, Complicated,
+  Complex, or Chaotic) so Phases 2 through 5 match the domain:
+  - Clear/Simple: confirm facts quickly, apply known practices, check failure
+    modes lightly.
+  - Complicated: lean on root-cause diagnosis (Six Sigma DMAIC, Current Reality
+    Tree), argument scrutiny (Toulmin, Pyramid Principle), and weighted
+    decision analysis or decision trees.
+  - Complex: probe through safe-to-fail experiments, emphasize systems thinking
+    and leverage points, divergent generation, competing hypotheses, scenario
+    planning, and fast OODA learning loops.
+  - Chaotic: stabilize first with a tight OODA loop and immediate containment
+    before deeper diagnosis.
+- Separate what the problem is from what it is not (Situation Appraisal), probe
+  purpose, assumptions, and evidence (Socratic questioning), and state the
+  issue as a need or tension rather than a premature solution.
+- Explore value, evidence, agency, and learning, then sharpen a working goal:
+  "Help [specific people] achieve [valuable outcomes] in [context], while
+  respecting [key constraints]."
+- Output: observations, assumptions, complexity classification, confirmed
+  problem framing, and working goal. Ask the user to confirm or revise before
+  advancing; do not invent evidence.
 
-## Stage 2: Select goals (decide and sharpen)
+## Phase 2: Diagnose (find root causes and structure)
 
-Goal: choose a worthwhile, testable direction tied to the working opportunity.
+Goal: uncover underlying causes, system structure, and leverage points before
+generating solutions.
 
-- Explore value (who benefits and how), evidence (observations and assumptions),
-  agency (available time, access and resources), and learning (what a small
-  experiment could reveal). Ask one question at a time.
-- Compare possible goals with the user rather than deciding for them. Make
-  tradeoffs and constraints explicit; if evidence or agency is weak, revisit
-  the opportunity or seek more evidence.
-- Loop between deciding and sharpening: propose a goal, check what success would
-  look like and what matters most, then revise or choose another candidate.
-  Use: "Help [specific people] achieve [valuable outcome] in [context], while
-  respecting [key constraint]."
-- Output: state the chosen goal, rationale, constraints, assumptions and a
-  visible sign of progress. Ask the user to confirm or revise it; do not advance
-  until they confirm. Treat the goal as a compass, not a fixed track.
+- Move beneath surface symptoms using methods matched to the Phase 1 framing:
+  Five Whys, Six Sigma DMAIC (Measure and Analyze: Pareto, fishbone, control
+  charts), Current Reality Tree (Logical Thinking Process), and Systems
+  Thinking / leverage points (feedback loops, delays, stocks and flows).
+- Mark every causal link as observed versus assumed; do not invent evidence or
+  force a single linear cause when multiple factors interact.
+- If diagnosis shows weak evidence or low agency, revisit Phase 1 to reframe
+  the question or narrow the working goal.
+- Output: candidate root causes, key system dynamics or leverage points,
+  verified observations versus assumptions, and any revised working goal. Ask
+  the user to confirm or revise before advancing.
 
-## Stage 3: Ideate with purpose (diverge, converge and learn)
+## Phase 3: Generate (produce options)
 
-Goal: generate and test approaches in service of the working goal.
+Goal: diverge broadly before judging so genuinely different mechanisms are on
+the table in service of the working goal.
 
-- Turn the goal into a "How might we…?" question, and check its framing with the
-  user. Diverge before judging: generate at least six genuinely different
-  approaches, varying mechanisms such as removing or automating a step, changing
-  timing or responsibility, making information visible, or adding a constraint.
-- Converge with the user: compare promising ideas against the goal, constraints,
-  assumptions and potential learning. The user selects what to pursue; combining
-  or setting aside ideas is welcome. Re-diverge if the options are weak.
-- For each promising idea, define:
+- Turn the working goal into a "How might we...?" question and check its
+  framing with the user. Separate generation from critique (keep the Artist /
+  Green Hat separate from the Judge / Black Hat).
+- Generate at least six genuinely different approaches using methods suited to
+  the challenge: brainstorming rules and checklist questions, SCAMPER,
+  Synectics analogies (direct, personal, symbolic, fantasy), morphological
+  analysis, TRIZ inventive principles for resolving contradictions, or lateral
+  provocation ("po" and movement).
+- Output: the full set of ideas considered across varied mechanisms without
+  prematurely filtering them. Re-diverge if options cluster around one pattern.
+
+## Phase 4: Evaluate (test options against evidence and scenarios)
+
+Goal: scrutinize promising options against logic, evidence, perspectives, and
+plausible futures to reduce confirmation bias.
+
+- Compare promising options with the user rather than deciding for them using
+  Toulmin argument checks (claim, grounds, warrant, rebuttal), Pyramid
+  Principle logic tests, Analysis of Competing Hypotheses (weighting
+  disconfirming evidence), Scenario Planning across plausible futures, and
+  Six Thinking Hats (White, Red, Black, Yellow, Green, Blue).
+- Make tradeoffs, constraints, and remaining assumptions explicit. Combining,
+  adapting, or setting aside options is welcome; return to Phase 3 if options
+  are weak.
+- Output: shortlisted option(s), supporting and challenging evidence, key
+  tradeoffs, scenario sensitivities, and open assumptions. Ask the user to
+  confirm the shortlist before advancing.
+
+## Phase 5: Decide and stress-test (commit and check failure modes)
+
+Goal: commit to a clear choice, stress-test how it could fail, define a
+smallest concrete first action, and run a fast learning loop.
+
+- Compare finalists rigorously using Kepner-Tregoe Decision Analysis (weighted
+  criteria) and Potential Problem Analysis, Decision Trees and expected value
+  for uncertain payoffs, Premortem (working backward from an assumed failure),
+  FMEA (Severity, Occurrence, Detection), and the OODA loop (Observe, Orient,
+  Decide, Act) for fast adaptation under changing conditions.
+- For each selected option, define:
   - First action: the smallest concrete step the user could take next.
-  - Observable evidence: what the user would see or measure to know the idea is
-    worth pursuing, including evidence that would challenge it.
+  - Observable evidence: what the user would see or measure to know the option
+    is working, including evidence that would challenge it.
 - Learn: after an authorized action or experiment, compare observations with
   expectations, capture what was learned, and ask whether to adapt, try another
-  idea, re-diverge, or revisit the goal or opportunity. Do not claim an action
-  happened or a result was observed before the user reports it.
-- Output: the ideas considered, selected idea(s), rationale, first action,
-  evidence to look for, and, when available, learning and any revision.
+  option, re-diverge, or revisit the diagnosis or framing. Do not claim an
+  action happened or a result was observed before the user reports it.
+- Output: ideas considered, selected option(s), decision rationale, stress-test
+  risks and mitigations, first action, observable evidence, and—once reported—
+  learning and revisions.
 - Encourage one idea at a time; multiple people may act in parallel, but each
   person should have one clear next step. Do not execute actions for the user.
   Proposed actions remain proposals; the user authorizes and performs them.
 
-## Optional supplementary guidance
+## Phase-specific and supplementary guidance
 
-Retrieve supplementary guidance when you judge it useful or needed, or when the
-user requests it. You may do so on your own initiative; an explicit user request
-is not required.
+Retrieve phase or supplementary guidance when you judge it useful or needed, or
+when the user requests it. You may do so on your own initiative; an explicit
+user request is not required.
 
-When supplementary guidance for the three stages is appropriate, call one of
-these read-only tools with no session content:
+All read-only guidance tools accept only bounded, context-free selectors—never
+the user's challenge, answers, goals, ideas, or session state. Apply all
+returned guidance locally:
 
-- `get_interview_guidance`: compact interview approaches.
-- `get_diagnostic_checks`: compact diagnostic checks.
-- `get_alternative_techniques`: compact directed-ideation-specific and broader
-  techniques.
-
-These three tools accept only an optional, bounded, context-free `stage` filter
-(`identify-opportunities`, `select-goals`, or `ideate-with-purpose`). It does
-not accept the user's challenge, answers, goals, ideas, or any other session
-context, and it does not track or store session state. Apply the returned
-guidance locally.
-
-Detailed technique guidance is not yet implemented and is not advertised as a
-callable operation.
+- `get_phase_guidance`: detailed facilitation guidance for a phase (`frame`,
+  `diagnose`, `generate`, `evaluate`, or `decide-and-stress-test`) and an
+  optional `method` selector for that phase.
+- `get_interview_guidance`: compact interview questions, optionally filtered by
+  `stage`.
+- `get_diagnostic_checks`: compact quality checks, optionally filtered by
+  `stage`.
+- `get_alternative_techniques`: compact technique menu, optionally filtered by
+  `stage`.
 
 ## Additional tools for blockages
 
 Lateral thinking, requirements clarification, and strategic thinking are
-separate, additional tools offered alongside the method to assist the user past
-blockages encountered during the MCP process (or when explicitly requested).
-None of these is a stage of directed ideation, and all three accept no
-arguments and no session context:
+separate, additional tools offered alongside the core five-phase method to
+assist the user past blockages encountered during the MCP process (or when
+explicitly requested). None of these is a phase of directed ideation, and all
+three accept no arguments and no session context:
 
-- `get_lateral_thinking_guidance`: optional creative-thinking exercises
-  drawing on Edward de Bono (provocations/"po", movement, random stimulus,
-  APC) and Roger von Oech (breaking mental locks and separating the Artist from
-  the Judge) for creative or framing blockages. Introduce each explicitly as a
-  thinking exercise, let the user choose, and bring any useful principle back
-  to serve the user's direction.
+- `get_lateral_thinking_guidance`: optional creative-thinking exercises drawing
+  on Edward de Bono (provocations/"po", movement, random stimulus, APC) and
+  Roger von Oech (breaking mental locks and separating the Artist from the
+  Judge) for creative or framing blockages.
 - `get_requirements_clarification_guidance`: optional Six Sigma-inspired
-  clarifying exercises (such as Five Whys, VOC to CTQ trees, SIPOC,
-  Ishikawa/Fishbone, scope and operational definitions, and lightweight FMEA)
-  for ambiguity, symptom-vs-cause, or vague-requirement blockages. Introduce
-  each explicitly as a clarifying exercise, distinguish observations from
-  assumptions, and carry the confirmed clarification back into the active
-  directed-ideation stage.
+  clarifying exercises (Five Whys, VOC to CTQ trees, SIPOC, Ishikawa/Fishbone,
+  scope and operational definitions, and lightweight FMEA) for ambiguity,
+  symptom-vs-cause, or vague-requirement blockages.
 - `get_strategic_thinking_guidance`: optional strategic and systems-thinking
   exercises drawing on William Dettmer's Logical Thinking Process (Goal Tree,
   Current Reality Tree, Evaporating Cloud, Future Reality Tree, Prerequisite
-  Tree, and Categories of Legitimate Reservation), Edward de Bono's Six
-  Thinking Hats and direct-attention tools (CAF, PMI, APC), and Roger von
-  Oech's creative-to-execution roles (Explorer, Artist, Judge, Warrior) for
-  entrenched conflicts, systems root causes, unintended side effects, or
-  execution-obstacle blockages. Introduce each explicitly as a strategic
-  exercise, distinguish observations from assumptions, and carry the confirmed
-  insight back into the active directed-ideation stage.
+  Tree, Categories of Legitimate Reservation), Edward de Bono's Six Thinking
+  Hats and direct-attention tools (CAF, PMI, APC), and Roger von Oech's
+  Explorer, Artist, Judge, and Warrior roles.
 
 ## Pacing and adaptation
 
 - Ask one question at a time unless the user asks for a faster format.
 - After each answer, synthesize what you understand so far and ask the next
   targeted question.
-- If the user wants to revisit an earlier stage, do so. Stages are not linear
+- If the user wants to revisit an earlier phase, do so. Phases are not linear
   traps.
 
 ## Output shape
 
 Maintain a concise, client-side record of:
-- Observations, assumptions and confirmed opportunity framing
-- Confirmed goal, rationale, constraints and sign of progress
-- Ideas considered and selected idea(s), rationale, first action and evidence
-- Learning, revisions and next step the user commits to
+- Observations, assumptions, complexity class, and confirmed framing/goal
+- Root causes, system dynamics, and leverage points
+- Ideas considered across varied mechanisms
+- Evaluation findings, tradeoffs, and scenario or perspective checks
+- Selected option(s), stress-test risks, first action, observable evidence, and
+  learning revisions
 
 Do not send this record to the MCP service.
+```
+
+## `get_phase_guidance`
+
+### `phase="frame"`
+
+```text
+# Phase 1: Frame — define the real question
+
+Define what kind of situation you face, separate what the problem is from what it is not, probe assumptions, and confirm a working goal. Use the Cynefin classification to route Phases 2-5 (Clear: light checks; Complicated: analytical diagnosis and decision modeling; Complex: systems leverage, safe-to-fail probes, competing hypotheses, scenarios, and OODA; Chaotic: immediate stabilization via OODA).
+
+Available method selectors for this phase:
+- `cynefin` (Cynefin framework): Sort the situation into Clear/Simple (known cause-effect), Complicated (analyzable with expertise), Complex (cause-effect clear only in retrospect; requires safe-to-fail probes), or Chaotic (act immediately to stabilize). Ask what evidence supports the domain choice and use it to select methods for Phases 2-5.
+- `kt-situation-appraisal` (Kepner-Tregoe Situation Appraisal): List separate concerns, split compound issues apart, clarify what the problem IS versus what it IS NOT (where, when, who, extent), and prioritize by timing, trend, and impact before diagnosing.
+- `socratic-questioning` (Socratic questioning and elements of reasoning): Probe one element at a time: purpose, the exact question at issue, observed information versus inference, underlying assumptions, key concepts, overlooked points of view, and implications.
+```
+
+### `phase="diagnose"`
+
+```text
+# Phase 2: Diagnose — find root causes and structure
+
+Uncover root causes, variation, causal chains, and system leverage points before inventing solutions. Distinguish verified observations from assumptions at every causal link.
+
+Available method selectors for this phase:
+- `five-whys` (Five Whys): Start from one concrete observed symptom and ask 'Why did that happen?' iteratively up to five times. Mark every link as observed or assumed, and allow branching causes rather than forcing a single linear chain.
+- `six-sigma-dmaic` (Six Sigma DMAIC tools (Measure and Analyze)): Quantify the gap before assuming causes: identify the vital few drivers (Pareto principle), group potential causes across categories (fishbone / cause-and-effect), and distinguish ordinary variation from special-cause shifts (control-chart thinking).
+- `current-reality-tree` (Current Reality Tree (Logical Thinking Process)): List observed Undesirable Effects (symptoms), connect them with if-then cause-and-effect chains down to a shared core root cause, and test each arrow with Categories of Legitimate Reservation (clarity, existence, causality, sufficiency).
+- `systems-thinking` (Systems thinking and leverage points): Map reinforcing and balancing feedback loops, information delays, incentives, and bottlenecks to find leverage points where a small, focused shift changes system behavior sustainably.
+```
+
+### `phase="generate"`
+
+```text
+# Phase 3: Generate — produce options
+
+Diverge before judging to produce at least six genuinely different approaches across distinct mechanisms. Keep generation separate from critique.
+
+Available method selectors for this phase:
+- `brainstorming-checklist` (Brainstorming rules and checklist questions): Defer judgment completely during divergence, aim for volume and wild combinations, build on earlier ideas, and prompt across varied mechanisms (remove, automate, resequence, shift ownership, expose information, add a constraint).
+- `scamper` (SCAMPER): Transform the current workflow or artifact systematically across seven lenses: Substitute, Combine, Adapt, Modify/Magnify, Put to other uses, Eliminate, and Reverse/Rearrange.
+- `synectics-analogies` (Synectics analogies): Make the familiar strange and the strange familiar using four analogy types: Direct (how nature or another field solves it), Personal (imagine being the component or user), Symbolic (a vivid compressed paradox), and Fantasy (ideal world without limits), then extract a practical mechanism.
+- `morphological-analysis` (Morphological analysis): Break the solution space into 3-5 independent dimensions (such as trigger, actor, channel, cadence, artifact), list 3-4 options per dimension, and combine unexpected cells into distinct concepts.
+- `triz-principles` (TRIZ inventive principles): State the contradiction explicitly ('improving X worsens Y'), then apply inventive principles—such as segmentation, taking out, asymmetry, prior action, dynamics, or separation in time/space—to resolve the conflict without weak compromise.
+- `lateral-provocation` (Lateral provocation): Introduce a deliberate 'Po:' statement as an unlikely stepping stone (explicitly framed as a thinking exercise), use movement (extract a principle or trace moment-to-moment consequences) before judging, and test how the extracted principle serves the goal.
+```
+
+### `phase="evaluate"`
+
+```text
+# Phase 4: Evaluate — test options against evidence and scenarios
+
+Test candidate options against reasoning quality, disconfirming evidence, plausible futures, and distinct stakeholder perspectives to counter confirmation bias.
+
+Available method selectors for this phase:
+- `toulmin-argument` (Toulmin argument model): Test each promising recommendation by separating its Claim, Grounds (observed evidence), Warrant (why those grounds support the claim), Backing, Qualifier (degree of certainty), and Rebuttal (conditions under which the claim fails).
+- `pyramid-principle` (Pyramid Principle): State the recommended conclusion first, group supporting reasons so they are mutually exclusive and collectively exhaustive (MECE), and verify that every lower-level fact actually supports the point above it.
+- `competing-hypotheses` (Analysis of Competing Hypotheses): List mutually exclusive explanations or candidate options across columns and key evidence across rows. Score each piece of evidence for consistency or inconsistency—focusing on disconfirming evidence to counter confirmation bias.
+- `scenario-planning` (Scenario planning): Identify two high-impact, high-uncertainty external drivers, sketch 3-4 plausible futures, and stress-test how each option performs across scenarios to find robust or adaptable choices.
+- `six-thinking-hats` (Six Thinking Hats): Examine candidate options one parallel mode at a time: White (facts and gaps), Red (intuition without forced justification), Black (caution and risks), Yellow (logical value), Green (improvements and alternatives), and Blue (summary and next step).
+```
+
+### `phase="decide-and-stress-test"`
+
+```text
+# Phase 5: Decide and stress-test — commit and check failure modes
+
+Commit against explicit criteria, quantify key uncertainties when warranted, surface failure modes before launch, define one concrete first action with observable evidence, and adapt rapidly after results are reported.
+
+Available method selectors for this phase:
+- `kt-decision-analysis` (Kepner-Tregoe Decision Analysis): Separate non-negotiable MUST constraints (pass/fail) from weighted WANT criteria (scored 1-10), evaluate finalists transparently, then run Potential Problem Analysis to list likely threats plus preventive and contingent actions.
+- `decision-trees` (Decision trees and expected value): Map decision branches, key chance events with explicit rough probabilities, and outcomes/costs so uncertain tradeoffs and the value of running a small information-gathering test become visible.
+- `premortem` (Premortem): Assume the chosen plan has already failed weeks or months from now, work backward to list the most plausible causes of failure, and strengthen the first action or add kill criteria before starting.
+- `fmea` (FMEA): List concrete ways the chosen approach could fail, rate Severity, Occurrence, and Detection (1-10 or High/Medium/Low), prioritize the highest-risk modes, and assign a mitigation or early warning signal.
+- `ooda-loop` (OODA loop): Run a fast Observe -> Orient -> Decide -> Act cycle around one small authorized step: gather fresh observations after action, re-orient mental models against disconfirming evidence, decide whether to adapt or pivot, and propose the next concrete step.
 ```
 
 ## `get_interview_guidance`
@@ -171,34 +280,47 @@ Do not send this record to the MCP service.
 ```text
 Interview guidance menu:
 
-## identify-opportunities
+## frame
 - Observation: what happened in a recent, specific example?
+- Complexity (Cynefin): is cause-and-effect clear, analyzable, emergent, or chaotic?
+- Is / Is Not: what specifically is part of this problem, and what is not?
 - Assumption: what are we inferring rather than observing?
-- Perspective: whose experience or workaround have we missed?
-- Core cause and factors: what shared cause links these symptoms, and what factor have we left out?
-- Compare framings: what other need or tension could explain this?
-- Confirm: which framing best fits, and would you revise it?
-- Detailed technique guidance is not yet implemented and is not advertised as a callable operation.
+- Value, agency, and goal: who benefits, what can you influence, and which constraints are fixed versus assumed?
+- Confirm: which problem framing and working goal best fit, and would you revise them?
+- Call `get_phase_guidance` with `phase` and an optional `method` selector for step-by-step facilitation guidance on any phase tool.
 
-## select-goals
-- Value and agency: who benefits, and what can you influence?
-- Constraints: which limits are fixed, and which are assumed?
-- Conflict check: what hidden assumption creates a tradeoff between two things you need?
-- Compare: which opportunity offers the most value and learning?
-- Tradeoffs: what would you give up by choosing this goal?
-- Success: what observable sign would show progress?
-- Confirm: is this a useful, revisable goal?
-- Detailed technique guidance is not yet implemented and is not advertised as a callable operation.
+## diagnose
+- Root cause: why did that observed symptom happen, and which causal links are observed versus assumed?
+- Variation and drivers: which few factors account for most of the pain?
+- Shared cause: what underlying core problem links separate symptoms?
+- System dynamics: what feedback loop, delay, or incentive keeps this pattern in place?
+- Leverage: where could a small intervention shift the outcome?
+- Confirm: does this diagnosis hold up, or should we revisit the framing?
+- Call `get_phase_guidance` with `phase` and an optional `method` selector for step-by-step facilitation guidance on any phase tool.
 
-## ideate-with-purpose
-- Reframe: what 'How might we...?' follows from the confirmed goal?
+## generate
+- Reframe: what 'How might we...?' follows from the confirmed goal and diagnosis?
 - Diverge: what approaches use genuinely different mechanisms?
-- Provoke: what could work without new software or budget?
-- Compare: which ideas best fit the goal, constraints, and tradeoffs?
-- Side effects and obstacles: what unintended negative branch or obstacle could block this first step?
-- Act: what is the first small action, and what evidence will you look for?
-- Learn: what happened, and should the idea, goal, or framing change?
-- Detailed technique guidance is not yet implemented and is not advertised as a callable operation.
+- Transform and combine: what happens if we substitute, eliminate, reverse, or recombine dimensions?
+- Contradictions: where do two desirable properties conflict, and how could we separate or resolve that conflict?
+- Analogy and provocation: where else is a similar tension solved, or what works with no new software or budget?
+- Call `get_phase_guidance` with `phase` and an optional `method` selector for step-by-step facilitation guidance on any phase tool.
+
+## evaluate
+- Argument check: what concrete grounds and warrant actually support this recommendation, and what rebuttal could weaken it?
+- Competing hypotheses: what evidence is inconsistent with each option?
+- Scenarios: which plausible future changes would break or strengthen each candidate?
+- Perspectives: what do neutral facts, intuition, caution, and benefits each highlight when examined separately?
+- Tradeoffs: what would you give up by shortlisting these options?
+- Call `get_phase_guidance` with `phase` and an optional `method` selector for step-by-step facilitation guidance on any phase tool.
+
+## decide-and-stress-test
+- Decision criteria: which MUST limits are non-negotiable, and how do finalists score on weighted WANT criteria?
+- Uncertainty: where do odds or payoffs matter most, and what small test would reduce uncertainty?
+- Premortem and failure modes: if this failed a month from now, why, and which failure modes are most severe or hardest to detect?
+- First action and evidence: what is the smallest concrete next step, and what observable evidence would confirm or challenge it?
+- Learn (OODA): after an authorized action, what happened, and should the option, diagnosis, or framing change?
+- Call `get_phase_guidance` with `phase` and an optional `method` selector for step-by-step facilitation guidance on any phase tool.
 ```
 
 ## `get_diagnostic_checks`
@@ -206,28 +328,38 @@ Interview guidance menu:
 ```text
 Diagnostic checks menu:
 
-## identify-opportunities
-- Is the opportunity stated as a need or tension, not a solution?
-- Is there at least one concrete observation behind it?
-- Have assumptions and alternative framings been made visible?
-- Have we checked whether multiple symptoms share a core cause or overlooked factor (e.g., CRT or CAF)?
-- Detailed technique guidance is not yet implemented and is not advertised as a callable operation.
+## frame
+- Is the issue stated as a need or tension rather than a solution?
+- Has the situation's complexity (Cynefin) been checked to guide later phases?
+- Are observations separated from assumptions, and is scope (is / is not) clear?
+- Does the working goal name specific people, valuable outcomes, agency, and key constraints?
+- Call `get_phase_guidance` with `phase` and an optional `method` selector for step-by-step facilitation guidance on any phase tool.
 
-## select-goals
-- Does the goal name specific people and a valuable outcome?
-- Is the goal framed within the user's agency and constraints?
-- Can a small experiment test the goal within days or weeks?
-- Have hidden conflicts or assumed rules been surfaced rather than accepted as fixed tradeoffs?
-- Has the user confirmed the goal and its tradeoffs as a revisable direction?
-- Detailed technique guidance is not yet implemented and is not advertised as a callable operation.
+## diagnose
+- Are candidate causes backed by at least one concrete observation?
+- Have assumed causal links been explicitly flagged rather than invented?
+- Have shared core causes, feedback loops, or leverage points been checked?
+- Does the diagnosis confirm the working goal, or require reframing?
+- Call `get_phase_guidance` with `phase` and an optional `method` selector for step-by-step facilitation guidance on any phase tool.
 
-## ideate-with-purpose
-- Are there at least six genuinely different approaches?
-- Did we separate idea generation from critique (Artist/Green Hat before Judge/Black Hat)?
-- Is each promising idea tied to the confirmed goal?
-- Does each selected idea have a first action, observable evidence, and a check for unintended negative side effects or obstacles?
-- After learning, should the idea, goal, or opportunity be revised?
-- Detailed technique guidance is not yet implemented and is not advertised as a callable operation.
+## generate
+- Are there at least six genuinely different approaches across varied mechanisms?
+- Was idea generation separated from critique (Artist/Green Hat before Judge/Black Hat)?
+- Are generated options tied to the confirmed goal and diagnosed causes?
+- Call `get_phase_guidance` with `phase` and an optional `method` selector for step-by-step facilitation guidance on any phase tool.
+
+## evaluate
+- Has each shortlisted option been tested for logical backing and disconfirming evidence?
+- Have options been checked across more than one plausible future or stakeholder perspective?
+- Are tradeoffs and open assumptions visible to the user?
+- Call `get_phase_guidance` with `phase` and an optional `method` selector for step-by-step facilitation guidance on any phase tool.
+
+## decide-and-stress-test
+- Did the user confirm the decision criteria, tradeoffs, and selected option?
+- Have failure modes, negative side effects, and execution obstacles been stress-tested before acting?
+- Does the selected option have one concrete first action and observable confirming and challenging evidence?
+- After reported results, should the option, diagnosis, or framing be revised?
+- Call `get_phase_guidance` with `phase` and an optional `method` selector for step-by-step facilitation guidance on any phase tool.
 ```
 
 ## `get_alternative_techniques`
@@ -235,35 +367,49 @@ Diagnostic checks menu:
 ```text
 Alternative techniques menu:
 
-## identify-opportunities
-- Directed — workaround audit: list the shortcuts people already use.
-- Directed — expectation gap map: compare what users expect vs. what happens.
-- Broader — jobs-to-be-done interview: what progress is the user trying to make?
-- Broader — analogical search: where else does this pattern appear?
-- Broader — Current Reality Tree (Dettmer): link observed undesirable effects to a shared core cause.
-- Broader — Consider All Factors / CAF (de Bono): list overlooked stakeholders, variables, and constraints.
-- Broader — Explorer role (von Oech): step outside your familiar domain to gather fresh raw material.
-- Detailed technique guidance is not yet implemented and is not advertised as a callable operation.
+## frame
+- Phase tool — Cynefin framework (`cynefin`): classify Clear, Complicated, Complex, or Chaotic to route Phases 2-5.
+- Phase tool — Kepner-Tregoe Situation Appraisal (`kt-situation-appraisal`): separate what the problem is from what it is not and set priorities.
+- Phase tool — Socratic questioning (`socratic-questioning`): probe purpose, assumptions, inferences, and evidence.
+- Directed — workaround audit and expectation gap map: inspect current shortcuts and user expectation gaps.
+- Broader — Explorer role (von Oech) and CAF (de Bono): gather outside raw material and list overlooked factors.
+- Call `get_phase_guidance` with `phase` and an optional `method` selector for step-by-step facilitation guidance on any phase tool.
 
-## select-goals
-- Directed — weighted criteria matrix: score opportunities on value, evidence, agency, learning.
-- Directed — kill criteria: what would make you abandon this goal?
-- Broader — premortem: imagine the goal failed; why?
-- Broader — ICE scoring: impact, confidence, ease.
-- Broader — Goal Tree and Evaporating Cloud (Dettmer): define necessary conditions and expose hidden assumptions behind goal conflicts.
-- Broader — PMI and Six Thinking Hats (de Bono): scan Plus, Minus, and Interesting points or separate White, Yellow, and Black Hat views.
-- Broader — Judge role (von Oech): evaluate feasibility and tradeoffs deliberately once exploration is sufficient.
-- Detailed technique guidance is not yet implemented and is not advertised as a callable operation.
+## diagnose
+- Phase tool — Five Whys (`five-whys`): iterative root-cause questioning with observed-vs-assumed links.
+- Phase tool — Six Sigma DMAIC Measure/Analyze (`six-sigma-dmaic`): Pareto focus, fishbone diagrams, and variation analysis.
+- Phase tool — Current Reality Tree (`current-reality-tree`): link undesirable effects to a shared core cause (Dettmer).
+- Phase tool — Systems thinking and leverage points (`systems-thinking`): map feedback loops, delays, and high-leverage interventions.
+- Broader — Evaporating Cloud (Dettmer) and jobs-to-be-done: surface hidden conflict assumptions and underlying user progress.
+- Call `get_phase_guidance` with `phase` and an optional `method` selector for step-by-step facilitation guidance on any phase tool.
 
-## ideate-with-purpose
-- Directed — constraint shuffle: apply no-software, no-budget, or no-meeting constraints.
-- Directed — assumption reversal: flip a key assumption and generate ideas.
-- Broader — SCAMPER: substitute, combine, adapt, modify, put to other uses, eliminate, reverse.
-- Broader — random entry: introduce an unrelated word and force a connection.
-- Broader — Future Reality and Prerequisite Trees (Dettmer): trim unintended negative branches and map obstacles to intermediate objectives.
-- Broader — Po provocation and APC (de Bono): use a deliberate provocation for movement and force multiple alternatives before choosing.
-- Broader — Artist-to-Warrior handoff and mental locks (von Oech): look for the second right answer without premature judging, then commit to clearing execution obstacles.
-- Detailed technique guidance is not yet implemented and is not advertised as a callable operation.
+## generate
+- Phase tool — Brainstorming checklist (`brainstorming-checklist`): defer judgment and vary solution mechanisms.
+- Phase tool — SCAMPER (`scamper`): substitute, combine, adapt, modify, put to other uses, eliminate, reverse.
+- Phase tool — Synectics analogies (`synectics-analogies`): direct, personal, symbolic, and fantasy analogies.
+- Phase tool — Morphological analysis (`morphological-analysis`): map solution dimensions and systematically recombine options.
+- Phase tool — TRIZ inventive principles (`triz-principles`): resolve contradictions where X and Y conflict.
+- Phase tool — Lateral provocation (`lateral-provocation`): deliberate 'po' statements and movement (de Bono).
+- Broader — constraint shuffle and mental locks (von Oech): force no-software/no-budget ideas and seek the second right answer.
+- Call `get_phase_guidance` with `phase` and an optional `method` selector for step-by-step facilitation guidance on any phase tool.
+
+## evaluate
+- Phase tool — Toulmin argument model (`toulmin-argument`): audit claim, grounds, warrant, qualifier, and rebuttal.
+- Phase tool — Pyramid Principle (`pyramid-principle`): test conclusion-first MECE argument structure.
+- Phase tool — Analysis of Competing Hypotheses (`competing-hypotheses`): weigh evidence across alternatives to counter confirmation bias.
+- Phase tool — Scenario planning (`scenario-planning`): stress-test options against multiple plausible futures.
+- Phase tool — Six Thinking Hats (`six-thinking-hats`): separate facts, intuition, caution, benefits, alternatives, and process (de Bono).
+- Broader — PMI (de Bono) and Future Reality Tree (Dettmer): scan Plus/Minus/Interesting and trace negative branches.
+- Call `get_phase_guidance` with `phase` and an optional `method` selector for step-by-step facilitation guidance on any phase tool.
+
+## decide-and-stress-test
+- Phase tool — Kepner-Tregoe Decision Analysis (`kt-decision-analysis`): MUST/WANT weighted criteria plus Potential Problem Analysis.
+- Phase tool — Decision trees and expected value (`decision-trees`): quantify uncertain branches, odds, and test value.
+- Phase tool — Premortem (`premortem`): assume failure and work backward to blind spots and kill criteria.
+- Phase tool — FMEA (`fmea`): score failure modes by severity, occurrence, and detection.
+- Phase tool — OODA loop (`ooda-loop`): fast Observe, Orient, Decide, Act adaptation under changing conditions.
+- Broader — Prerequisite Tree (Dettmer) and Warrior role (von Oech): map execution obstacles to intermediate objectives and commit.
+- Call `get_phase_guidance` with `phase` and an optional `method` selector for step-by-step facilitation guidance on any phase tool.
 ```
 
 ## `get_lateral_thinking_guidance`
@@ -271,11 +417,11 @@ Alternative techniques menu:
 ```text
 # Lateral-thinking exercises (additional unblocking tool)
 
-Lateral thinking is an additional tool separate from the core three-stage
+Lateral thinking is an additional tool separate from the core five-phase
 directed-ideation method. Use it when the user requests lateral thinking or
 when it may assist them past a blockage encountered during the directed-ideation
 MCP process (or outside it). Do not send private context to the tool; apply
-this guidance locally. These optional exercises are not a stage of directed
+this guidance locally. These optional exercises are not a phase of directed
 ideation and are not instructions to act on implausible ideas.
 
 Whenever offering a prompt, explicitly introduce it as a thinking exercise,
@@ -312,7 +458,7 @@ Bono and Roger von Oech):
 
 After the response, help extract a potentially useful principle from the
 exercise and ask how, if at all, it might serve the user's direction—and if
-they are in a directed-ideation session, return to the active stage once the
+they are in a directed-ideation session, return to the active phase once the
 blockage clears. Treat practicality and constraints as something to check
 together, not as proven.
 ```
@@ -323,11 +469,11 @@ together, not as proven.
 # Requirements-clarification exercises (additional Six Sigma-inspired tool)
 
 Requirements clarification is an additional tool separate from the core
-three-stage directed-ideation method. Use it when the user requests it or when
+five-phase directed-ideation method. Use it when the user requests it or when
 ambiguity, symptom-vs-cause confusion, or vague requirements block progress
 during the directed-ideation MCP process (or outside it). Apply this
 guidance locally; do not send private context to the tool. These optional
-exercises are not a stage of directed ideation and must not invent evidence.
+exercises are not a phase of directed ideation and must not invent evidence.
 
 Whenever offering a prompt, explicitly introduce it as a clarifying exercise,
 for example: "Let's try a clarifying exercise: ..." Ask one question at a time
@@ -358,8 +504,8 @@ Choose or offer one of these Six Sigma-inspired approaches:
 After the exercise, synthesize the clarified cause, boundary, or measurable
 requirement—distinguishing observations from assumptions—and ask the user to
 confirm or revise it. If they are in a directed-ideation session, carry the
-confirmed clarification back into the active stage (opportunity framing, goal
-selection, or test evidence) and resume the method.
+confirmed clarification back into the active phase (framing, diagnosis,
+evaluation, or test criteria) and resume the method.
 ```
 
 ## `get_strategic_thinking_guidance`
@@ -367,12 +513,12 @@ selection, or test evidence) and resume the method.
 ```text
 # Strategic-thinking exercises (additional systems and parallel-thinking tool)
 
-Strategic thinking is an additional tool separate from the core three-stage
+Strategic thinking is an additional tool separate from the core five-phase
 directed-ideation method. Use it when the user requests it or when entrenched
 conflicts, systems-level cause-and-effect, unintended side effects, lopsided
 evaluation, or execution obstacles block progress during the directed-ideation
 MCP process (or outside it). Apply this guidance locally; do not send private
-context to the tool. These optional exercises are not a stage of directed
+context to the tool. These optional exercises are not a phase of directed
 ideation and must not invent evidence.
 
 Whenever offering a prompt, explicitly introduce it as a strategic exercise,
@@ -427,5 +573,5 @@ After the exercise, synthesize the resulting goal conditions, core cause,
 dissolved conflict, trimmed risks, or obstacle plan—distinguishing observations
 from assumptions—and ask the user to confirm or revise it. If they are in a
 directed-ideation session, carry the confirmed strategic insight back into the
-active stage and resume the method.
+active phase and resume the method.
 ```

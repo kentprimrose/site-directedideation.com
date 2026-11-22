@@ -1,30 +1,402 @@
-
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101c39">
-  <meta name="description" content="Directed Ideation: a practical field guide to finding opportunities, choosing worthwhile goals, and generating ideas that serve them.">
+  <meta name="description" content="Directed Ideation: a practical five-step field guide to framing the right question, diagnosing root causes, generating options, evaluating against evidence, and deciding with confidence.">
   <title>Directed Ideation — A Field Guide</title>
   <link rel="stylesheet" href="site/style.css">
+  <script src="site/nav.js" defer></script>
 </head>
 
 <body>
-  <header id="top">
-    <div class="wrap topbar"><a class="brand" href="#top"><span class="brand-mark" aria-hidden="true">△</span> Directed Ideation</a><nav aria-label="Primary"><a href="#opportunities">Find opportunities</a><a href="#goals">Choose goals</a><a href="#ideas">Generate ideas</a><a href="#tools">Additional tools</a><a href="#security">Security design</a><a href="resources.html">Resources</a></nav></div>
-    <div class="wrap hero"><div class="hero-content"><span class="eyebrow">A field guide / from possibility to progress</span><h1>Better ideas begin <em>before</em> the brainstorm.</h1><p>Notice what could be better. Decide what is worth pursuing. Then generate ideas aimed at a clear outcome.</p><div class="hero-actions"><a class="button primary" href="#opportunities">Explore the approach</a><a class="button" href="#practice">Use the prompts</a></div><div class="hero-note"><span>01 → 02 → 03</span><span>A repeatable path for creative work, individual or shared.</span></div></div></div>
+  <header class="site-header">
+    <div class="wrap topbar">
+      <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true">△</span> Directed Ideation</a>
+      <nav class="site-nav" aria-label="Primary">
+        <div class="nav-inline">
+          <a href="#frame">Frame</a>
+          <a href="#diagnose">Diagnose</a>
+          <a href="#generate">Generate</a>
+          <a href="#evaluate">Evaluate</a>
+          <a href="#decide">Decide</a>
+          <a href="#tools">Tools</a>
+        </div>
+        <button class="menu-button" type="button" popovertarget="site-menu" popovertargetaction="toggle" aria-controls="site-menu" aria-label="Menu">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M3 5h14M3 10h14M3 15h14"/>
+          </svg>
+        </button>
+        <ul id="site-menu" class="site-menu" popover="auto">
+          <li class="compact-only"><a href="#frame">Frame</a></li>
+          <li class="compact-only"><a href="#diagnose">Diagnose</a></li>
+          <li class="compact-only"><a href="#generate">Generate</a></li>
+          <li class="compact-only"><a href="#evaluate">Evaluate</a></li>
+          <li class="compact-only"><a href="#decide">Decide</a></li>
+          <li class="compact-only"><a href="#tools">Tools</a></li>
+          <li><a href="#security">Security</a></li>
+          <li><a href="resources.html">Resources</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
-  <main>
-    <div class="rail"><div class="wrap rail-inner"><a href="#opportunities"><span>01</span> Identify opportunities</a><a href="#goals"><span>02</span> Select goals</a><a href="#ideas"><span>03</span> Ideate with purpose</a></div></div>
-    <section class="section" id="opportunities"><div class="wrap"><div class="section-head"><span class="eyebrow">01 / Observe</span><div><h2>Look for the space between what is and what could be.</h2><p class="lede">An opportunity is an unmet need, a recurring friction, or a new possibility. Start with evidence from real life before deciding what the solution should be.</p></div></div><div class="grid"><article class="card"><span class="num">01 / Friction</span><h3>Follow the workarounds</h3><p>Watch where people repeat steps, invent shortcuts, wait, give up, or ask for help. A workaround often points to a need the current process misses.</p><div class="prompt">What do people keep doing despite the inconvenience?</div></article><article class="card"><span class="num">02 / Change</span><h3>Notice what has shifted</h3><p>New tools, constraints, expectations, and habits make previously impossible or unimportant ideas newly useful.</p><div class="prompt">What can people do now that they could not do a year ago?</div></article><article class="card"><span class="num">03 / Perspective</span><h3>Change the viewpoint</h3><p>Ask who benefits from the current arrangement and who struggles with it. Look at the first use, the handoff, and the edge cases.</p><div class="prompt">Whose experience have we not examined?</div></article></div><div class="aside-strip"><strong>Capture, then frame</strong><p>Write observations as needs or tensions: “New team members cannot tell which decision is current,” rather than “We need a new dashboard.” The first leaves room for better solutions.</p></div></div></section>
-    <section class="section dark-section" id="goals"><div class="wrap"><div class="section-head"><span class="eyebrow">02 / Decide</span><div><h2>Choose a goal that gives creativity a direction.</h2><p class="lede">Not every opportunity deserves immediate attention. Select one by weighing its importance, the evidence behind it, and your ability to make progress.</p></div></div><div class="criteria"><article class="criterion"><div class="index">A / Value</div><h3>Does it matter?</h3><p>Who would benefit, and how much would their experience improve?</p></article><article class="criterion"><div class="index">B / Evidence</div><h3>Is it real?</h3><p>What have you observed? What assumption still needs testing?</p></article><article class="criterion"><div class="index">C / Agency</div><h3>Can you act?</h3><p>What can you change with the time, access, and resources available?</p></article><article class="criterion"><div class="index">D / Learning</div><h3>Will you learn?</h3><p>Can a small experiment reveal whether this is worth a larger effort?</p></article></div><div class="goal-formula"><span class="eyebrow">Frame the goal</span><blockquote>Help <b>[specific people]</b> achieve <b>[valuable outcome]</b> in <b>[context]</b>, while respecting <b>[key constraint]</b>.</blockquote></div></div></section>
-    <section class="section" id="ideas"><div class="wrap"><div class="section-head"><span class="eyebrow">03 / Create</span><div><h2>Generate options for the goal you chose.</h2><p class="lede">A clear goal makes divergent thinking more useful. Produce genuinely different approaches first; judge them against the goal afterward.</p></div></div><div class="methods"><article class="method"><span class="tag">Reframe</span><h3>Ask “How might we…?”</h3><p>Turn a fixed problem into an open question. Make it narrow enough to guide ideas and wide enough to allow different answers.</p><strong>Try: How might we make the next step obvious without adding more meetings?</strong></article><article class="method"><span class="tag">Expand</span><h3>Vary the mechanism</h3><p>Generate options through different means: remove a step, automate one, change the timing, shift responsibility, or make information visible.</p><strong>Try: Produce five ideas that work in five different ways.</strong></article><article class="method"><span class="tag">Challenge</span><h3>Use a useful constraint</h3><p>Temporarily limit time, money, technology, or complexity. Constraints can uncover simple ideas that an unrestricted brainstorm overlooks.</p><strong>Try: What could work with no new software?</strong></article><article class="method"><span class="tag">Test</span><h3>Make the idea falsifiable</h3><p>Choose promising ideas by their fit with the goal, then find the smallest test that would show whether each one helps.</p><strong>Try: What would you need to see to change your mind?</strong></article></div></div></section>
-    <section class="example" id="example"><div class="wrap"><div class="example-top"><div><span class="eyebrow">A worked example</span><h2>From a vague complaint to a testable idea.</h2></div><p>Imagine a team that keeps losing track of decisions made in meetings. “We need better meetings” is too broad to direct creative work.</p></div><div class="example-steps"><article class="example-step"><span>01 / Opportunity</span><h3>Spot the pattern</h3><p>People repeatedly ask which decision is final and where its rationale lives. New colleagues struggle most.</p></article><article class="example-step"><span>02 / Goal</span><h3>Name the outcome</h3><p>Help team members find the current decision and its owner in under two minutes, without adding another meeting.</p></article><article class="example-step"><span>03 / Idea + test</span><h3>Try a small change</h3><p>Add a one paragraph decision record to the existing project page. Ask three colleagues to find a decision a week later.</p></article></div></div></section>
-    <section class="practice" id="practice"><div class="wrap practice-inner"><div><span class="eyebrow">Put it to work / 15 minutes</span><h2>Take one real challenge through the sequence.</h2><p>Use a notebook or work with a partner. Keep the observation, goal, and ideas separate until you have explored each one.</p></div><ol class="questions"><li>What recurring friction or overlooked possibility have you observed? Describe one concrete instance.</li><li>Who is affected, and what would a meaningful improvement look like for them?</li><li>Which opportunity scores best on value, evidence, agency, and learning?</li><li>Write one “How might we…?” question tied to that goal.</li><li>Generate at least six different approaches. Pick one small test and decide what evidence would count.</li></ol></div></section>
-    <section class="section" id="tools"><div class="wrap"><div class="section-head"><span class="eyebrow">MCP companion tools</span><div><h2>Keep the core method distinct from unblocking tools.</h2><p class="lede">Directed ideation is the three-stage method for finding opportunities, selecting goals, and ideating with purpose. When you hit a blockage during an MCP-guided session, additional standalone tools can help you get unstuck without changing the core method.</p></div></div><div class="methods"><article class="method"><span class="tag">Core method</span><h3>Directed Ideation</h3><p>Three revisable stages—identify opportunities, select goals, and ideate with purpose—supported by stage-specific interview prompts, diagnostic checks, and technique menus.</p><strong>Purpose: Orient the work, clarify tradeoffs, and guide ideas toward a testable outcome.</strong></article><article class="method"><span class="tag">Additional tool</span><h3>Lateral Thinking</h3><p>Not a stage of directed ideation, but a separate optional MCP tool to assist you past creative or framing blockages by questioning assumptions, shifting perspective, and exploring fresh options before judging them.</p><strong>Purpose: Break through stuck thinking, then carry any useful principle back to your direction.</strong></article><article class="method"><span class="tag">Additional tool</span><h3>Requirements Clarification</h3><p>Not a stage of directed ideation, but a separate optional MCP tool to untangle vague complaints, separate symptoms from underlying causes, clarify boundaries, and turn broad wants into observable criteria.</p><strong>Purpose: Replace ambiguity with clear causes and measurable criteria, then return to the active stage.</strong></article><article class="method"><span class="tag">Additional tool</span><h3>Strategic Thinking</h3><p>Not a stage of directed ideation, but a separate optional MCP tool to examine system-wide causes, surface hidden assumptions behind tradeoffs, evaluate options from multiple angles, and plan around execution obstacles.</p><strong>Purpose: Resolve persistent conflicts, unintended side effects, and execution obstacles, then return to your direction.</strong></article></div><div class="aside-strip"><strong>How they fit together</strong><p>Directed ideation sets the compass; additional MCP tools help when progress stalls. Use them when ideas feel too narrow, requirements feel vague, or conflicts and obstacles block movement—then test every insight against your goal, constraints, and evidence. Explore the underlying thinkers and references on the <a href="resources.html">Resources</a> page.</p></div></div></section>
-    <section class="section dark-section" id="security"><div class="wrap"><div class="section-head"><span class="eyebrow">Service design / Security &amp; privacy</span><div><h2>Keep session context with your calling agent.</h2><p class="lede">The planned Directed Ideation MCP provides stage guidance and additional support tools (for lateral thinking, requirements clarification, and strategic thinking) without receiving or storing your challenge, conversation, goals, or ideas. The calling agent manages that context and its own provider's policies determine how it is handled.</p></div></div><div class="criteria"><article class="criterion"><div class="index">01 / Access</div><h3>Authenticated, scoped access</h3><p>Require secure sign-in and authorize account and team operations against the authenticated user. Isolate account and team records and test those boundaries.</p></article><article class="criterion"><div class="index">02 / Protection</div><h3>Limit exposure</h3><p>Use encrypted connections and encrypted storage for the limited account and team data the service needs. Restrict and audit staff access, and keep session content out of service requests, logs, and analytics.</p></article><article class="criterion"><div class="index">03 / Context boundary</div><h3>Session data stays with the agent</h3><p>The service does not store session history, stage progress, or session content. It cannot control the calling agent's storage, model use, retention, or sharing; check that provider's privacy controls.</p></article><article class="criterion"><div class="index">04 / Evidence</div><h3>Show what is verifiable</h3><p>Publish data-flow and security information, independent security-review summaries, and their dates, scope, findings, and limitations. Provide a way to report vulnerabilities.</p></article></div><div class="aside-strip"><strong>Planned controls, not a claim of current certification</strong><p>The initial service is planned as an invite-only US pilot, with US hosting and processing, clear US-only eligibility, and reasonable signup restrictions. Legal review is required before inviting pilot users; access will not be marketed or intentionally offered in other jurisdictions. These restrictions reduce risk but cannot guarantee that foreign laws will not apply. Session context is managed by the calling agent and its provider, not this MCP service; this boundary does not guarantee end-to-end privacy. The hosted MCP and these protections are still being developed. Do not submit sensitive or confidential information until the service is available and its current privacy and security disclosures are published. Independent reviews and assurance evidence will be identified by scope and date; no single control or certification eliminates risk.</p></div></div></section>
-  </main><footer><div class="wrap footer-inner"><p>Directed Ideation · A practical field guide</p><div class="footer-links"><a href="resources.html">Resources</a><a href="#top">Back to top ↑</a></div></div></footer>
+  <main id="top">
+    <section class="hero-band">
+      <div class="wrap hero">
+        <div class="hero-content">
+          <span class="eyebrow">A field guide / from complex situation to tested decision</span>
+          <h1>Better ideas begin <em>before</em> the brainstorm.</h1>
+          <p>Frame the real question. Diagnose root causes and system structure. Generate genuinely different options. Evaluate them against evidence and scenarios. Then decide, stress-test, and learn.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#frame">Explore the five steps</a>
+            <a class="button" href="#practice">Use the prompts</a>
+          </div>
+          <div class="hero-note">
+            <span>01 → 02 → 03 → 04 → 05</span>
+            <span>A repeatable five-step path for creative and strategic work, individual or shared.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="rail">
+      <div class="wrap rail-inner">
+        <a href="#frame"><span>01</span> Frame</a>
+        <a href="#diagnose"><span>02</span> Diagnose</a>
+        <a href="#generate"><span>03</span> Generate</a>
+        <a href="#evaluate"><span>04</span> Evaluate</a>
+        <a href="#decide"><span>05</span> Decide &amp; stress-test</a>
+      </div>
+    </div>
 
+    <section class="section" id="frame">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">01 / Frame</span>
+          <div>
+            <h2>Define the real question before hunting for answers.</h2>
+            <p class="lede">Clarify what kind of situation you face, separate what the problem is from what it is not, and test the assumptions built into your starting point.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card">
+            <span class="num">01 / Complexity</span>
+            <h3>Match the approach to the situation</h3>
+            <p>Determine whether cause and effect are clear, analyzable with expertise, emergent through small experiments, or urgent and unstable—then let that guide how much analysis or experimentation comes next.</p>
+            <div class="prompt">Can we predict the outcome up front, or must we learn by probing?</div>
+          </article>
+          <article class="card">
+            <span class="num">02 / Boundaries</span>
+            <h3>Separate what is from what is not</h3>
+            <p>Split tangled concerns apart, clarify where and for whom the issue occurs—and where it does not—and set priorities before diving into investigation.</p>
+            <div class="prompt">Where does this issue appear, and where does it noticeably not appear?</div>
+          </article>
+          <article class="card">
+            <span class="num">03 / Assumptions</span>
+            <h3>Question purpose and evidence</h3>
+            <p>Test your framing by distinguishing direct observations from inferences, surfacing hidden assumptions, and examining viewpoints you have not checked yet.</p>
+            <div class="prompt">What are we treating as a fact that is actually an assumption?</div>
+          </article>
+        </div>
+        <div class="aside-strip">
+          <strong>Capture, then frame</strong>
+          <p>Write observations as needs or tensions—“New team members cannot tell which decision is current,” rather than “We need a new dashboard.” The first leaves room for better solutions.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section dark-section" id="diagnose">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">02 / Diagnose</span>
+          <div>
+            <h2>Find root causes and structure beneath the symptoms.</h2>
+            <p class="lede">Look past surface complaints to understand why the pattern persists, which few drivers matter most, and where a focused shift creates real leverage.</p>
+          </div>
+        </div>
+        <div class="criteria">
+          <article class="criterion">
+            <div class="index">A / Root causes</div>
+            <h3>Ask why more than once</h3>
+            <p>Work backward from a specific observed event, marking each causal link as observed or assumed instead of guessing a single cause.</p>
+          </article>
+          <article class="criterion">
+            <div class="index">B / Drivers</div>
+            <h3>Measure what moves the gap</h3>
+            <p>Look for the vital few contributors, group causes across distinct categories, and separate routine variation from unusual shifts.</p>
+          </article>
+          <article class="criterion">
+            <div class="index">C / Cause chains</div>
+            <h3>Connect shared effects</h3>
+            <p>Map how separate recurring pain points trace back to a common core problem rather than patching each symptom in isolation.</p>
+          </article>
+          <article class="criterion">
+            <div class="index">D / Leverage</div>
+            <h3>See the wider system</h3>
+            <p>Spot feedback loops, delays, and incentives that hold the current behavior in place—and the points where a small change shifts outcomes.</p>
+          </article>
+        </div>
+        <div class="goal-formula">
+          <span class="eyebrow">Sharpen the direction</span>
+          <blockquote>Help <b>[specific people]</b> achieve <b>[valuable outcomes]</b> in <b>[context]</b>, while respecting <b>[key constraints]</b>.</blockquote>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="generate">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">03 / Generate</span>
+          <div>
+            <h2>Produce genuinely different options before judging.</h2>
+            <p class="lede">A clear frame and diagnosis make divergent thinking far more useful. Keep idea generation separate from critique and vary how candidate solutions work.</p>
+          </div>
+        </div>
+        <div class="methods">
+          <article class="method">
+            <span class="tag">Expand</span>
+            <h3>Defer judgment and vary the mechanism</h3>
+            <p>Turn the working goal into an open “How might we…?” question and generate options that work in distinct ways: remove, automate, substitute, combine, adapt, or reverse a step.</p>
+            <strong>Try: Produce at least six options that rely on different mechanisms.</strong>
+          </article>
+          <article class="method">
+            <span class="tag">Analogize</span>
+            <h3>Borrow from unrelated domains</h3>
+            <p>Look outside your immediate field—nature, other industries, or unfamiliar roles—to see how a similar tension is handled elsewhere, then translate the underlying principle back.</p>
+            <strong>Try: Where else is this exact tension solved cleanly?</strong>
+          </article>
+          <article class="method">
+            <span class="tag">Combine</span>
+            <h3>Map and recombine dimensions</h3>
+            <p>Break the solution space into independent dimensions—such as trigger, timing, owner, channel, and format—and pair unexpected combinations to reveal overlooked designs.</p>
+            <strong>Try: List four dimensions and force three unfamiliar combinations.</strong>
+          </article>
+          <article class="method">
+            <span class="tag">Break patterns</span>
+            <h3>Resolve contradictions and provoke new paths</h3>
+            <p>Name direct tradeoffs explicitly (“improving X worsens Y”) and use deliberate constraints or unlikely stepping-stone provocations to break out of habitual answers.</p>
+            <strong>Try: What could work with no new software and no extra meetings?</strong>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section dark-section" id="evaluate">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">04 / Evaluate</span>
+          <div>
+            <h2>Test options against evidence, logic, and scenarios.</h2>
+            <p class="lede">Reduce confirmation bias before committing. Check whether reasoning truly holds together, look for disconfirming evidence, and test options across plausible futures.</p>
+          </div>
+        </div>
+        <div class="criteria">
+          <article class="criterion">
+            <div class="index">A / Reasoning</div>
+            <h3>Audit the argument</h3>
+            <p>Check whether observed evidence genuinely supports each recommendation, make hidden links explicit, and test if the supporting structure holds together from the conclusion down.</p>
+          </article>
+          <article class="criterion">
+            <div class="index">B / Evidence</div>
+            <h3>Weigh competing explanations</h3>
+            <p>Compare every option against the same body of facts, paying special attention to observations that contradict or weaken a favorite choice.</p>
+          </article>
+          <article class="criterion">
+            <div class="index">C / Futures</div>
+            <h3>Test across scenarios</h3>
+            <p>Sketch several plausible future conditions rather than relying on one forecast, and check which options stay useful or adaptable if conditions shift.</p>
+          </article>
+          <article class="criterion">
+            <div class="index">D / Perspectives</div>
+            <h3>Separate modes of review</h3>
+            <p>Examine facts, intuition, caution, benefits, and fresh refinements one lens at a time so critique does not silence value and optimism does not hide risk.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="decide">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">05 / Decide &amp; stress-test</span>
+          <div>
+            <h2>Commit clearly, check failure modes, and learn fast.</h2>
+            <p class="lede">Make the decision criteria explicit, look proactively for how the chosen approach could fail before acting, and treat the first concrete step as a fast feedback loop.</p>
+          </div>
+        </div>
+        <div class="methods">
+          <article class="method">
+            <span class="tag">Compare</span>
+            <h3>Score against explicit criteria</h3>
+            <p>Separate non-negotiable limits from weighted priorities, compare finalists transparently, and identify preventive and fallback actions for top threats.</p>
+            <strong>Try: Which limits are fixed must-haves, and which are weighted tradeoffs?</strong>
+          </article>
+          <article class="method">
+            <span class="tag">Uncertainty</span>
+            <h3>Map odds and payoffs</h3>
+            <p>When stakes and uncertainty are high, lay out decision branches, rough likelihoods, and expected outcomes—and check whether a small test reduces the biggest uncertainty.</p>
+            <strong>Try: What single piece of evidence would change our choice?</strong>
+          </article>
+          <article class="method">
+            <span class="tag">Stress-test</span>
+            <h3>Imagine failure before starting</h3>
+            <p>Assume the chosen approach has already failed and work backward to surface blind spots; rank concrete failure modes by severity, likelihood, and how early you would detect them.</p>
+            <strong>Try: If this fails in a month, what will have gone wrong first?</strong>
+          </article>
+          <article class="method">
+            <span class="tag">Adapt</span>
+            <h3>Run a tight learning cycle</h3>
+            <p>Commit to one smallest concrete first action and observable confirming and challenging evidence. Once results come back, observe, re-orient, decide, and adjust quickly.</p>
+            <strong>Try: What is the smallest step one person can test this week?</strong>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="example" id="example">
+      <div class="wrap">
+        <div class="example-top">
+          <div>
+            <span class="eyebrow">A worked example</span>
+            <h2>From a vague complaint to a stress-tested decision.</h2>
+          </div>
+          <p>Imagine a team that keeps losing track of decisions made in meetings. “We need better meetings” is too broad to direct creative or strategic work.</p>
+        </div>
+        <div class="example-steps">
+          <article class="example-step">
+            <span>01 / Frame</span>
+            <h3>Define the tension</h3>
+            <p>Clarify the scope: decisions are made in meetings, but people—especially new colleagues—cannot tell which decision is current or who owns it.</p>
+          </article>
+          <article class="example-step">
+            <span>02 / Diagnose</span>
+            <h3>Find the root cause</h3>
+            <p>Trace recurring confusion back to scattered chat threads and unowned notes, with no single place updated when a choice changes.</p>
+          </article>
+          <article class="example-step">
+            <span>03 / Generate</span>
+            <h3>Explore varied options</h3>
+            <p>Produce six distinct mechanisms: a one-paragraph project-page log, a weekly digest, a decision-owner sign-off, an automated summary, a shared tag, and retiring side threads.</p>
+          </article>
+          <article class="example-step">
+            <span>04 / Evaluate</span>
+            <h3>Test against evidence</h3>
+            <p>Compare options for maintenance burden, onboarding clarity, and resilience during busy release weeks; notice that heavy tooling fails under time pressure.</p>
+          </article>
+          <article class="example-step">
+            <span>05 / Decide &amp; stress-test</span>
+            <h3>Run one small test</h3>
+            <p>Add a one-paragraph decision record to the existing project page, pre-check the risk of forgotten updates, and ask three colleagues to locate a decision a week later.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="practice" id="practice">
+      <div class="wrap practice-inner">
+        <div>
+          <span class="eyebrow">Put it to work / 20 minutes</span>
+          <h2>Take one real challenge through all five steps.</h2>
+          <p>Use a notebook, work with a partner, or run a guided MCP session. Keep framing, diagnosis, options, evaluation, and commitment distinct until you have explored each one.</p>
+        </div>
+        <ol class="questions">
+          <li><strong>Frame:</strong> What concrete friction or decision are you facing, what is inside versus outside scope, and how predictable is the situation?</li>
+          <li><strong>Diagnose:</strong> What root causes, system patterns, or assumptions explain why this keeps happening?</li>
+          <li><strong>Generate:</strong> Tied to a clear working goal, what are at least six genuinely different approaches?</li>
+          <li><strong>Evaluate:</strong> What evidence supports or challenges the top options, and how do they hold up under different scenarios?</li>
+          <li><strong>Decide &amp; stress-test:</strong> Which option wins on clear criteria, how could it fail, and what smallest first action and observable evidence will test it?</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section" id="tools">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">MCP companion tools</span>
+          <div>
+            <h2>Keep the core process distinct from unblocking tools.</h2>
+            <p class="lede">Directed ideation is the five-step process for framing, diagnosing, generating, evaluating, and deciding. When you hit a blockage during an MCP-guided session, additional standalone tools help you get unstuck without changing the core process.</p>
+          </div>
+        </div>
+        <div class="methods">
+          <article class="method">
+            <span class="tag">Core process</span>
+            <h3>Directed Ideation</h3>
+            <p>Five revisable phases—frame, diagnose, generate, evaluate, and decide and stress-test—supported by phase-level guidance, interview prompts, diagnostic checks, and technique menus.</p>
+            <strong>Purpose: Orient the work, clarify tradeoffs, and guide ideas toward a stress-tested decision.</strong>
+          </article>
+          <article class="method">
+            <span class="tag">Additional tool</span>
+            <h3>Lateral Thinking</h3>
+            <p>Not a phase of directed ideation, but a separate optional MCP tool to assist you past creative or framing blockages by questioning assumptions, shifting perspective, and exploring fresh options before judging them.</p>
+            <strong>Purpose: Break through stuck thinking, then carry any useful principle back to your direction.</strong>
+          </article>
+          <article class="method">
+            <span class="tag">Additional tool</span>
+            <h3>Requirements Clarification</h3>
+            <p>Not a phase of directed ideation, but a separate optional MCP tool to untangle vague complaints, separate symptoms from underlying causes, clarify boundaries, and turn broad wants into observable criteria.</p>
+            <strong>Purpose: Replace ambiguity with clear causes and measurable criteria, then return to the active phase.</strong>
+          </article>
+          <article class="method">
+            <span class="tag">Additional tool</span>
+            <h3>Strategic Thinking</h3>
+            <p>Not a phase of directed ideation, but a separate optional MCP tool to examine system-wide causes, surface hidden assumptions behind tradeoffs, evaluate options from multiple angles, and work through execution obstacles.</p>
+            <strong>Purpose: Resolve persistent conflicts, unintended side effects, and execution obstacles, then return to your direction.</strong>
+          </article>
+        </div>
+        <div class="aside-strip">
+          <strong>How they fit together</strong>
+          <p>Directed ideation sets the compass; additional MCP tools help when progress stalls. Use them when ideas feel too narrow, requirements feel vague, or conflicts and obstacles block movement—then test every insight against your goal, constraints, and evidence. Explore the underlying thinkers and references on the <a href="resources.html">Resources</a> page.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section dark-section" id="security">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">Service design / Security &amp; privacy</span>
+          <div>
+            <h2>Keep session context with your calling agent.</h2>
+            <p class="lede">The Directed Ideation MCP provides five-phase method guidance and additional support tools (for lateral thinking, requirements clarification, and strategic thinking) without receiving or storing your challenge, conversation, goals, or ideas. The calling agent manages that context and its own provider’s policies determine how it is handled.</p>
+          </div>
+        </div>
+        <div class="criteria">
+          <article class="criterion">
+            <div class="index">01 / Access</div>
+            <h3>Authenticated, scoped access</h3>
+            <p>Uses secure sign-in and authorizes account and team operations against the authenticated user, isolating account and team records across tested boundaries.</p>
+          </article>
+          <article class="criterion">
+            <div class="index">02 / Protection</div>
+            <h3>Limit exposure</h3>
+            <p>Uses encrypted connections and encrypted storage for the limited account and team data the service requires, restricts and audits staff access, and keeps session content out of service requests, logs, and analytics.</p>
+          </article>
+          <article class="criterion">
+            <div class="index">03 / Context boundary</div>
+            <h3>Session data stays with the agent</h3>
+            <p>The service does not store session history, phase progress, or session content. It cannot control the calling agent’s storage, model use, retention, or sharing; check that provider’s privacy controls.</p>
+          </article>
+          <article class="criterion">
+            <div class="index">04 / Evidence</div>
+            <h3>Show what is verifiable</h3>
+            <p>Publishes data-flow and security information, independent review summaries with their dates, scope, findings, and limitations, and a channel to report vulnerabilities.</p>
+          </article>
+        </div>
+        <div class="aside-strip">
+          <strong>Scope and security boundary</strong>
+          <p>The hosted MCP operates as an invite-only US service with US-based hosting, clear US eligibility, and signup restrictions; access is not marketed or intentionally offered in other jurisdictions, though restrictions cannot guarantee that foreign laws will not apply. Session context is managed solely by your calling agent and its provider, not this MCP service, so this boundary does not guarantee end-to-end privacy. Keep confidential or regulated data within your agent provider’s approved controls. Published security reviews and assurance summaries identify their specific scope and date; no single control or certification eliminates risk.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <div class="wrap footer-inner">
+      <p>Directed Ideation · A practical field guide</p>
+      <div class="footer-links">
+        <a href="resources.html">Resources</a>
+        <a href="#top">Back to top ↑</a>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>

@@ -20,6 +20,7 @@ from mcp.types import TextContent
 
 from site_directedideation_com.mcp import (
     INTERVIEW_STAGES,
+    PHASE_METHODS,
     Stage,
     _InputBoundary,
     aggregate_counts,
@@ -54,6 +55,23 @@ _REJECTED_INPUT_CASES = [
     ("tool", "get_requirements_clarification_guidance", {"stage": "SENTINEL_PROBE"}),
     ("tool", "get_strategic_thinking_guidance", {"context": "SENTINEL_PROBE"}),
     ("tool", "get_strategic_thinking_guidance", {"stage": "SENTINEL_PROBE"}),
+    ("tool", "get_phase_guidance", {}),
+    ("tool", "get_phase_guidance", {"phase": "SENTINEL_PROBE"}),
+    (
+        "tool",
+        "get_phase_guidance",
+        {"phase": "frame", "method": "SENTINEL_PROBE"},
+    ),
+    (
+        "tool",
+        "get_phase_guidance",
+        {"phase": "frame", "method": "ooda-loop"},
+    ),
+    (
+        "tool",
+        "get_phase_guidance",
+        {"phase": "frame", "extra": "SENTINEL_PROBE"},
+    ),
     *[
         ("tool", tool, args)
         for tool in _SUPPLEMENTARY_TOOLS
@@ -157,6 +175,11 @@ def test_aggregate_counts_are_bounded_and_exclude_rejections(
 
     async def check(client: Client) -> None:
         text(await client.call_tool("get_directed_ideation_method", {}))
+        text(
+            await client.call_tool(
+                "get_phase_guidance", {"phase": "frame", "method": "cynefin"}
+            )
+        )
         text(await client.call_tool("get_lateral_thinking_guidance", {}))
         text(await client.call_tool("get_requirements_clarification_guidance", {}))
         text(await client.call_tool("get_strategic_thinking_guidance", {}))
@@ -164,7 +187,7 @@ def test_aggregate_counts_are_bounded_and_exclude_rejections(
         text(await client.call_tool("get_interview_guidance", {"stage": None}))
         text(
             await client.call_tool(
-                "get_diagnostic_checks", {"stage": INTERVIEW_STAGES[0]}
+                "get_diagnostic_checks", {"stage": INTERVIEW_STAGES[1]}
             )
         )
         for operation, name, arguments in _REJECTED_INPUT_CASES:
@@ -178,6 +201,7 @@ def test_aggregate_counts_are_bounded_and_exclude_rejections(
     after = aggregate_counts()
     assert {k: after["tools"][k] - v for k, v in before["tools"].items()} == {
         "get_directed_ideation_method": 1,
+        "get_phase_guidance": 1,
         "get_interview_guidance": 2,
         "get_diagnostic_checks": 1,
         "get_alternative_techniques": 0,
@@ -188,9 +212,11 @@ def test_aggregate_counts_are_bounded_and_exclude_rejections(
     assert {
         k: after["stage_filters"][k] - v for k, v in before["stage_filters"].items()
     } == {
-        INTERVIEW_STAGES[0]: 1,
-        INTERVIEW_STAGES[1]: 0,
-        INTERVIEW_STAGES[2]: 0,
+        "frame": 1,
+        "diagnose": 1,
+        "generate": 0,
+        "evaluate": 0,
+        "decide-and-stress-test": 0,
         "unfiltered": 2,
     }
     assert "SENTINEL_PROBE" not in repr(after)
@@ -208,6 +234,7 @@ def test_discovery_and_annotations(transport: Transport) -> None:
         tools = (await client.list_tools()).tools
         assert {tool.name for tool in tools} == {
             "get_directed_ideation_method",
+            "get_phase_guidance",
             "get_interview_guidance",
             "get_diagnostic_checks",
             "get_alternative_techniques",
@@ -222,34 +249,26 @@ def test_discovery_and_annotations(transport: Transport) -> None:
             assert tool.annotations.idempotent_hint is True
             assert tool.annotations.open_world_hint is False
 
-        method_tool = next(
-            tool for tool in tools if tool.name == "get_directed_ideation_method"
+        for no_arg_name in (
+            "get_directed_ideation_method",
+            "get_lateral_thinking_guidance",
+            "get_requirements_clarification_guidance",
+            "get_strategic_thinking_guidance",
+        ):
+            tool = next(t for t in tools if t.name == no_arg_name)
+            assert tool.input_schema.get("additionalProperties") is False
+            assert not tool.input_schema.get("properties")
+            assert not tool.input_schema.get("required")
+
+        phase_tool = next(t for t in tools if t.name == "get_phase_guidance")
+        assert phase_tool.input_schema.get("additionalProperties") is False
+        assert phase_tool.input_schema.get("required") == ["phase"]
+        assert phase_tool.input_schema["properties"]["phase"]["enum"] == list(
+            INTERVIEW_STAGES
         )
-        assert method_tool.input_schema.get("additionalProperties") is False
-        assert not method_tool.input_schema.get("properties")
-        assert not method_tool.input_schema.get("required")
+        assert "method" in phase_tool.input_schema["properties"]
 
-        lateral = next(t for t in tools if t.name == "get_lateral_thinking_guidance")
-        assert lateral.input_schema.get("additionalProperties") is False
-        assert not lateral.input_schema.get("properties")
-
-        clarification = next(
-            t for t in tools if t.name == "get_requirements_clarification_guidance"
-        )
-        assert clarification.input_schema.get("additionalProperties") is False
-        assert not clarification.input_schema.get("properties")
-
-        strategic = next(
-            t for t in tools if t.name == "get_strategic_thinking_guidance"
-        )
-        assert strategic.input_schema.get("additionalProperties") is False
-        assert not strategic.input_schema.get("properties")
-
-        for name in {
-            "get_interview_guidance",
-            "get_diagnostic_checks",
-            "get_alternative_techniques",
-        }:
+        for name in _SUPPLEMENTARY_TOOLS:
             tool = next(t for t in tools if t.name == name)
             assert tool.input_schema.get("additionalProperties") is False
             assert "stage" in tool.input_schema["properties"]
@@ -269,58 +288,64 @@ def test_discovery_and_annotations(transport: Transport) -> None:
     "transport", ["memory", pytest.param("http", marks=pytest.mark.integration)]
 )
 def test_complete_method(transport: Transport) -> None:
-    """The canonical tool returns the full three-stage method guidance."""
+    """The canonical tool returns the full five-phase method guidance."""
 
     async def check(client: Client) -> None:
         result = text(await client.call_tool("get_directed_ideation_method", {}))
-        assert "# Directed Ideation — complete method" in result
-        assert "Stage 1: Identify opportunities" in result
-        assert "Stage 2: Select goals" in result
-        assert "Stage 3: Ideate with purpose" in result
-        assert "confirm context" in result.lower()
-        assert "one question at a time" in result.lower()
-        assert "confirm it" in result.lower()
-        assert "confirm or revise it" in result.lower()
+        assert "# Directed Ideation — complete five-phase method" in result
+        assert "Phase 1: Frame" in result
+        assert "Phase 2: Diagnose" in result
+        assert "Phase 3: Generate" in result
+        assert "Phase 4: Evaluate" in result
+        assert "Phase 5: Decide and stress-test" in result
+        lower = result.lower()
         for phrase in (
+            "confirm context",
+            "one question at a time",
             "direction is a compass, not a track",
-            "observation and reframing",
-            "deciding and sharpening",
-            "diverge, converge and learn",
+            "cynefin",
+            "situation appraisal",
+            "socratic questioning",
+            "five whys",
+            "current reality tree",
+            "leverage points",
+            "scamper",
+            "synectics",
+            "morphological",
+            "triz",
+            "toulmin",
+            "pyramid principle",
+            "analysis of competing hypotheses",
+            "scenario planning",
+            "six thinking hats",
+            "decision analysis",
+            "decision trees",
+            "premortem",
+            "fmea",
+            "ooda",
             "do not invent evidence",
-            "do not advance",
-            "do not claim an action",
+            "do not claim an",
             "ideas considered",
-            "learning, revisions",
+            "first action",
+            "observable evidence",
+            "do not execute actions",
+            "do not send this record to the mcp service",
+            "get_phase_guidance",
+            "get_interview_guidance",
+            "get_diagnostic_checks",
+            "get_alternative_techniques",
+            "get_lateral_thinking_guidance",
+            "get_requirements_clarification_guidance",
+            "get_strategic_thinking_guidance",
+            "none of these is a phase of",
+            "additional tools",
+            "blockages",
+            "william dettmer",
+            "roger von oech",
+            "edward de bono",
+            "context-free",
         ):
-            assert phrase in result.lower()
-        assert "First action" in result
-        assert "Observable evidence" in result
-        assert "Do not execute actions" in result
-        assert "Do not send this record to the MCP service" in result
-        assert "Optional supplementary guidance" in result
-        assert "when you judge it useful or needed" in result.lower()
-        assert "user requests it" in result.lower()
-        assert "on your own initiative" in result.lower()
-        assert "an explicit user request\nis not required" in result.lower()
-        assert "only retrieve" not in result.lower()
-        assert "get_interview_guidance" in result
-        assert "get_diagnostic_checks" in result
-        assert "get_alternative_techniques" in result
-        assert "get_lateral_thinking_guidance" in result
-        assert "get_requirements_clarification_guidance" in result
-        assert "get_strategic_thinking_guidance" in result
-        assert "none of these is a stage of" in result.lower()
-        assert "additional tools" in result.lower()
-        assert "blockages" in result.lower()
-        assert "five whys" in result.lower()
-        assert "william dettmer" in result.lower()
-        assert "roger von oech" in result.lower()
-        assert "edward de bono" in result.lower()
-        assert "context-free" in result
-        assert "no session content" in result.lower()
-        assert "does not track or store session state" in result.lower()
-        assert "not advertised" in result.lower()
-        assert "callable operation" in result.lower()
+            assert phrase in lower, f"Missing phrase in complete method: {phrase}"
 
     run_check(transport, check)
 
@@ -328,23 +353,41 @@ def test_complete_method(transport: Transport) -> None:
 @pytest.mark.parametrize(
     "transport", ["memory", pytest.param("http", marks=pytest.mark.integration)]
 )
+def test_phase_guidance_covers_all_phases_and_methods(transport: Transport) -> None:
+    """Every phase and every bounded method selector returns focused guidance."""
+
+    async def check(client: Client) -> None:
+        for phase, methods in PHASE_METHODS.items():
+            overview = text(
+                await client.call_tool("get_phase_guidance", {"phase": phase})
+            )
+            for method_id, (label, _guidance) in methods.items():
+                assert method_id in overview
+                assert label in overview
+                focused = text(
+                    await client.call_tool(
+                        "get_phase_guidance", {"phase": phase, "method": method_id}
+                    )
+                )
+                assert label in focused
+                assert method_id in focused
+                assert "never send session context" in focused.lower()
+
+    run_check(transport, check)
+
+
 @pytest.mark.parametrize(
-    "tool_name",
-    [
-        "get_interview_guidance",
-        "get_diagnostic_checks",
-        "get_alternative_techniques",
-    ],
+    "transport", ["memory", pytest.param("http", marks=pytest.mark.integration)]
 )
+@pytest.mark.parametrize("tool_name", _SUPPLEMENTARY_TOOLS)
 def test_supplementary_menus(transport: Transport, tool_name: str) -> None:
-    """Each supplementary tool returns compact menus with optional stage filter."""
+    """Each supplementary tool returns compact menus with optional phase filter."""
 
     async def check(client: Client) -> None:
         for arguments in ({}, {"stage": None}):
             menu = text(await client.call_tool(tool_name, arguments))
-            assert all(stage in menu for stage in INTERVIEW_STAGES)
-            assert "not yet implemented" in menu.lower()
-            assert "not advertised" in menu.lower()
+            assert all(f"## {stage}\n" in menu for stage in INTERVIEW_STAGES)
+            assert "get_phase_guidance" in menu
         unfiltered = text(await client.call_tool(tool_name, {}))
         for stage in INTERVIEW_STAGES:
             menu = text(await client.call_tool(tool_name, {"stage": stage}))
@@ -355,9 +398,11 @@ def test_supplementary_menus(transport: Transport, tool_name: str) -> None:
                 if part.startswith(f"## {stage}\n")
             )
             assert menu == f"{title}\n\n{expected}"
-            assert stage in menu
+            assert f"## {stage}\n" in menu
             assert all(
-                other not in menu for other in INTERVIEW_STAGES if other != stage
+                f"## {other}\n" not in menu
+                for other in INTERVIEW_STAGES
+                if other != stage
             )
 
     run_check(transport, check)
@@ -367,34 +412,35 @@ def test_supplementary_menus(transport: Transport, tool_name: str) -> None:
     ("stage", "phrases"),
     [
         (
-            "identify-opportunities",
-            ("recent, specific", "inferring", "other need", "best fits"),
+            "frame",
+            ("recent, specific", "cynefin", "is / is not", "inferring", "best fit"),
         ),
         (
-            "select-goals",
-            ("fixed", "assumed", "tradeoffs", "observable sign", "revisable"),
+            "diagnose",
+            ("root cause", "few factors", "core problem", "feedback loop", "leverage"),
         ),
         (
-            "ideate-with-purpose",
-            (
-                "different mechanisms",
-                "which ideas",
-                "first small action",
-                "evidence",
-                "what happened",
-                "framing change",
-            ),
+            "generate",
+            ("how might we", "different mechanisms", "recombine", "conflict"),
+        ),
+        (
+            "evaluate",
+            ("grounds", "competing hypotheses", "plausible future", "tradeoffs"),
+        ),
+        (
+            "decide-and-stress-test",
+            ("must limits", "odds or payoffs", "premortem", "first action", "ooda"),
         ),
     ],
 )
-def test_interview_guidance_covers_iterative_substeps(
+def test_interview_guidance_covers_five_phases(
     stage: Stage, phrases: tuple[str, ...]
 ) -> None:
-    """Each filtered menu offers the stage's key iterative questions."""
+    """Each phase menu offers that phase's core iterative questions."""
     from site_directedideation_com.mcp import get_interview_guidance
 
-    menu = get_interview_guidance(stage)
-    assert all(phrase in menu.lower() for phrase in phrases)
+    menu = get_interview_guidance(stage).lower()
+    assert all(phrase in menu for phrase in phrases if phrase)
 
 
 @pytest.mark.parametrize(
@@ -444,6 +490,7 @@ def test_documented_tool_responses_match_implementation() -> None:
         get_directed_ideation_method,
         get_interview_guidance,
         get_lateral_thinking_guidance,
+        get_phase_guidance,
         get_requirements_clarification_guidance,
         get_strategic_thinking_guidance,
     )
@@ -461,6 +508,11 @@ def test_documented_tool_responses_match_implementation() -> None:
         get_strategic_thinking_guidance,
     ):
         assert f"## `{tool.__name__}`\n\n```text\n{tool().rstrip()}\n```" in reference
+    for phase in INTERVIEW_STAGES:
+        assert (
+            f'### `phase="{phase}"`\n\n```text\n'
+            f"{get_phase_guidance(phase).rstrip()}\n```" in reference
+        )
 
 
 @pytest.mark.parametrize(
@@ -474,9 +526,9 @@ def test_lateral_guidance_protocol(transport: Transport) -> None:
             await client.call_tool("get_lateral_thinking_guidance", {})
         ).lower()
         for phrase in (
-            "additional tool separate from the core three-stage",
+            "additional tool separate from the core five-phase",
             "blockage encountered during the directed-ideation",
-            "not a stage of directed",
+            "not a phase of directed",
             "thinking exercise",
             "one question at a time",
             "skip, stop",
@@ -515,7 +567,7 @@ def test_requirements_clarification_protocol(transport: Transport) -> None:
         ).lower()
         for phrase in (
             "additional tool separate from the core",
-            "not a stage of directed ideation",
+            "not a phase of directed ideation",
             "clarifying exercise",
             "one question at a time",
             "skip, stop",
@@ -526,7 +578,7 @@ def test_requirements_clarification_protocol(transport: Transport) -> None:
             "operational definition",
             "lightweight fmea",
             "observations from assumptions",
-            "active stage",
+            "active phase",
             "private context",
         ):
             assert phrase in result
@@ -546,7 +598,7 @@ def test_strategic_thinking_protocol(transport: Transport) -> None:
         ).lower()
         for phrase in (
             "additional tool separate from the core",
-            "not a stage of directed",
+            "not a phase of directed",
             "strategic exercise",
             "one question at a time",
             "skip, stop",
@@ -571,28 +623,9 @@ def test_strategic_thinking_protocol(transport: Transport) -> None:
             "judge",
             "warrior",
             "observations from assumptions",
-            "active stage",
+            "active phase",
             "private",
         ):
             assert phrase in result
 
     run_check(transport, check)
-
-
-def test_alternative_techniques_include_creative_and_strategic_thinkers() -> None:
-    """Stage-filtered alternative techniques surface Dettmer, de Bono, and von Oech."""
-    from site_directedideation_com.mcp import get_alternative_techniques
-
-    unfiltered = get_alternative_techniques().lower()
-    for phrase in (
-        "current reality tree (dettmer)",
-        "goal tree and evaporating cloud (dettmer)",
-        "future reality and prerequisite trees (dettmer)",
-        "consider all factors / caf (de bono)",
-        "pmi and six thinking hats (de bono)",
-        "po provocation and apc (de bono)",
-        "explorer role (von oech)",
-        "judge role (von oech)",
-        "artist-to-warrior handoff and mental locks (von oech)",
-    ):
-        assert phrase in unfiltered

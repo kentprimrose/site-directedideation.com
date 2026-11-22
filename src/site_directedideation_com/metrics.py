@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 
 TOOLS = (
     "get_directed_ideation_method",
+    "get_phase_guidance",
     "get_interview_guidance",
     "get_diagnostic_checks",
     "get_alternative_techniques",
@@ -15,7 +16,14 @@ TOOLS = (
     "get_requirements_clarification_guidance",
     "get_strategic_thinking_guidance",
 )
-STAGES = ("identify-opportunities", "select-goals", "ideate-with-purpose", "unfiltered")
+STAGES = (
+    "frame",
+    "diagnose",
+    "generate",
+    "evaluate",
+    "decide-and-stress-test",
+    "unfiltered",
+)
 
 
 def configuration():
