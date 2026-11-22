@@ -1,5 +1,8 @@
 # Directed ideation evaluation pilot
 
+This benchmark compares method text against a direct answer. To evaluate
+live MCP use instead, see the [paired live-MCP suite](test_plan/LIVE_MCP.md).
+
 This is a directional pilot, not evidence of effectiveness by itself. The
 answerer, simulated user (interrogator), and judge rotate as follows:
 

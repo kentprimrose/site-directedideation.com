@@ -1,0 +1,553 @@
+{
+  "judgments": [
+    {
+      "case": "01-pantry",
+      "judge": "claude",
+      "harness": "Claude Code 2.1.330",
+      "model": "claude-sonnet-4-6",
+      "effort": "medium",
+      "herdr_pane": "wG:p1",
+      "trace_ids": [
+        "f4585530-c551-48db-8e8d-855efd8daab5"
+      ],
+      "mapping": {
+        "A": "MCP",
+        "B": "Control"
+      },
+      "scores": {
+        "A": {
+          "Fit to evidence": {
+            "score": 2,
+            "evidence": "Plan A explicitly targets the three observed exception types (name mismatch, address change, first visit) and rules out the side table precisely because the floater's unavailability during the 9:20–9:40 restocking peak was the documented staffing failure."
+          },
+          "Feasibility and safeguards": {
+            "score": 2,
+            "evidence": "Keeps one line, one volunteer, and one roster; explicitly states exceptions are handled in place without sending households to the back of the line, preserving access and exception priority within the existing staffing footprint."
+          },
+          "Actionability": {
+            "score": 2,
+            "evidence": "Names one reversible change (a one-page checklist), specifies a 15-minute setup using only the checker's own knowledge of existing steps, and requires no additional staff or equipment."
+          },
+          "Testability": {
+            "score": 2,
+            "evidence": "Explicitly sets 20 minutes as the repeat threshold, defines the comparison (comparable normal Saturday with records), distinguishes routine from exception slips, and lists four named guardrails plus specific revision triggers for each failure mode."
+          },
+          "Trade-off reasoning": {
+            "score": 2,
+            "evidence": "Directly compares the checklist against the staffed side table, explaining why the side table is weaker during the restocking peak, and names the key uncertainty (how much of the 3–5 minute exception time is actually avoidable) as the assumption that could change the choice."
+          }
+        },
+        "B": {
+          "Fit to evidence": {
+            "score": 2,
+            "evidence": "Targets the same three exception types and explicitly cites the floater's documented failure (had to leave the second station to restock) as the reason the single-station trial is preferred."
+          },
+          "Feasibility and safeguards": {
+            "score": 2,
+            "evidence": "Keeps the same volunteer and roster, requires no extra coverage, and includes a privacy safeguard (keep identifying details out of earshot) alongside a prohibition on changing food choice or moving households out of line."
+          },
+          "Actionability": {
+            "score": 2,
+            "evidence": "Names one reversible change (standardized exception prompts), specifies a 15-minute setup using the volunteer's existing clarification questions, and adds no paperwork or process burden for households."
+          },
+          "Testability": {
+            "score": 1,
+            "evidence": "Specifies routine vs. exception marking and arrival-to-pickup spot-checks, but never states the 20-minute arrival-to-pickup target as the explicit success threshold, leaving the pass/fail criterion underspecified."
+          },
+          "Trade-off reasoning": {
+            "score": 2,
+            "evidence": "Explicitly weighs the single-station approach against the side-table alternative, identifies the two unconfirmed conditions the side table requires (reliable staffing and a no-queue-loss return rule), and names the key uncertainty (how much exception time is avoidable) as what the trial tests."
+          }
+        }
+      }
+    },
+    {
+      "case": "02-library",
+      "judge": "claude",
+      "harness": "Claude Code 2.1.330",
+      "model": "claude-sonnet-4-6",
+      "effort": "medium",
+      "herdr_pane": "wG:p1",
+      "trace_ids": [
+        "b495d974-e80f-4ac7-88a9-8b8ff34686f2"
+      ],
+      "mapping": {
+        "A": "Control",
+        "B": "MCP"
+      },
+      "scores": {
+        "A": {
+          "Fit to evidence": {
+            "score": 2,
+            "evidence": "Explicitly separates unbooked, missed, and cancelled slots; correctly notes the earlier reminder trial did not prove a net benefit; ties closing-hour slots to the unbooked category, not misses."
+          },
+          "Feasibility and safeguards": {
+            "score": 2,
+            "evidence": "Respects the ten-minute daily cap, restricts voicemail to opt-in patrons with no appointment details disclosed, and preserves walk-in access as a non-phone route."
+          },
+          "Actionability": {
+            "score": 2,
+            "evidence": "Names one concrete change (opt-in reminder call the day before), specifies the script content, limits it to weekdays, and uses a paper tally with existing staff time."
+          },
+          "Testability": {
+            "score": 2,
+            "evidence": "Sets a prior-four-week baseline of 16/48 unused including 6 missed, targets ≤4 misses and ≤14 unused, and names explicit triggers—cap exceeded, low reach rate, or privacy breach—that prompt switching to the waitlist."
+          },
+          "Trade-off reasoning": {
+            "score": 2,
+            "evidence": "Compares directly against the opt-in waitlist as the strongest alternative, notes the waitlist could have recovered at most three slots, and names the key unknown as how many patrons staff can reach within the time budget."
+          }
+        },
+        "B": {
+          "Fit to evidence": {
+            "score": 2,
+            "evidence": "Targets the cancellation category specifically, notes none of the three logged cancellations triggered a waitlist check, and honestly flags that refilling all three would reach only 13 unused slots—one short of the target."
+          },
+          "Feasibility and safeguards": {
+            "score": 2,
+            "evidence": "Ties the check to an existing staff action (logging a cancellation), respects the ten-minute cap, bans appointment details in voicemail, and explicitly protects patrons without a phone."
+          },
+          "Actionability": {
+            "score": 2,
+            "evidence": "Defines one reversible step (check the waitlist upon logging a same-day cancellation), specifies order and stopping rules, and requires no new tools or hours."
+          },
+          "Testability": {
+            "score": 2,
+            "evidence": "Uses prior-four-week baseline, sets a 12-or-fewer unused target, tracks per-cancellation compliance, and names distinct revision paths for missed checks, privacy issues, and insufficient cancellation volume."
+          },
+          "Trade-off reasoning": {
+            "score": 2,
+            "evidence": "Compares against a daily unbooked-slot check, acknowledges that alternative has more upside but unknown reliability within ten minutes, and names three assumptions that could change the outcome."
+          }
+        }
+      }
+    },
+    {
+      "case": "03-repair-cafe",
+      "judge": "claude",
+      "harness": "Claude Code 2.1.330",
+      "model": "claude-sonnet-4-6",
+      "effort": "medium",
+      "herdr_pane": "wG:p1",
+      "trace_ids": [
+        "55974c42-29c6-4d12-87d4-e9dcd1b9c27a"
+      ],
+      "mapping": {
+        "A": "MCP",
+        "B": "Control"
+      },
+      "scores": {
+        "A": {
+          "Fit to evidence": {
+            "score": 2,
+            "evidence": "Explicitly preserves electrical item checks, tracks pre-ticket departures separately, acknowledges the 11-of-44 baseline, and flags that reasons for leaving remain unknown."
+          },
+          "Feasibility and safeguards": {
+            "score": 2,
+            "evidence": "Limits floater to ticketing only (no routing decisions), 20-minute window matches a single rush period, and seated waiting without losing a place directly protects accessibility."
+          },
+          "Actionability": {
+            "score": 2,
+            "evidence": "Names one concrete change (door queue numbers), assigns it to the floater, specifies the minute-20 handoff, and keeps the greeter on spoken routing throughout."
+          },
+          "Testability": {
+            "score": 2,
+            "evidence": "Sets a numeric target (≤6 of ~45 pre-bench departures), defines the comparison event, splits departures before and after ticketing, and lists three named triggers for stopping the trial."
+          },
+          "Trade-off reasoning": {
+            "score": 2,
+            "evidence": "Compares against floater-led routing as the strongest alternative, names the specific assumption (floater routing confidence), and explicitly flags the risk that ticketing merely displaces the wait."
+          }
+        },
+        "B": {
+          "Fit to evidence": {
+            "score": 2,
+            "evidence": "Directly targets idle benches as the core waste, explicitly notes the 18-minute median excluded leavers, tracks the five pre-ticket departures, and separates electrical capacity from front-door flow."
+          },
+          "Feasibility and safeguards": {
+            "score": 2,
+            "evidence": "Floater works from a bench map only for non-electrical items, unassessed electrical items are explicitly barred from benches, and a pre-opening agreement on bench-calling prevents coordination gaps."
+          },
+          "Actionability": {
+            "score": 2,
+            "evidence": "Names one change (two-person intake for 20 minutes), specifies the bench map, assigns roles by item type, and details both the minute-20 handoff and the pre-opening setup step."
+          },
+          "Testability": {
+            "score": 2,
+            "evidence": "Tracks arrival-to-bench (not ticket-to-bench), reports the first 20 minutes separately, watches the minute-20–25 rebuild as a guardrail, and gives three distinct revision triggers tied to different failure modes."
+          },
+          "Trade-off reasoning": {
+            "score": 2,
+            "evidence": "Explicitly compares against immediate queue numbering, explains why that approach may only move the wait downstream, and names the assumption that idle benches are the binding constraint."
+          }
+        }
+      }
+    },
+    {
+      "case": "01-pantry",
+      "judge": "codex",
+      "harness": "Codex CLI 0.171.0",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "herdr_pane": "wH:p1",
+      "trace_ids": [
+        "01a200bf-7ec8-7591-8338-8c4b2345ec74"
+      ],
+      "mapping": {
+        "A": "Control",
+        "B": "MCP"
+      },
+      "scores": {
+        "A": {
+          "Fit to evidence": {
+            "score": 2,
+            "evidence": "Targets slow normal-day exceptions and accounts for the shared-roster constraint and prior floater failure."
+          },
+          "Feasibility and safeguards": {
+            "score": 2,
+            "evidence": "Uses the existing checker without floater coverage while preserving verification, privacy, access, and households’ places."
+          },
+          "Actionability": {
+            "score": 2,
+            "evidence": "Defines one reversible prompt-based change with a 15-minute setup and fallback to the existing process."
+          },
+          "Testability": {
+            "score": 1,
+            "evidence": "Separates routine and exception timings and gives revision triggers, but omits the 20-minute target and explicit throughput guardrail."
+          },
+          "Trade-off reasoning": {
+            "score": 2,
+            "evidence": "Compares a side table against the single-station trial and identifies avoidable exception time as the key uncertainty."
+          }
+        },
+        "B": {
+          "Fit to evidence": {
+            "score": 2,
+            "evidence": "Targets the observed exception cases while addressing roster dependence and unreliable floater availability during restocking."
+          },
+          "Feasibility and safeguards": {
+            "score": 2,
+            "evidence": "Retains existing staffing and required checks while preserving line position and explicitly protecting extra-verification households from added delay."
+          },
+          "Actionability": {
+            "score": 2,
+            "evidence": "Specifies one reversible checklist trial, its setup, its contents, and when to restore the existing process."
+          },
+          "Testability": {
+            "score": 1,
+            "evidence": "Defines comparable waits, the 20-minute target, guardrails, and revision triggers, but leaves sample size and timestamp-recording responsibility unspecified."
+          },
+          "Trade-off reasoning": {
+            "score": 2,
+            "evidence": "Compares the checklist with a staffed side table and explains how the amount of unavoidable verification could change the choice."
+          }
+        }
+      }
+    },
+    {
+      "case": "02-library",
+      "judge": "codex",
+      "harness": "Codex CLI 0.171.0",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "herdr_pane": "wH:p1",
+      "trace_ids": [
+        "01a200bf-7ec8-7893-aeac-a8bf07bb95c5"
+      ],
+      "mapping": {
+        "A": "Control",
+        "B": "MCP"
+      },
+      "scores": {
+        "A": {
+          "Fit to evidence": {
+            "score": 2,
+            "evidence": "Targets documented reasons for missed appointments, separates unused categories, and correctly limits conclusions from earlier calls."
+          },
+          "Feasibility and safeguards": {
+            "score": 2,
+            "evidence": "Uses opt-in calls within ten weekday minutes, protects voicemail privacy, and preserves walk-in access."
+          },
+          "Actionability": {
+            "score": 2,
+            "evidence": "Specifies a reversible month-long reminder pilot with call timing, consent rules, and paper tracking."
+          },
+          "Testability": {
+            "score": 1,
+            "evidence": "Defines comparisons and revision triggers but substitutes a two-slot improvement without assessing the requested four-slot target."
+          },
+          "Trade-off reasoning": {
+            "score": 2,
+            "evidence": "Compares reminders with cancellation refills and identifies staff reach within ten minutes as a deciding uncertainty."
+          }
+        },
+        "B": {
+          "Fit to evidence": {
+            "score": 2,
+            "evidence": "Targets the observed cancellation-refill gap, distinguishes capacity categories, and explicitly acknowledges the four-slot target exceeds three potential refills."
+          },
+          "Feasibility and safeguards": {
+            "score": 2,
+            "evidence": "Uses an opt-in paper waitlist within the daily cap and explicitly protects privacy and access for patrons without phones."
+          },
+          "Actionability": {
+            "score": 2,
+            "evidence": "Defines who checks the waitlist, what triggers calls, their order, and when staff stop."
+          },
+          "Testability": {
+            "score": 2,
+            "evidence": "Sets a four-week comparison and numerical target, counts completed refills, and defines privacy, access, and operational revision triggers."
+          },
+          "Trade-off reasoning": {
+            "score": 2,
+            "evidence": "Compares cancellation-triggered checks with daily openings checks and identifies cancellation volume and short-notice availability as uncertain assumptions."
+          }
+        }
+      }
+    },
+    {
+      "case": "03-repair-cafe",
+      "judge": "codex",
+      "harness": "Codex CLI 0.171.0",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "herdr_pane": "wH:p1",
+      "trace_ids": [
+        "01a200bf-7ec8-74b2-9938-920fd6431a8c"
+      ],
+      "mapping": {
+        "A": "MCP",
+        "B": "Control"
+      },
+      "scores": {
+        "A": {
+          "Fit to evidence": {
+            "score": 2,
+            "evidence": "Early queue numbers with assisted routing address front-door uncertainty and include visitors who leave before ticketing."
+          },
+          "Feasibility and safeguards": {
+            "score": 2,
+            "evidence": "The bounded floater assignment preserves spoken assistance, seated visitors’ places, and required item checks."
+          },
+          "Actionability": {
+            "score": 2,
+            "evidence": "It specifies one reversible 20-minute trial with clear roles and a handoff."
+          },
+          "Testability": {
+            "score": 1,
+            "evidence": "It defines a departure target and revision triggers but does not measure door-to-bench time systematically."
+          },
+          "Trade-off reasoning": {
+            "score": 2,
+            "evidence": "It compares delegated routing against early ticketing and identifies floater confidence and displaced waiting as uncertainties."
+          }
+        },
+        "B": {
+          "Fit to evidence": {
+            "score": 2,
+            "evidence": "It separates intake delays from electrical capacity and explicitly recognizes that the reported median excludes abandoners."
+          },
+          "Feasibility and safeguards": {
+            "score": 1,
+            "evidence": "The staffing limit and electrical checks are explicit, but accessibility and assisted-routing safeguards remain underspecified."
+          },
+          "Actionability": {
+            "score": 2,
+            "evidence": "It gives a concrete 20-minute intake split using the floater, greeter, bench map, and defined handoff."
+          },
+          "Testability": {
+            "score": 1,
+            "evidence": "It measures door-to-bench time and departures with revision triggers but lacks a clear success threshold and assisted-routing outcome checks."
+          },
+          "Trade-off reasoning": {
+            "score": 2,
+            "evidence": "It compares immediate numbering with split intake and identifies visitor-calling arrangements and item mix as assumptions affecting the choice."
+          }
+        }
+      }
+    },
+    {
+      "case": "01-pantry",
+      "judge": "gemini",
+      "harness": "agy 1.5.14",
+      "model": "gemini-4-neon-medium",
+      "effort": "medium",
+      "herdr_pane": "wJ:p1",
+      "trace_ids": [
+        "4c705ec5-699d-496e-b46a-96d6e7bb20fe"
+      ],
+      "mapping": {
+        "A": "Control",
+        "B": "MCP"
+      },
+      "scores": {
+        "A": {
+          "Actionability": {
+            "evidence": "Names one reversible change (standardized short prompts for the three common exception cases at check-in) and explains how the existing volunteer sets it up in 15 minutes and falls back to the full process.",
+            "score": 2
+          },
+          "Feasibility and safeguards": {
+            "evidence": "Fits existing staffing and the 15-minute setup without pulling anyone off-station, and explicitly protects privacy, access, and exception priority by handling cases in order without added paperwork or moving households out of line.",
+            "score": 2
+          },
+          "Fit to evidence": {
+            "evidence": "Targets the three normal-day check-in exception types behind the 3–5 minute delays and accounts for the single-roster limit and the floater having to leave a second station to restock.",
+            "score": 2
+          },
+          "Testability": {
+            "evidence": "Distinguishes routine from exception check-ins and gives clear revision triggers, but omits the 20-minute target, leaves arrival-to-pickup measurement as an unspecified spot-check, and lacks a throughput guardrail.",
+            "score": 1
+          },
+          "Trade-off reasoning": {
+            "evidence": "Compares against a private side table, explains the staffing and place-holding conditions under which it would be stronger, and names avoidable versus required exception time as the key uncertainty.",
+            "score": 2
+          }
+        },
+        "B": {
+          "Actionability": {
+            "evidence": "Names one reversible first change (a one-page verification checklist beside the roster) with concrete 15-minute drafting steps for the checker and an explicit stop-and-revert rule.",
+            "score": 2
+          },
+          "Feasibility and safeguards": {
+            "evidence": "Works within existing staffing and the 15-minute setup without relying on the floater during restocking, and safeguards affected households by handling exceptions in place, preserving priority and required checks, and keeping slips anonymous.",
+            "score": 2
+          },
+          "Fit to evidence": {
+            "evidence": "Targets the three observed normal-day check-in exceptions (3–5 minutes) and accounts for the single-roster constraint, the 9:20–9:40 restocking peak pulling the floater away, and baseline limitations.",
+            "score": 2
+          },
+          "Testability": {
+            "evidence": "Defines an anonymous arrival-to-pickup sample distinguishing routine from extra-verification outcomes, sets the 20-minute target, includes throughput, equity, and handoff-queue guardrails, and specifies concrete revision triggers.",
+            "score": 2
+          },
+          "Trade-off reasoning": {
+            "evidence": "Compares the checklist against a staffed side table by citing restocking-peak floater unavailability and prompt-return risks, and identifies avoidable lookup versus required verification time as the assumption that could change the choice.",
+            "score": 2
+          }
+        }
+      }
+    },
+    {
+      "case": "02-library",
+      "judge": "gemini",
+      "harness": "agy 1.5.14",
+      "model": "gemini-4-neon-medium",
+      "effort": "medium",
+      "herdr_pane": "wJ:p1",
+      "trace_ids": [
+        "8135515e-70c7-46d1-b457-95a3a2b34054"
+      ],
+      "mapping": {
+        "A": "MCP",
+        "B": "Control"
+      },
+      "scores": {
+        "A": {
+          "Actionability": {
+            "evidence": "Specifies one reversible four-week workflow—having the staff member who logs a weekday cancellation call opt-in waitlist patrons in order within existing resources and clear stopping rules.",
+            "score": 2
+          },
+          "Feasibility and safeguards": {
+            "evidence": "Respects the ten-minute daily cap and weekday staffing using the existing paper waitlist, while protecting privacy (no voicemail details) and non-phone/walk-in access.",
+            "score": 2
+          },
+          "Fit to evidence": {
+            "evidence": "Separates unused capacity into unbooked, missed, and cancelled slots, targets the three unworked same-day cancellations, incorporates the privacy constraint, and notes that refilling all three still falls one short of the four-slot target.",
+            "score": 2
+          },
+          "Testability": {
+            "evidence": "Defines a four-week baseline comparison across consistent categories, a target of 12 or fewer unused slots, privacy/access/time guardrails, and clear revision triggers including pivoting to unbooked slots.",
+            "score": 2
+          },
+          "Trade-off reasoning": {
+            "evidence": "Weighs the cancellation-triggered check against a higher-upside daily openings check under the ten-minute limit and names key uncertainties like cancellation volume and short-notice patron availability.",
+            "score": 2
+          }
+        },
+        "B": {
+          "Actionability": {
+            "evidence": "Defines one reversible month-long trial of brief day-before opt-in reminder calls with concrete call scripts, voicemail rules, a paper tally, and no added weekend staffing.",
+            "score": 2
+          },
+          "Feasibility and safeguards": {
+            "evidence": "Stays within the existing ten weekday minutes without adding weekend coverage, preserves walk-in access, and enforces separate voicemail opt-in with neutral messages only.",
+            "score": 2
+          },
+          "Fit to evidence": {
+            "evidence": "Targets the five of six addressable missed appointments, notes reminders will not fix unbooked near-closing slots, avoids overclaiming the prior trial, and shapes voicemail around the privacy complaint.",
+            "score": 2
+          },
+          "Testability": {
+            "evidence": "Compares the same four slot categories against the 16-of-48 baseline, sets a plausible target of 4 or fewer misses and 14 or fewer unused slots with time/privacy guardrails, and specifies concrete stop and pivot triggers.",
+            "score": 2
+          },
+          "Trade-off reasoning": {
+            "evidence": "Compares reminders against the opt-in waitlist alternative (capped at three cancellations with unknown notice) and identifies how many patrons staff can reach in ten minutes as the key deciding unknown.",
+            "score": 2
+          }
+        }
+      }
+    },
+    {
+      "case": "03-repair-cafe",
+      "judge": "gemini",
+      "harness": "agy 1.5.14",
+      "model": "gemini-4-neon-medium",
+      "effort": "medium",
+      "herdr_pane": "wJ:p1",
+      "trace_ids": [
+        "a398b57e-2bf4-4bd3-bbfb-e3311255f2f4"
+      ],
+      "mapping": {
+        "A": "Control",
+        "B": "MCP"
+      },
+      "scores": {
+        "A": {
+          "Actionability": {
+            "evidence": "Specifies one reversible 20-minute two-person intake trial using the existing floater, greeter, a simple bench map, a pre-opening caller agreement, and a clear handoff.",
+            "score": 2
+          },
+          "Feasibility and safeguards": {
+            "evidence": "Fits staffing limits with a 20-minute floater burst and preserves electrical item checks, but omits an explicit accessibility safeguard such as seated waiting or spoken routing support.",
+            "score": 1
+          },
+          "Fit to evidence": {
+            "evidence": "Targets the pre-ticket bottleneck using the 11-of-44 departure baseline, explicitly notes that the 18-minute median excludes leavers, and separates front-door sorting from electrical capacity.",
+            "score": 2
+          },
+          "Testability": {
+            "evidence": "Defines arrival-to-bench and departure comparisons plus clear revision triggers, but lacks a concrete success target and guardrails tracking assisted-routing outcomes.",
+            "score": 1
+          },
+          "Trade-off reasoning": {
+            "evidence": "Compares against immediate door numbering, notes the risk of shifting waits post-ticketing, and identifies key uncertainties such as who calls visitors and the crowd's item mix.",
+            "score": 2
+          }
+        },
+        "B": {
+          "Actionability": {
+            "evidence": "Names one reversible 20-minute door-numbering trial and details concrete roles for the floater, greeter, and minute-20 handoff with available resources.",
+            "score": 2
+          },
+          "Feasibility and safeguards": {
+            "evidence": "Fits the 20-minute floater limit with a clean handoff and explicitly safeguards accessibility through spoken explanations, seated waiting, assisted routing, and required electrical item checks.",
+            "score": 2
+          },
+          "Fit to evidence": {
+            "evidence": "Targets pre-ticket abandonment with an early queue marker and spoken routing against the 11-of-44 baseline, but does not address the reported wait's abandonment bias or separate sorting from electrical capacity.",
+            "score": 1
+          },
+          "Testability": {
+            "evidence": "Defines the comparison to 11 of 44, a concrete target of at most 6 of roughly 45 departures, guardrails for routing help and item checks, and explicit stop and revision triggers for shifted waits.",
+            "score": 2
+          },
+          "Trade-off reasoning": {
+            "evidence": "Compares against floater-led routine routing, names uncertainty about floater routing confidence as the deciding assumption, and notes the risk of only moving the wait after ticketing.",
+            "score": 2
+          }
+        }
+      }
+    }
+  ]
+}

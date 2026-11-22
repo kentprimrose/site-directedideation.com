@@ -1,5 +1,8 @@
 # Directed Ideation Test Harness: Design
 
+This design compares method text against a control. For paired Pi-Bolt sessions
+with live tools enabled in only one arm, see [Live MCP evaluation](LIVE_MCP.md).
+
 ## Purpose
 
 A repeatable test of whether the directed-ideation method improves answers to strategic problems. For each problem, the answerer works it in two arms: `method` (following the three directed-ideation stages) and `control` (solving it directly). Three model families fill three roles, so no model grades its own work and every model plays every role.

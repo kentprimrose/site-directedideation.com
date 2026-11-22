@@ -2,11 +2,33 @@
 
 import csv
 import json
+import re
+import runpy
 import subprocess
 import sys
 from pathlib import Path
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts/ideation_eval/harness.py"
+
+
+def test_live_cases_load_and_have_interview_scoring_keys():
+    """The live case bank also works with the method-text fixture loader."""
+    load_problems = runpy.run_path(str(SCRIPT))["load_problems"]
+    cases_dir = SCRIPT.parents[2] / "docs/test_plan/live_cases"
+    cases = load_problems(cases_dir, pilot=False)
+    assert len(cases) >= 3
+    assert load_problems(cases_dir, pilot=True) == cases[:1]
+    expected_keys = (
+        "baseline",
+        "bottleneck",
+        "prior_attempt",
+        "constraints",
+        "success",
+    )
+    for case in cases:
+        assert (cases_dir / f"{case['id']}.json").is_file()
+        keys = re.findall(r"^\[(\w+)\] \S", case["hidden_brief"], re.M)
+        assert tuple(keys) == expected_keys
 
 
 def test_pilot_and_role_isolation(tmp_path):
@@ -83,19 +105,22 @@ else:
     assert subprocess.run(cmd, capture_output=True).returncode != 0
 
 
-def test_validation_and_turn_limit(tmp_path):
+def test_validation_and_turn_limit(tmp_path, monkeypatch):
     """Validate scoring and cap dialogues without fabricating a FINAL."""
     import importlib.util
 
     spec = importlib.util.spec_from_file_location("eval_harness", SCRIPT)
+    assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     import pytest
 
     with pytest.raises(ValueError):
         module.parse_scores('{"usefulness": 9}')
-    module.invoke = lambda model, prompt: (
-        "QUESTION: More?" if model == "a" else "Unknown"
+    monkeypatch.setattr(
+        module,
+        "invoke",
+        lambda model, _prompt: "QUESTION: More?" if model == "a" else "Unknown",
     )
     transcript, status = module.run_dialogue(
         {"statement": "p", "hidden_brief": "b"},
